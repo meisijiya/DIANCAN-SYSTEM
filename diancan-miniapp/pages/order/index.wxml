@@ -1,0 +1,138 @@
+<view class="order-page">
+  <view class="order-page__glow order-page__glow-a"></view>
+  <view class="order-page__glow order-page__glow-b"></view>
+
+  <view class="order-topbar">
+    <view class="order-topbar__title">订单列表</view>
+    <view class="order-topbar__hint">{{tableId ? ('桌号 ' + tableId) : '当前桌台'}}</view>
+  </view>
+
+  <view class="order-stats" wx:if="{{orders.length > 0}}">
+    <view class="order-stats__card">
+      <text class="order-stats__label">订单数</text>
+      <text class="order-stats__value">{{orders.length}}</text>
+    </view>
+    <view class="order-stats__card">
+      <text class="order-stats__label">待支付</text>
+      <text class="order-stats__value">{{unpaidOrderCount}}</text>
+    </view>
+    <view class="order-stats__card">
+      <text class="order-stats__label">已完成菜品</text>
+      <text class="order-stats__value">{{completedDishCount}}</text>
+    </view>
+  </view>
+
+  <view class="order-section" wx:if="{{orders.length > 0}}">
+    <view class="order-card" wx:for="{{orders}}" wx:key="id" wx:for-item="order" data-order-id="{{order.id}}" bindtap="openOrderDetail">
+      <view class="order-card__head">
+        <view class="order-card__meta">
+          <view class="order-card__store">堂食 · 当前桌台</view>
+          <view class="order-card__time">{{order.timeText}}</view>
+        </view>
+        <view class="order-card__status status-{{order.status}}">{{order.statusText}}</view>
+      </view>
+
+      <view class="order-card__body">
+        <view class="order-card__summary">
+          <view class="order-card__thumbs">
+            <image
+              wx:for="{{order.items}}"
+              wx:key="id"
+              wx:for-item="dish"
+              wx:if="{{index < 3 && dish.dishImageUrl && !dish.imageError}}"
+              class="order-card__thumb"
+              src="{{dish.dishImageUrl}}"
+              mode="aspectFill"
+              data-order-id="{{order.id}}"
+              data-item-id="{{dish.id}}"
+              binderror="onDishImageError"
+            />
+            <view wx:if="{{order.items.length === 0}}" class="order-card__thumb order-card__thumb--empty">暂无</view>
+          </view>
+          <view class="order-card__amount">
+            <text class="order-card__price">¥{{order.actualAmount}}</text>
+            <text class="order-card__count">共 {{order.items.length}} 件</text>
+          </view>
+        </view>
+
+        <view class="order-card__dishline">{{order.items[0].dishName}}{{order.items.length > 1 ? ' 等' : ''}}</view>
+      </view>
+
+      <view class="order-card__foot">
+        <view class="order-card__action ghost" bindtap="openOrderDetail" data-order-id="{{order.id}}">查看详情</view>
+        <button class="order-card__action primary" wx:if="{{order.status === 0}}" data-order-id="{{order.id}}" catchtap="goPayment">去支付</button>
+        <button class="order-card__action primary" wx:if="{{order.status === 1 && !order.reviewed}}" data-order-id="{{order.id}}" data-status="{{order.status}}" catchtap="goReview">去评价</button>
+        <view class="order-card__done" wx:if="{{order.reviewed}}">已评价</view>
+      </view>
+    </view>
+  </view>
+
+  <view wx:else class="order-empty">
+    <image class="order-empty__icon" src="/assets/tabbar/order.png" mode="aspectFit" />
+    <view class="order-empty__title">还没有订单</view>
+    <view class="order-empty__desc">先去点餐页选菜，下单后这里会展示支付和出餐进度。</view>
+    <button class="order-empty__btn" bindtap="goMenuForAddItem">去点餐</button>
+  </view>
+
+  <view class="detail-mask" wx:if="{{detailVisible}}" bindtap="closeOrderDetail">
+    <view class="detail-sheet" catchtap="closeOrderDetail">
+      <view class="detail-card" catchtap="noop">
+        <view class="detail-card__topbar">
+          <view class="detail-card__title">订单详情</view>
+          <view class="detail-card__close" bindtap="closeOrderDetail">×</view>
+        </view>
+
+        <view class="detail-banner">
+          <view class="detail-banner__status">{{currentOrderDetail.statusText}}</view>
+          <view class="detail-banner__desc">{{currentOrderDetail.status === 1 ? '订单已支付，可继续查看出餐和评价状态' : '订单待支付，完成后会继续同步出餐进度'}}</view>
+        </view>
+
+        <view class="detail-store">
+          <view class="detail-store__title">当前桌台订单</view>
+          <view class="detail-store__meta">{{currentOrderDetail.timeText}}</view>
+          <view class="detail-store__line">订单号 {{currentOrderDetail.orderNo || currentOrderDetail.id}}</view>
+        </view>
+
+        <view class="detail-items">
+          <view class="detail-item" wx:for="{{currentOrderDetail.items}}" wx:key="id">
+            <image
+              wx:if="{{item.dishImageUrl && !item.imageError}}"
+              class="detail-item__thumb"
+              src="{{item.dishImageUrl}}"
+              mode="aspectFill"
+              data-order-id="{{currentOrderDetail.id}}"
+              data-item-id="{{item.id}}"
+              binderror="onDishImageError"
+            />
+            <view wx:else class="detail-item__thumb detail-item__thumb--empty">无图</view>
+            <view class="detail-item__info">
+              <view class="detail-item__top">
+                <text class="detail-item__name">{{item.dishName}}</text>
+                <text class="detail-item__price">¥{{item.price}}</text>
+              </view>
+              <view class="detail-item__sub">{{item.remark || '默认口味'}} · x{{item.quantity}}</view>
+              <view class="detail-item__tag state-{{item.status}}">{{item.statusText}}</view>
+            </view>
+          </view>
+        </view>
+
+        <view class="detail-summary">
+          <view class="detail-summary__row">
+            <text>菜品数量</text>
+            <text>共 {{currentOrderDetail.items.length}} 份</text>
+          </view>
+          <view class="detail-summary__row detail-summary__row--strong">
+            <text>总计</text>
+            <text>¥{{currentOrderDetail.actualAmount}}</text>
+          </view>
+        </view>
+
+        <view class="detail-actions">
+          <button class="detail-actions__btn ghost" bindtap="closeOrderDetail">我知道了</button>
+          <button class="detail-actions__btn primary" wx:if="{{currentOrderDetail.status === 0}}" data-order-id="{{currentOrderDetail.id}}" catchtap="goPayment">去支付</button>
+          <button class="detail-actions__btn primary" wx:if="{{currentOrderDetail.status === 1 && !currentOrderDetail.reviewed}}" data-order-id="{{currentOrderDetail.id}}" data-status="{{currentOrderDetail.status}}" catchtap="goReview">去评价</button>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

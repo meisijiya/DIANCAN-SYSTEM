@@ -1,0 +1,38 @@
+{
+  "official": true,
+  "name": "鸢尾紫",
+  "desc": "更强调品牌感和识别度，适合会员、营销、优惠券等偏运营策划模块。",
+  "version": "2.1.0",
+  "themeScheme": "light",
+  "themeColor": "#7336ee",
+  "themeRadius": 14,
+  "isInfoFollowPrimary": true,
+  "otherColor": {
+    "info": "#8452f8",
+    "success": "#22a06b",
+    "warning": "#d9911d",
+    "error": "#df5d74"
+  },
+  "tokens": {
+    "light": {
+      "colors": {
+        "container": "rgb(249, 246, 255)",
+        "layout": "rgb(232, 223, 251)",
+        "inverted": "rgb(41, 27, 75)",
+        "base-text": "rgb(45, 32, 79)"
+      },
+      "boxShadow": {
+        "header": "0 14px 32px rgb(115, 54, 238, 0.1)",
+        "sider": "12px 0 28px 0 rgb(115, 54, 238, 0.08)",
+        "tab": "0 10px 24px rgb(115, 54, 238, 0.08)"
+      }
+    },
+    "dark": {
+      "colors": {
+        "container": "rgb(29, 24, 40)",
+        "layout": "rgb(20, 16, 30)",
+        "base-text": "rgb(235, 229, 248)"
+      }
+    }
+  }
+}

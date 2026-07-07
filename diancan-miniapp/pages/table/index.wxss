@@ -1,0 +1,282 @@
+.table-page {
+  padding-bottom: 20rpx;
+}
+
+.hero-wrap {
+  position: relative;
+  margin-bottom: 18rpx;
+  border-radius: 24rpx;
+  overflow: hidden;
+  background: linear-gradient(140deg, #6f281e 0%, #9f3d2e 58%, #d29e8d 100%);
+  min-height: 230rpx;
+  box-shadow: 0 18rpx 36rpx rgba(159, 61, 46, 0.24);
+}
+
+.hero-glow {
+  position: absolute;
+  width: 240rpx;
+  height: 240rpx;
+  border-radius: 999rpx;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.hero-glow-left {
+  left: -72rpx;
+  top: -76rpx;
+}
+
+.hero-glow-right {
+  right: -84rpx;
+  bottom: -106rpx;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  padding: 30rpx 28rpx;
+}
+
+.hero-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6rpx 14rpx;
+  border-radius: 999rpx;
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  font-size: 20rpx;
+  letter-spacing: 1rpx;
+}
+
+.hero-title {
+  margin-top: 14rpx;
+  color: #fff;
+  font-size: 42rpx;
+  font-weight: 700;
+}
+
+.hero-sub {
+  margin-top: 8rpx;
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 24rpx;
+}
+
+.hero-table {
+  margin-top: 18rpx;
+  padding: 14rpx 16rpx;
+  border-radius: 14rpx;
+  background: rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20rpx;
+}
+
+.hero-table-label {
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 22rpx;
+}
+
+.hero-table-value {
+  color: #fff;
+  font-size: 24rpx;
+  font-weight: 600;
+}
+
+.entry-card {
+  border: 1rpx solid #eaded7;
+}
+
+.section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.scene-tag {
+  padding: 6rpx 14rpx;
+  border-radius: 999rpx;
+  background: #f8ebe7;
+  color: #9f3d2e;
+  font-size: 20rpx;
+  font-weight: 600;
+}
+
+.agreement-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12rpx;
+  margin-top: 18rpx;
+}
+
+.agreement-check {
+  width: 28rpx;
+  height: 28rpx;
+  margin-top: 4rpx;
+  border-radius: 999rpx;
+  border: 2rpx solid rgba(159, 61, 46, 0.24);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 18rpx;
+  font-weight: 800;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.agreement-check.checked {
+  border-color: #9f3d2e;
+  background: #9f3d2e;
+}
+
+.agreement-text {
+  color: #667085;
+  font-size: 22rpx;
+  line-height: 1.6;
+}
+
+.agreement-link {
+  color: #9f3d2e;
+  font-weight: 700;
+}
+
+.login-btn {
+  margin-top: 22rpx;
+}
+
+.login-btn--disabled {
+  background: #d6d8dd !important;
+  color: #f8fafc !important;
+}
+
+.input-box {
+  margin-top: 16rpx;
+  padding: 16rpx;
+  border-radius: 14rpx;
+  background: #f8fafc;
+}
+
+.input-label {
+  color: #667085;
+  font-size: 22rpx;
+}
+
+.input {
+  margin-top: 10rpx;
+  padding: 18rpx 20rpx;
+  background: #fff;
+  border-radius: 12rpx;
+  font-size: 26rpx;
+  border: 1rpx solid #e4e7ec;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.between {
+  justify-content: space-between;
+}
+
+.row button {
+  flex: 1;
+}
+
+.entry-card .row {
+  margin-top: 16rpx;
+}
+
+.table-card {
+  border: 1rpx solid #eaded7;
+}
+
+.table-meta {
+  margin-top: 16rpx;
+  border-radius: 14rpx;
+  background: #fff7f3;
+  padding: 14rpx 16rpx;
+}
+
+.meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 44rpx;
+}
+
+.meta-row + .meta-row {
+  margin-top: 6rpx;
+}
+
+.label {
+  color: #98a2b3;
+  font-size: 24rpx;
+}
+
+.value {
+  color: #1d2939;
+  font-size: 26rpx;
+  font-weight: 500;
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 88rpx;
+  padding: 5rpx 14rpx;
+  border-radius: 999rpx;
+  font-size: 20rpx;
+  font-weight: 600;
+}
+
+.status.s0 {
+  background: #ecfdf3;
+  color: #027a48;
+}
+
+.status.s1 {
+  background: #f6eee3;
+  color: #9a7340;
+}
+
+.status.s2 {
+  background: #f8ebe7;
+  color: #9f3d2e;
+}
+
+.status.s3 {
+  background: #f7ebe3;
+  color: #8b4f2c;
+}
+
+.enter-btn {
+  margin-top: 20rpx;
+}
+
+.small-title {
+  font-size: 30rpx;
+}
+
+.table-card .btn-muted,
+.debug-card .btn-muted {
+  margin-top: 14rpx;
+}
+
+.split {
+  height: 1rpx;
+  background: #eef2f6;
+  margin: 20rpx 0;
+}
+
+.debug-card {
+  border: 1rpx dashed #e4e7ec;
+  background: rgba(255, 255, 255, 0.86);
+}
+
+
+

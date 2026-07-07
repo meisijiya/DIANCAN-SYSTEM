@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.scaffold.modules.member.mapper.MemberProfileMapper">
+
+    <select id="selectByIdForUpdate" resultType="com.scaffold.modules.member.entity.MemberProfile">
+        SELECT *
+        FROM member_profile
+        WHERE id = #{id}
+          AND deleted = 0
+        FOR UPDATE
+    </select>
+
+    <select id="selectByUserIdForUpdate" resultType="com.scaffold.modules.member.entity.MemberProfile">
+        SELECT *
+        FROM member_profile
+        WHERE user_id = #{userId}
+          AND deleted = 0
+        LIMIT 1
+        FOR UPDATE
+    </select>
+</mapper>

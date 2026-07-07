@@ -1,0 +1,38 @@
+{
+  "official": true,
+  "name": "海湾蓝",
+  "desc": "默认运营主题，明亮清爽，适合日常收银、桌台与配置管理场景。",
+  "version": "2.1.0",
+  "themeScheme": "light",
+  "themeColor": "#0a63f0",
+  "themeRadius": 14,
+  "isInfoFollowPrimary": true,
+  "otherColor": {
+    "info": "#0f8ff5",
+    "success": "#21a67a",
+    "warning": "#f0a11a",
+    "error": "#e0564a"
+  },
+  "tokens": {
+    "light": {
+      "colors": {
+        "container": "rgb(245, 250, 255)",
+        "layout": "rgb(220, 236, 255)",
+        "inverted": "rgb(15, 35, 68)",
+        "base-text": "rgb(21, 44, 76)"
+      },
+      "boxShadow": {
+        "header": "0 14px 32px rgb(10, 99, 240, 0.1)",
+        "sider": "12px 0 28px 0 rgb(10, 99, 240, 0.08)",
+        "tab": "0 10px 24px rgb(10, 99, 240, 0.08)"
+      }
+    },
+    "dark": {
+      "colors": {
+        "container": "rgb(28, 28, 28)",
+        "layout": "rgb(18, 18, 18)",
+        "base-text": "rgb(224, 224, 224)"
+      }
+    }
+  }
+}

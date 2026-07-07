@@ -1,0 +1,144 @@
+const { isLoggedIn, wxLogin, phoneLogin } = require('../../utils/auth');
+const { KEYS, get, remove } = require('../../utils/storage');
+
+Page({
+  data: {
+    statusBarHeight: 0,
+    navBarHeight: 44,
+    loggedIn: false,
+    userInfo: null,
+    agreeProtocol: false
+  },
+
+  onLoad() {
+    this.initNavBar();
+  },
+
+  onShow() {
+    const loggedIn = isLoggedIn();
+    const userInfo = get(KEYS.USER_INFO) || null;
+    this.setData({ loggedIn, userInfo });
+  },
+
+  initNavBar() {
+    const { statusBarHeight } = wx.getWindowInfo();
+    const menuBtn = wx.getMenuButtonBoundingClientRect();
+    this.setData({
+      statusBarHeight,
+      navBarHeight: (menuBtn.top - statusBarHeight) * 2 + menuBtn.height
+    });
+  },
+
+  /* ========== 登录 ========== */
+  async handlePhoneLogin(e) {
+    if (!this.data.agreeProtocol) {
+      wx.showToast({ title: '请先勾选用户协议与隐私政策', icon: 'none' });
+      return;
+    }
+    if (!e.detail.code) {
+      wx.showToast({ title: e.detail.errMsg || '请授权手机号', icon: 'none' });
+      return;
+    }
+    wx.showLoading({ title: '登录中', mask: true });
+    try {
+      const code = await wxLogin();
+      await phoneLogin(code, e.detail.code);
+      const userInfo = get(KEYS.USER_INFO) || null;
+      this.setData({ loggedIn: true, userInfo });
+      wx.showToast({ title: '登录成功', icon: 'none' });
+    } catch (err) {
+      wx.showToast({ title: err.message || '登录失败', icon: 'none', duration: 2000 });
+    } finally {
+      wx.hideLoading();
+    }
+  },
+
+  toggleAgreeProtocol() {
+    this.setData({ agreeProtocol: !this.data.agreeProtocol });
+  },
+
+  openUserAgreement() {
+    wx.showModal({
+      title: '用户协议',
+      content: '登录前请阅读并同意《用户协议》。当前先使用说明弹窗占位，后续可接正式协议页。',
+      showCancel: false
+    });
+  },
+
+  openPrivacyPolicy() {
+    wx.showModal({
+      title: '隐私政策',
+      content: '登录前请阅读并同意《隐私政策》。当前先使用说明弹窗占位，后续可接正式隐私政策页。',
+      showCancel: false
+    });
+  },
+
+  handleLogout() {
+    wx.showModal({
+      title: '退出登录',
+      content: '确定退出当前账号吗？退出后仍可继续浏览和点餐。',
+      success: (res) => {
+        if (!res.confirm) return;
+        remove(KEYS.TOKEN);
+        remove(KEYS.OPENID);
+        remove(KEYS.USER_INFO);
+        this.setData({ loggedIn: false, userInfo: null });
+        wx.showToast({ title: '已退出登录', icon: 'none' });
+      }
+    });
+  },
+
+  /* ========== 导航 ========== */
+  goMyReview() {
+    wx.navigateTo({ url: '/pages/my-review/index' });
+  },
+
+  goOrder() {
+    wx.switchTab({ url: '/pages/order/index' });
+  },
+
+  goCoupon() {
+    wx.navigateTo({ url: '/pages/coupon/index' });
+  },
+
+  goMember() {
+    wx.navigateTo({ url: '/pages/member/index' });
+  },
+
+  handleQuickEntryAction() {
+    if (this.data.loggedIn) {
+      this.handleLogout();
+      return;
+    }
+    this.goFeedback();
+  },
+
+  goFeedback() {
+    wx.navigateTo({ url: '/pages/feedback/index' });
+  },
+
+  goAbout() {
+    wx.showModal({
+      title: '关于云点餐',
+      content: '云点餐 — 智能堂食点单系统\n版本 1.0.0\n\n致力于为餐厅提供便捷的扫码点餐体验',
+      showCancel: false
+    });
+  },
+
+  clearCache() {
+    wx.showModal({
+      title: '清除缓存',
+      content: '确定要清除本地缓存吗？这将清除桌台信息和本地记录。',
+      success: (res) => {
+        if (res.confirm) {
+          remove(KEYS.TABLE);
+          remove(KEYS.TOKEN);
+          remove(KEYS.OPENID);
+          remove(KEYS.USER_INFO);
+          wx.showToast({ title: '缓存已清除', icon: 'none' });
+          this.setData({ loggedIn: false, userInfo: null });
+        }
+      }
+    });
+  }
+});

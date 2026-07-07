@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.scaffold.modules.coupon.mapper.UserCouponMapper">
+
+    <insert id="batchInsert">
+        INSERT INTO user_coupon
+        (id, template_id, user_id, username, nickname, phone, coupon_name, coupon_type, threshold_amount, discount_amount,
+         discount_rate, source_type, status, received_time, valid_from, valid_to, used_time, order_id, grant_task_id,
+         available_weekdays,
+         create_by, update_by, create_time, update_time, deleted)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.id},
+            #{item.templateId},
+            #{item.userId},
+            #{item.username},
+            #{item.nickname},
+            #{item.phone},
+            #{item.couponName},
+            #{item.couponType},
+            #{item.thresholdAmount},
+            #{item.discountAmount},
+            #{item.discountRate},
+            #{item.sourceType},
+            #{item.status},
+            #{item.receivedTime},
+            #{item.validFrom},
+            #{item.validTo},
+            #{item.usedTime},
+            #{item.orderId},
+            #{item.grantTaskId},
+            #{item.availableWeekdays},
+            #{item.createBy},
+            #{item.updateBy},
+            #{item.createTime},
+            #{item.updateTime},
+            #{item.deleted}
+            )
+        </foreach>
+    </insert>
+
+</mapper>

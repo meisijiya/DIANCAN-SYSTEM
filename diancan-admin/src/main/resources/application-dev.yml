@@ -1,0 +1,64 @@
+# 开发环境配置
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/diancan-system?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: root
+    password: 123456
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: 123456
+      database: 0
+      timeout: 10000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-wait: -1ms
+          max-idle: 8
+          min-idle: 0
+
+# 开发环境日志级别
+logging:
+  level:
+    com.scaffold: debug
+    org.springframework: info
+
+# MinIO 文件上传配置（开发环境）
+storage:
+  minio:
+    enabled: ${MINIO_ENABLED:true}
+    endpoint: ${MINIO_ENDPOINT:http://127.0.0.1:9000}
+    access-key: ${MINIO_ACCESS_KEY:minioadmin}
+    secret-key: ${MINIO_SECRET_KEY:minioadmin}
+    bucket: ${MINIO_BUCKET:dish-images}
+    public-url: ${MINIO_PUBLIC_URL:http://127.0.0.1:9000}
+    auto-create-bucket: ${MINIO_AUTO_CREATE_BUCKET:true}
+    max-file-size-mb: ${MINIO_MAX_FILE_SIZE_MB:5}
+    private-bucket: ${MINIO_PRIVATE_BUCKET:true}
+    presign-expire-seconds: ${MINIO_PRESIGN_EXPIRE_SECONDS:3600}
+
+
+# 微信小程序码配置
+wechat:
+  miniapp:
+    enabled: ${WECHAT_MINIAPP_ENABLED:false}
+    app-id: ${WECHAT_MINIAPP_APP_ID:}
+    app-secret: ${WECHAT_MINIAPP_APP_SECRET:}
+    page: ${WECHAT_MINIAPP_PAGE:pages/index/index}
+    env-version: ${WECHAT_MINIAPP_ENV_VERSION:release}
+    width: ${WECHAT_MINIAPP_WIDTH:430}
+
+# 微信支付配置
+wx:
+  pay:
+    enabled: ${WX_PAY_ENABLED:false}
+    app-id: ${WX_PAY_APP_ID:}
+    mch-id: ${WX_PAY_MCH_ID:}
+    api-v3-key: ${WX_PAY_API_V3_KEY:}
+    merchant-serial-no: ${WX_PAY_MERCHANT_SERIAL_NO:}
+    private-key-path: ${WX_PAY_PRIVATE_KEY_PATH:}
+    public-key-path: ${WX_PAY_PUBLIC_KEY_PATH:}
+    notify-url: ${WX_PAY_NOTIFY_URL:https://your-domain.com/api/wx/pay/notify}

@@ -1,0 +1,2180 @@
+@import './reset.css';
+@import './nprogress.css';
+@import './transition.css';
+
+html,
+body,
+#app {
+  height: 100%;
+  text-autospace: normal;
+}
+
+html {
+  overflow-x: hidden;
+  color: rgb(var(--base-text-color));
+  background: linear-gradient(180deg, var(--admin-layout-start) 0%, var(--admin-layout-end) 100%);
+  --admin-accent-rgb: 15, 111, 255;
+  --admin-accent-strong: #0f6fff;
+  --admin-accent-soft: #e8f1ff;
+  --admin-accent-gradient-start: #39a2ff;
+  --admin-accent-gradient-end: #0f6fff;
+  --admin-layout-start: #f4f9ff;
+  --admin-layout-end: #e6f0ff;
+  --admin-slate-rgb: 18, 48, 85;
+  --admin-success-rgb: 33, 166, 122;
+  --admin-info-rgb: 20, 163, 255;
+  --admin-warning-rgb: 240, 161, 26;
+  --admin-error-rgb: 224, 86, 74;
+}
+
+html.dark {
+  background: linear-gradient(180deg, #020305 0%, #060911 45%, #090d17 100%);
+  color: rgb(var(--base-text-color));
+}
+
+/* 卡片微阴影 */
+.n-card {
+  border: 1px solid rgba(var(--admin-accent-rgb), 0.08);
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at top right, rgba(var(--admin-accent-rgb), 0.1), transparent 22%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), color-mix(in srgb, var(--admin-layout-start) 46%, white));
+  box-shadow:
+    0 18px 34px rgba(var(--admin-accent-rgb), 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+}
+
+.n-card:hover {
+  box-shadow:
+    0 24px 42px rgba(var(--admin-accent-rgb), 0.13),
+    inset 0 1px 0 rgba(255, 255, 255, 0.88);
+  border-color: rgba(var(--admin-accent-rgb), 0.14);
+}
+
+/* 统计卡片 hover 微上浮 */
+.n-card:has(.n-statistic) {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.n-card:has(.n-statistic):hover {
+  transform: translateY(-2px);
+}
+
+.n-form {
+  border-radius: 18px;
+}
+
+.n-input,
+.n-base-selection,
+.n-date-picker,
+.n-input-number {
+  border-radius: 14px !important;
+}
+
+.n-input .n-input-wrapper,
+.n-input-number .n-input-wrapper,
+.n-base-selection .n-base-selection-label,
+.n-date-picker .n-input-wrapper {
+  background: rgba(252, 254, 255, 0.97) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.n-input:not(.n-input--disabled),
+.n-input-number:not(.n-input-number--disabled),
+.n-base-selection:not(.n-base-selection--disabled),
+.n-date-picker:not(.n-date-picker--disabled) {
+  border: 1px solid rgba(var(--admin-accent-rgb), 0.12) !important;
+}
+
+.n-data-table {
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid rgba(var(--admin-accent-rgb), 0.08);
+  background: color-mix(in srgb, var(--admin-layout-start) 34%, white);
+}
+
+.n-data-table .n-data-table-base-table-header {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.99), color-mix(in srgb, var(--admin-layout-start) 58%, white));
+}
+
+.n-data-table .n-data-table-th {
+  color: #163a70;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.n-data-table .n-data-table-td {
+  color: #173358;
+}
+
+/* 侧边栏菜单选中态 —— 左侧指示条 */
+#__GLOBAL_SIDER_MENU__ {
+  height: 100%;
+}
+
+#__GLOBAL_SIDER_MENU__ .n-menu {
+  padding: 6px 4px 12px;
+  background: transparent !important;
+}
+
+#__GLOBAL_SIDER_MENU__ .n-menu-item-content,
+#__GLOBAL_SIDER_MENU__ .n-menu-item-content::before,
+#__GLOBAL_SIDER_MENU__ .n-menu-item-content-header,
+#__GLOBAL_SIDER_MENU__ .n-menu-item-content__icon {
+  transition: none !important;
+}
+
+#__GLOBAL_SIDER_MENU__ .n-menu-item-content,
+#__GLOBAL_SIDER_MENU__ .n-menu-item-content-header {
+  position: relative;
+  margin: 4px 0;
+  min-height: 46px;
+  border-radius: 16px;
+  padding-left: 14px !important;
+  padding-right: 14px !important;
+  overflow: visible;
+}
+
+#__GLOBAL_SIDER_MENU__ .n-menu-item-content::after,
+#__GLOBAL_SIDER_MENU__ .n-menu-item-content-header::after {
+  z-index: 0;
+  left: 12px !important;
+  right: 12px !important;
+  border-radius: 14px !important;
+}
+
+#__GLOBAL_SIDER_MENU__ .n-menu-item-content:hover::after,
+#__GLOBAL_SIDER_MENU__ .n-menu-item-content-header:hover::after {
+  background: rgba(var(--admin-accent-rgb), 0.05) !important;
+}
+
+#__GLOBAL_SIDER_MENU__ .n-menu-item-content-header__label,
+#__GLOBAL_SIDER_MENU__ .n-menu-item-content__content {
+  position: relative;
+  z-index: 2;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+#__GLOBAL_SIDER_MENU__ .n-menu-item-content__icon,
+#__GLOBAL_SIDER_MENU__ .n-menu-item-content-header__icon {
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 10px !important;
+  color: rgba(18, 48, 85, 0.68);
+}
+
+#__GLOBAL_SIDER_MENU__ .n-menu-item-content-header {
+  color: rgba(21, 44, 76, 0.92);
+}
+
+#__GLOBAL_SIDER_MENU__ .n-menu-item-content-body,
+#__GLOBAL_SIDER_MENU__ .n-menu-item-content-header {
+  display: flex;
+  align-items: center;
+}
+
+#__GLOBAL_SIDER_MENU__ .n-menu-item-content-body {
+  position: relative;
+  z-index: 2;
+}
+
+#__GLOBAL_SIDER_MENU__ > .n-menu > .n-menu-item > .n-menu-item-content,
+#__GLOBAL_SIDER_MENU__ > .n-menu > .n-submenu > .n-menu-item-content-header {
+  min-height: 48px;
+  border-radius: 18px;
+}
+
+#__GLOBAL_SIDER_MENU__ .n-menu-item-content--child-active .n-menu-item-content-header,
+#__GLOBAL_SIDER_MENU__ .n-menu-item-content-header--selected {
+  color: var(--admin-accent-strong) !important;
+}
+
+#__GLOBAL_SIDER_MENU__ .n-menu-item-content--child-active .n-menu-item-content-header__icon,
+#__GLOBAL_SIDER_MENU__ .n-menu-item-content-header--selected .n-menu-item-content-header__icon,
+#__GLOBAL_SIDER_MENU__ .n-menu-item-content--selected .n-menu-item-content__icon {
+  color: var(--admin-accent-strong) !important;
+}
+
+#__GLOBAL_SIDER_MENU__ .n-menu-item-content-header .n-base-icon,
+#__GLOBAL_SIDER_MENU__ .n-menu-item-content .n-base-icon {
+  font-size: 18px;
+}
+
+#__GLOBAL_SIDER_MENU__ > .n-menu > .n-menu-item > .n-menu-item-content--selected::before {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  left: 8px;
+  top: 10px;
+  bottom: 10px;
+  width: 4px;
+  background: var(--admin-accent-strong);
+  border-radius: 999px;
+  box-shadow: 0 0 0 3px rgba(var(--admin-accent-rgb), 0.14);
+  animation: sider-menu-indicator-in 0.2s ease-out;
+}
+
+#__GLOBAL_SIDER_MENU__ > .n-menu > .n-menu-item > .n-menu-item-content--selected,
+#__GLOBAL_SIDER_MENU__ > .n-menu > .n-submenu > .n-menu-item-content--child-active .n-menu-item-content-header,
+#__GLOBAL_SIDER_MENU__ > .n-menu > .n-submenu > .n-menu-item-content-header--selected {
+  background:
+    linear-gradient(90deg, var(--admin-accent-gradient-end), var(--admin-accent-gradient-start)) !important;
+  border: 1px solid rgba(var(--admin-accent-rgb), 0.72) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    0 14px 28px rgba(var(--admin-accent-rgb), 0.2);
+  animation: sider-menu-selected-in 0.2s ease-out;
+}
+
+#__GLOBAL_SIDER_MENU__ > .n-menu > .n-submenu > .n-menu-item-content--child-active .n-menu-item-content-header,
+#__GLOBAL_SIDER_MENU__ > .n-menu > .n-submenu > .n-menu-item-content-header--selected {
+  outline: 1px solid rgba(var(--admin-accent-rgb), 0.12);
+}
+
+#__GLOBAL_SIDER_MENU__ > .n-menu > .n-menu-item > .n-menu-item-content--selected .n-menu-item-content__content,
+#__GLOBAL_SIDER_MENU__ > .n-menu > .n-submenu > .n-menu-item-content--child-active .n-menu-item-content-header__label,
+#__GLOBAL_SIDER_MENU__ > .n-menu > .n-submenu > .n-menu-item-content-header--selected .n-menu-item-content-header__label {
+  color: #fffdfb !important;
+  font-weight: 700;
+}
+
+#__GLOBAL_SIDER_MENU__ > .n-menu > .n-menu-item > .n-menu-item-content--selected .n-menu-item-content__icon {
+  display: inline-flex !important;
+  color: #ffffff !important;
+}
+
+#__GLOBAL_SIDER_MENU__ > .n-menu > .n-menu-item > .n-menu-item-content--selected .n-menu-item-content__icon,
+#__GLOBAL_SIDER_MENU__ > .n-menu > .n-menu-item > .n-menu-item-content--selected .n-menu-item-content__icon .n-base-icon,
+#__GLOBAL_SIDER_MENU__ > .n-menu > .n-menu-item > .n-menu-item-content--selected .n-menu-item-content__icon svg {
+  position: relative;
+  z-index: 3;
+  opacity: 1 !important;
+  visibility: visible !important;
+  color: #ffffff !important;
+  fill: currentColor !important;
+}
+
+#__GLOBAL_SIDER_MENU__ > .n-menu > .n-submenu > .n-menu-item-content--child-active .n-menu-item-content-header__icon,
+#__GLOBAL_SIDER_MENU__ > .n-menu > .n-submenu > .n-menu-item-content-header--selected .n-menu-item-content-header__icon,
+#__GLOBAL_SIDER_MENU__ > .n-menu > .n-menu-item > .n-menu-item-content--selected .n-menu-item-content__icon {
+  color: #ffffff !important;
+}
+
+#__GLOBAL_SIDER_MENU__ > .n-menu > .n-submenu > .n-menu-item-content--child-active .n-menu-item-content-header > .n-base-icon:last-child,
+#__GLOBAL_SIDER_MENU__ > .n-menu > .n-submenu > .n-menu-item-content--child-active .n-menu-item-content-header > .n-base-icon:last-child svg,
+#__GLOBAL_SIDER_MENU__ > .n-menu > .n-submenu > .n-menu-item-content--child-active .n-menu-item-content-header > .n-base-icon:last-child svg path,
+#__GLOBAL_SIDER_MENU__ > .n-menu > .n-submenu > .n-menu-item-content-header--selected > .n-base-icon:last-child,
+#__GLOBAL_SIDER_MENU__ > .n-menu > .n-submenu > .n-menu-item-content-header--selected > .n-base-icon:last-child svg,
+#__GLOBAL_SIDER_MENU__ > .n-menu > .n-submenu > .n-menu-item-content-header--selected > .n-base-icon:last-child svg path {
+  color: #123055 !important;
+  fill: currentColor !important;
+  stroke: currentColor !important;
+}
+
+#__GLOBAL_SIDER_MENU__ .n-menu-item-content--selected::after {
+  opacity: 0 !important;
+}
+
+#__GLOBAL_SIDER_MENU__ .n-menu-item-content-header::before {
+  display: none !important;
+}
+
+#__GLOBAL_SIDER_MENU__ > .n-menu > .n-submenu > .n-menu-item-content--child-active .n-menu-item-content-header__arrow,
+#__GLOBAL_SIDER_MENU__ > .n-menu > .n-submenu > .n-menu-item-content--child-active .n-menu-item-content-header__arrow .n-base-icon,
+#__GLOBAL_SIDER_MENU__ > .n-menu > .n-submenu > .n-menu-item-content--child-active .n-menu-item-content-header__arrow svg,
+#__GLOBAL_SIDER_MENU__ > .n-menu > .n-submenu > .n-menu-item-content--child-active .n-menu-item-content-header__arrow svg path,
+#__GLOBAL_SIDER_MENU__ > .n-menu > .n-submenu > .n-menu-item-content-header--selected .n-menu-item-content-header__arrow,
+#__GLOBAL_SIDER_MENU__ > .n-menu > .n-submenu > .n-menu-item-content-header--selected .n-menu-item-content-header__arrow .n-base-icon,
+#__GLOBAL_SIDER_MENU__ > .n-menu > .n-submenu > .n-menu-item-content-header--selected .n-menu-item-content-header__arrow svg,
+#__GLOBAL_SIDER_MENU__ > .n-menu > .n-submenu > .n-menu-item-content-header--selected .n-menu-item-content-header__arrow svg path {
+  color: #123055 !important;
+  fill: currentColor !important;
+  stroke: currentColor !important;
+}
+
+#__GLOBAL_SIDER_MENU__ .n-menu-item-content--child-active .n-menu-item-content__arrow,
+#__GLOBAL_SIDER_MENU__ .n-menu-item-content--child-active .n-menu-item-content__arrow svg,
+#__GLOBAL_SIDER_MENU__ .n-menu-item-content--child-active .n-menu-item-content__arrow svg path,
+#__GLOBAL_SIDER_MENU__ .n-menu-item-content-header--selected .n-menu-item-content__arrow,
+#__GLOBAL_SIDER_MENU__ .n-menu-item-content-header--selected .n-menu-item-content__arrow svg,
+#__GLOBAL_SIDER_MENU__ .n-menu-item-content-header--selected .n-menu-item-content__arrow svg path {
+  color: #123055 !important;
+  fill: currentColor !important;
+  stroke: currentColor !important;
+}
+
+#__GLOBAL_SIDER_MENU__ .n-menu .n-menu .n-menu-item-content {
+  min-height: 42px;
+  margin: 2px 0;
+  border-radius: 14px;
+  padding-left: 18px !important;
+}
+
+#__GLOBAL_SIDER_MENU__ > .n-menu > .n-submenu > .n-menu-item-children {
+  margin: 6px 0 10px;
+  padding: 8px 8px 8px 10px !important;
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(var(--admin-accent-rgb), 0.04), rgba(var(--admin-accent-rgb), 0.02));
+  border: 1px solid rgba(var(--admin-accent-rgb), 0.08);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.78);
+}
+
+#__GLOBAL_SIDER_MENU__ .n-menu .n-menu .n-menu-item-content__content {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+#__GLOBAL_SIDER_MENU__ .n-menu .n-menu .n-menu-item-content__icon {
+  display: inline-flex !important;
+  align-items: center;
+  margin-right: 8px !important;
+  color: rgba(18, 48, 85, 0.72);
+}
+
+#__GLOBAL_SIDER_MENU__ .n-menu .n-menu .n-menu-item-content--selected::before {
+  display: none !important;
+}
+
+#__GLOBAL_SIDER_MENU__ .n-menu .n-menu .n-menu-item-content--selected {
+  background: linear-gradient(90deg, rgba(var(--admin-accent-rgb), 0.18), rgba(var(--admin-accent-rgb), 0.12)) !important;
+  border: 1px solid rgba(var(--admin-accent-rgb), 0.2) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.82),
+    0 8px 18px rgba(var(--admin-accent-rgb), 0.1);
+}
+
+#__GLOBAL_SIDER_MENU__ .n-menu .n-menu .n-menu-item-content--selected .n-menu-item-content__content {
+  color: var(--admin-accent-strong) !important;
+  font-weight: 700;
+}
+
+#__GLOBAL_SIDER_MENU__ .n-menu .n-menu .n-menu-item-content--selected .n-menu-item-content__icon {
+  color: var(--admin-accent-strong) !important;
+}
+
+/* 深色/反相侧边栏下，子菜单选中态需要更高对比度 */
+#__GLOBAL_SIDER_MENU__ .n-menu.n-menu--inverted .n-menu .n-menu-item-content--selected {
+  background: linear-gradient(90deg, rgba(var(--admin-accent-rgb), 0.3), rgba(var(--admin-accent-rgb), 0.2)) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 10px 18px rgba(0, 0, 0, 0.16);
+}
+
+#__GLOBAL_SIDER_MENU__ .n-menu.n-menu--inverted .n-menu .n-menu-item-content--selected .n-menu-item-content__content {
+  color: rgba(244, 249, 255, 0.98) !important;
+}
+
+@keyframes sider-menu-selected-in {
+  from {
+    background-color: rgba(var(--admin-accent-rgb), 0);
+  }
+  to {
+    background-color: rgba(var(--admin-accent-rgb), 0.08);
+  }
+}
+
+@keyframes sider-menu-indicator-in {
+  from {
+    opacity: 0;
+    transform: scaleY(0.4);
+  }
+  to {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+}
+
+/* 暗色模式下卡片阴影减弱 */
+html.dark .n-card {
+  border-color: rgba(var(--admin-accent-rgb), 0.12);
+  background:
+    radial-gradient(circle at top right, rgba(var(--admin-accent-rgb), 0.12), transparent 24%),
+    linear-gradient(180deg, rgba(10, 14, 22, 0.96), rgba(16, 21, 33, 0.98));
+  box-shadow:
+    0 18px 34px rgba(0, 0, 0, 0.32),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+html.dark .n-card:hover {
+  border-color: rgba(var(--admin-accent-rgb), 0.2);
+  box-shadow:
+    0 20px 40px rgba(0, 0, 0, 0.38),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+html.dark .n-input .n-input-wrapper,
+html.dark .n-input-number .n-input-wrapper,
+html.dark .n-base-selection .n-base-selection-label,
+html.dark .n-date-picker .n-input-wrapper {
+  background: rgba(9, 14, 24, 0.96) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+html.dark .n-input:not(.n-input--disabled),
+html.dark .n-input-number:not(.n-input-number--disabled),
+html.dark .n-base-selection:not(.n-base-selection--disabled),
+html.dark .n-date-picker:not(.n-date-picker--disabled) {
+  border-color: rgba(137, 157, 196, 0.2) !important;
+}
+
+html.dark .n-input__input-el,
+html.dark .n-input__textarea-el,
+html.dark .n-base-selection-label__render-label,
+html.dark .n-base-selection-placeholder,
+html.dark .n-input__placeholder,
+html.dark .n-input-number-input {
+  color: rgba(232, 238, 250, 0.94) !important;
+}
+
+html.dark .n-data-table {
+  border-color: rgba(var(--admin-accent-rgb), 0.18);
+  background:
+    radial-gradient(circle at top right, rgba(var(--admin-accent-rgb), 0.14), transparent 18%),
+    linear-gradient(180deg, rgba(8, 13, 22, 0.98), rgba(12, 18, 30, 0.98));
+  box-shadow:
+    0 18px 34px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+html.dark .n-data-table .n-data-table-base-table-header {
+  background:
+    linear-gradient(180deg, rgba(21, 29, 45, 0.98), rgba(14, 20, 31, 0.98));
+}
+
+html.dark .n-data-table .n-data-table-wrapper,
+html.dark .n-data-table .n-data-table-base-table,
+html.dark .n-data-table .n-data-table-base-table-body {
+  background: transparent !important;
+}
+
+html.dark .n-data-table .n-data-table-th {
+  background: rgba(17, 24, 38, 0.92);
+  color: rgba(236, 242, 255, 0.92);
+  border-bottom-color: rgba(var(--admin-accent-rgb), 0.14) !important;
+}
+
+html.dark .n-data-table .n-data-table-td {
+  background: rgba(11, 16, 26, 0.72);
+  color: rgba(220, 228, 242, 0.9);
+  border-bottom-color: rgba(var(--admin-accent-rgb), 0.1) !important;
+}
+
+html.dark .n-data-table .n-data-table-tr:not(.n-data-table-tr--summary):nth-child(even) td {
+  background: rgba(var(--admin-accent-rgb), 0.05);
+}
+
+html.dark .n-data-table .n-data-table-tbody .n-data-table-tr:hover td {
+  background: rgba(var(--admin-accent-rgb), 0.12) !important;
+}
+
+html.dark #__GLOBAL_SIDER_MENU__ .n-menu-item-content__icon,
+html.dark #__GLOBAL_SIDER_MENU__ .n-menu-item-content-header__icon,
+html.dark #__GLOBAL_SIDER_MENU__ .n-menu .n-menu .n-menu-item-content__icon {
+  color: rgba(214, 224, 242, 0.72);
+}
+
+html.dark #__GLOBAL_SIDER_MENU__ .n-menu-item-content-header,
+html.dark #__GLOBAL_SIDER_MENU__ .n-menu-item-content__content,
+html.dark #__GLOBAL_SIDER_MENU__ .n-menu-item-content-header__label {
+  color: rgba(232, 238, 250, 0.9);
+}
+
+html.dark #__GLOBAL_SIDER_MENU__ .n-menu-item-content:hover::after,
+html.dark #__GLOBAL_SIDER_MENU__ .n-menu-item-content-header:hover::after {
+  background: rgba(255, 255, 255, 0.04) !important;
+}
+
+html.dark #__GLOBAL_SIDER_MENU__ > .n-menu > .n-submenu > .n-menu-item-content--child-active .n-menu-item-content-header > .n-base-icon:last-child,
+html.dark #__GLOBAL_SIDER_MENU__ > .n-menu > .n-submenu > .n-menu-item-content--child-active .n-menu-item-content-header > .n-base-icon:last-child svg,
+html.dark #__GLOBAL_SIDER_MENU__ > .n-menu > .n-submenu > .n-menu-item-content--child-active .n-menu-item-content-header > .n-base-icon:last-child svg path,
+html.dark #__GLOBAL_SIDER_MENU__ > .n-menu > .n-submenu > .n-menu-item-content-header--selected > .n-base-icon:last-child,
+html.dark #__GLOBAL_SIDER_MENU__ > .n-menu > .n-submenu > .n-menu-item-content-header--selected > .n-base-icon:last-child svg,
+html.dark #__GLOBAL_SIDER_MENU__ > .n-menu > .n-submenu > .n-menu-item-content-header--selected > .n-base-icon:last-child svg path,
+html.dark #__GLOBAL_SIDER_MENU__ > .n-menu > .n-submenu > .n-menu-item-content--child-active .n-menu-item-content-header__arrow,
+html.dark #__GLOBAL_SIDER_MENU__ > .n-menu > .n-submenu > .n-menu-item-content--child-active .n-menu-item-content-header__arrow .n-base-icon,
+html.dark #__GLOBAL_SIDER_MENU__ > .n-menu > .n-submenu > .n-menu-item-content--child-active .n-menu-item-content-header__arrow svg,
+html.dark #__GLOBAL_SIDER_MENU__ > .n-menu > .n-submenu > .n-menu-item-content--child-active .n-menu-item-content-header__arrow svg path,
+html.dark #__GLOBAL_SIDER_MENU__ > .n-menu > .n-submenu > .n-menu-item-content-header--selected .n-menu-item-content-header__arrow,
+html.dark #__GLOBAL_SIDER_MENU__ > .n-menu > .n-submenu > .n-menu-item-content-header--selected .n-menu-item-content-header__arrow .n-base-icon,
+html.dark #__GLOBAL_SIDER_MENU__ > .n-menu > .n-submenu > .n-menu-item-content-header--selected .n-menu-item-content-header__arrow svg,
+html.dark #__GLOBAL_SIDER_MENU__ > .n-menu > .n-submenu > .n-menu-item-content-header--selected .n-menu-item-content-header__arrow svg path,
+html.dark #__GLOBAL_SIDER_MENU__ .n-menu-item-content--child-active .n-menu-item-content__arrow,
+html.dark #__GLOBAL_SIDER_MENU__ .n-menu-item-content--child-active .n-menu-item-content__arrow svg,
+html.dark #__GLOBAL_SIDER_MENU__ .n-menu-item-content--child-active .n-menu-item-content__arrow svg path,
+html.dark #__GLOBAL_SIDER_MENU__ .n-menu-item-content-header--selected .n-menu-item-content__arrow,
+html.dark #__GLOBAL_SIDER_MENU__ .n-menu-item-content-header--selected .n-menu-item-content__arrow svg,
+html.dark #__GLOBAL_SIDER_MENU__ .n-menu-item-content-header--selected .n-menu-item-content__arrow svg path {
+  color: rgba(245, 248, 255, 0.96) !important;
+  fill: currentColor !important;
+  stroke: currentColor !important;
+}
+
+html.dark #__GLOBAL_SIDER_MENU__ > .n-menu > .n-submenu > .n-menu-item-children {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(var(--admin-accent-rgb), 0.08));
+  border-color: rgba(255, 255, 255, 0.06);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+html.dark .n-button--default-type {
+  border-color: rgba(137, 157, 196, 0.18) !important;
+  background: rgba(11, 16, 26, 0.94) !important;
+  color: rgba(234, 240, 250, 0.92) !important;
+}
+
+html.dark .n-pagination .n-pagination-item,
+html.dark .n-pagination .n-pagination-item-link {
+  border-color: rgba(137, 157, 196, 0.14);
+  background: rgba(11, 16, 26, 0.94);
+  color: rgba(231, 238, 250, 0.9);
+}
+
+html.dark .n-tag.n-tag--success-type {
+  color: #77d8a8 !important;
+  background: rgba(34, 197, 94, 0.14) !important;
+  border-color: rgba(34, 197, 94, 0.24) !important;
+}
+
+html.dark .n-tag.n-tag--info-type {
+  color: #7cd3ff !important;
+  background: rgba(56, 189, 248, 0.14) !important;
+  border-color: rgba(56, 189, 248, 0.24) !important;
+}
+
+html.dark .n-tag.n-tag--warning-type {
+  color: #ffd07a !important;
+  background: rgba(245, 158, 11, 0.14) !important;
+  border-color: rgba(245, 158, 11, 0.24) !important;
+}
+
+html.dark .n-tag.n-tag--error-type {
+  color: #ff948f !important;
+  background: rgba(239, 68, 68, 0.14) !important;
+  border-color: rgba(239, 68, 68, 0.24) !important;
+}
+
+html.dark .n-tag.n-tag--default-type {
+  color: rgba(232, 238, 250, 0.92) !important;
+  background: rgba(var(--admin-accent-rgb), 0.16) !important;
+  border-color: rgba(var(--admin-accent-rgb), 0.24) !important;
+}
+
+html.dark .n-modal-mask {
+  background: rgba(0, 0, 0, 0.56) !important;
+}
+
+html.dark .n-modal .n-card > .n-card-header,
+html.dark .n-drawer .n-card > .n-card-header {
+  border-bottom-color: rgba(255, 255, 255, 0.06);
+}
+
+html.dark .n-modal .n-card > .n-card__content,
+html.dark .n-drawer .n-card > .n-card__content {
+  background: linear-gradient(180deg, rgba(10, 14, 22, 0.84), rgba(16, 21, 33, 0.92));
+}
+
+html.dark .log-hero,
+html.dark .order-list-hero,
+html.dark .stat-hero,
+html.dark .user-hero,
+html.dark .marketing-hero,
+html.dark .report-hero,
+html.dark .record-hero,
+html.dark .detail-hero,
+html.dark .ranking-hero,
+html.dark .role-hero,
+html.dark .growth-hero,
+html.dark .banner-hero,
+html.dark .manage-hero,
+html.dark .dict-hero,
+html.dark .coupon-hero,
+html.dark .level-hero {
+  background:
+    radial-gradient(circle at top right, rgba(var(--admin-accent-rgb), 0.18), transparent 24%) !important,
+    linear-gradient(135deg, rgba(8, 12, 20, 0.98), rgba(14, 19, 30, 0.98)) !important;
+}
+
+html.dark .log-hero__eyebrow,
+html.dark .order-list-hero__eyebrow,
+html.dark .stat-hero__eyebrow,
+html.dark .user-hero__eyebrow,
+html.dark .marketing-hero__eyebrow,
+html.dark .report-hero__eyebrow,
+html.dark .record-hero__eyebrow,
+html.dark .detail-hero__eyebrow,
+html.dark .ranking-hero__eyebrow,
+html.dark .role-hero__eyebrow,
+html.dark .growth-hero__eyebrow,
+html.dark .banner-hero__eyebrow,
+html.dark .manage-hero__eyebrow,
+html.dark .dict-hero__eyebrow,
+html.dark .coupon-hero__eyebrow,
+html.dark .level-hero__eyebrow {
+  color: rgba(183, 198, 228, 0.68) !important;
+}
+
+html.dark .log-hero__title,
+html.dark .order-list-hero__title,
+html.dark .stat-hero__title,
+html.dark .user-hero__title,
+html.dark .marketing-hero__title,
+html.dark .report-hero__title,
+html.dark .record-hero__title,
+html.dark .detail-hero__title,
+html.dark .ranking-hero__title,
+html.dark .role-hero__title,
+html.dark .growth-hero__title,
+html.dark .banner-hero__title,
+html.dark .manage-hero__title,
+html.dark .dict-hero__title,
+html.dark .coupon-hero__title,
+html.dark .level-hero__title {
+  color: rgba(241, 246, 255, 0.96) !important;
+}
+
+html.dark .log-hero__desc,
+html.dark .order-list-hero__desc,
+html.dark .stat-hero__desc,
+html.dark .user-hero__desc,
+html.dark .marketing-hero__desc,
+html.dark .report-hero__desc,
+html.dark .record-hero__desc,
+html.dark .detail-hero__desc,
+html.dark .ranking-hero__desc,
+html.dark .role-hero__desc,
+html.dark .growth-hero__desc,
+html.dark .banner-hero__desc,
+html.dark .manage-hero__desc,
+html.dark .dict-hero__desc,
+html.dark .coupon-hero__desc,
+html.dark .level-hero__desc {
+  color: rgba(206, 216, 236, 0.76) !important;
+}
+
+html.dark .log-hero__badge,
+html.dark .order-list-hero__badge,
+html.dark .user-hero__badge,
+html.dark .report-hero__badge,
+html.dark .record-hero__badge,
+html.dark .detail-hero__badge,
+html.dark .ranking-hero__badge,
+html.dark .role-hero__badge,
+html.dark .growth-hero__badge,
+html.dark .banner-hero__badge,
+html.dark .manage-hero__badge,
+html.dark .dict-hero__badge,
+html.dark .coupon-hero__badge,
+html.dark .marketing-hero__metric,
+html.dark .level-hero__stat,
+html.dark .metric-card,
+html.dark .asset-card,
+html.dark .panel-card {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  box-shadow:
+    0 16px 30px rgba(0, 0, 0, 0.24),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+html.dark .log-hero__badge span,
+html.dark .order-list-hero__badge span,
+html.dark .user-hero__badge span,
+html.dark .report-hero__badge span,
+html.dark .record-hero__badge span,
+html.dark .detail-hero__badge span,
+html.dark .ranking-hero__badge span,
+html.dark .role-hero__badge span,
+html.dark .growth-hero__badge span,
+html.dark .banner-hero__badge span,
+html.dark .manage-hero__badge span,
+html.dark .dict-hero__badge span,
+html.dark .coupon-hero__badge span,
+html.dark .marketing-hero__metric-label,
+html.dark .level-hero__stat span,
+html.dark .metric-card__label,
+html.dark .asset-card__label,
+html.dark .metric-card__note {
+  color: rgba(183, 198, 228, 0.68) !important;
+}
+
+html.dark .log-hero__badge strong,
+html.dark .order-list-hero__badge strong,
+html.dark .user-hero__badge strong,
+html.dark .report-hero__badge strong,
+html.dark .record-hero__badge strong,
+html.dark .detail-hero__badge strong,
+html.dark .ranking-hero__badge strong,
+html.dark .role-hero__badge strong,
+html.dark .growth-hero__badge strong,
+html.dark .banner-hero__badge strong,
+html.dark .manage-hero__badge strong,
+html.dark .dict-hero__badge strong,
+html.dark .coupon-hero__badge strong,
+html.dark .marketing-hero__metric-value,
+html.dark .level-hero__stat strong,
+html.dark .metric-card__value,
+html.dark .asset-card__value {
+  color: #dbe5ff !important;
+}
+
+html.dark .marketing-hero__metric[data-tone='success'] .marketing-hero__metric-value,
+html.dark .metric-card[data-tone='success'] .metric-card__value {
+  color: #77d8a8 !important;
+}
+
+html.dark .marketing-hero__metric[data-tone='warning'] .marketing-hero__metric-value,
+html.dark .metric-card[data-tone='warning'] .metric-card__value {
+  color: #ffd07a !important;
+}
+
+html.dark .marketing-hero__metric[data-tone='info'] .marketing-hero__metric-value,
+html.dark .metric-card[data-tone='info'] .metric-card__value {
+  color: #7cd3ff !important;
+}
+
+html.dark .report-hero + .n-grid .n-card[style*='border-top: 4px solid'],
+html.dark .stat-hero ~ .n-grid .n-card,
+html.dark .marketing-hero ~ .n-card {
+  box-shadow: 0 18px 34px rgba(0, 0, 0, 0.24);
+}
+
+.log-hero,
+.order-list-hero,
+.stat-hero,
+.user-hero,
+.marketing-hero,
+.report-hero,
+.record-hero,
+.detail-hero,
+.ranking-hero,
+.role-hero,
+.growth-hero,
+.banner-hero,
+.manage-hero,
+.dict-hero,
+.coupon-hero,
+.level-hero,
+.config-hero,
+.order-hero,
+.checkout-hero,
+.ops-hero,
+.kitchen-hero {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(var(--admin-accent-rgb), 0.14) !important;
+  box-shadow:
+    0 24px 46px rgba(var(--admin-accent-rgb), 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.74);
+}
+
+.log-hero::after,
+.order-list-hero::after,
+.stat-hero::after,
+.user-hero::after,
+.marketing-hero::after,
+.report-hero::after,
+.record-hero::after,
+.detail-hero::after,
+.ranking-hero::after,
+.role-hero::after,
+.growth-hero::after,
+.banner-hero::after,
+.manage-hero::after,
+.dict-hero::after,
+.coupon-hero::after,
+.level-hero::after,
+.config-hero::after,
+.order-hero::after,
+.checkout-hero::after,
+.ops-hero::after,
+.kitchen-hero::after {
+  content: '';
+  position: absolute;
+  right: -48px;
+  top: -56px;
+  width: 200px;
+  height: 200px;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(var(--admin-accent-rgb), 0.18) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.log-hero__eyebrow,
+.order-list-hero__eyebrow,
+.stat-hero__eyebrow,
+.user-hero__eyebrow,
+.marketing-hero__eyebrow,
+.report-hero__eyebrow,
+.record-hero__eyebrow,
+.detail-hero__eyebrow,
+.ranking-hero__eyebrow,
+.role-hero__eyebrow,
+.growth-hero__eyebrow,
+.banner-hero__eyebrow,
+.manage-hero__eyebrow,
+.dict-hero__eyebrow,
+.coupon-hero__eyebrow,
+.level-hero__eyebrow,
+.config-hero__eyebrow,
+.order-hero__eyebrow,
+.checkout-hero__eyebrow,
+.ops-hero__eyebrow,
+.kitchen-hero__eyebrow {
+  margin-bottom: 10px !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.24em !important;
+  color: rgba(15, 62, 124, 0.68) !important;
+}
+
+.log-hero__head,
+.order-list-hero__head,
+.stat-hero__head,
+.user-hero__head,
+.report-hero__head,
+.record-hero__head,
+.detail-hero__head,
+.ranking-hero__head,
+.role-hero__head,
+.growth-hero__head,
+.banner-hero__head,
+.manage-hero__head,
+.dict-hero__head,
+.coupon-hero__head,
+.level-hero__head,
+.config-hero__head,
+.order-hero__head,
+.checkout-hero__head,
+.ops-hero__head,
+.kitchen-hero__head {
+  display: flex !important;
+  align-items: flex-end !important;
+  justify-content: space-between !important;
+  gap: 18px !important;
+}
+
+.log-hero__title,
+.order-list-hero__title,
+.stat-hero__title,
+.user-hero__title,
+.marketing-hero__title,
+.report-hero__title,
+.record-hero__title,
+.detail-hero__title,
+.ranking-hero__title,
+.role-hero__title,
+.growth-hero__title,
+.banner-hero__title,
+.manage-hero__title,
+.dict-hero__title,
+.coupon-hero__title,
+.level-hero__title,
+.config-hero__title,
+.order-hero__title,
+.checkout-hero__title,
+.ops-hero__title,
+.kitchen-hero__title {
+  margin: 0 !important;
+  font-size: 28px !important;
+  letter-spacing: -0.02em;
+  color: #123055 !important;
+}
+
+.log-hero__desc,
+.order-list-hero__desc,
+.stat-hero__desc,
+.user-hero__desc,
+.marketing-hero__desc,
+.report-hero__desc,
+.record-hero__desc,
+.detail-hero__desc,
+.ranking-hero__desc,
+.role-hero__desc,
+.growth-hero__desc,
+.banner-hero__desc,
+.manage-hero__desc,
+.dict-hero__desc,
+.coupon-hero__desc,
+.level-hero__desc,
+.config-hero__desc,
+.order-hero__desc,
+.checkout-hero__desc,
+.ops-hero__desc,
+.kitchen-hero__desc {
+  max-width: 760px !important;
+  margin: 10px 0 0 !important;
+  line-height: 1.75 !important;
+  color: rgba(21, 44, 76, 0.72) !important;
+}
+
+.log-hero__badge,
+.order-list-hero__badge,
+.user-hero__badge,
+.report-hero__badge,
+.record-hero__badge,
+.detail-hero__badge,
+.ranking-hero__badge,
+.role-hero__badge,
+.growth-hero__badge,
+.banner-hero__badge,
+.manage-hero__badge,
+.dict-hero__badge,
+.coupon-hero__badge,
+.config-hero__badge,
+.checkout-hero__badge,
+.ops-hero__badge,
+.marketing-hero__metric,
+.level-hero__stat,
+.kitchen-hero__stat,
+.order-hero__stat,
+.metric-card,
+.asset-card,
+.panel-card {
+  backdrop-filter: blur(10px);
+  min-width: 170px;
+  padding: 16px 18px;
+  border-radius: 18px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.68),
+    0 14px 28px rgba(var(--admin-accent-rgb), 0.08);
+}
+
+.log-hero__badge span,
+.order-list-hero__badge span,
+.user-hero__badge span,
+.report-hero__badge span,
+.record-hero__badge span,
+.detail-hero__badge span,
+.ranking-hero__badge span,
+.role-hero__badge span,
+.growth-hero__badge span,
+.banner-hero__badge span,
+.manage-hero__badge span,
+.dict-hero__badge span,
+.coupon-hero__badge span,
+.config-hero__badge span,
+.checkout-hero__badge span,
+.ops-hero__badge span {
+  display: block !important;
+  font-size: 12px !important;
+  color: rgba(15, 62, 124, 0.68) !important;
+}
+
+.log-hero__badge strong,
+.order-list-hero__badge strong,
+.user-hero__badge strong,
+.report-hero__badge strong,
+.record-hero__badge strong,
+.detail-hero__badge strong,
+.ranking-hero__badge strong,
+.role-hero__badge strong,
+.growth-hero__badge strong,
+.banner-hero__badge strong,
+.manage-hero__badge strong,
+.dict-hero__badge strong,
+.coupon-hero__badge strong,
+.config-hero__badge strong,
+.checkout-hero__badge strong,
+.ops-hero__badge strong {
+  display: block !important;
+  margin-top: 8px !important;
+  font-size: 28px !important;
+  color: var(--admin-accent-strong) !important;
+}
+
+html.dark .log-hero,
+html.dark .order-list-hero,
+html.dark .stat-hero,
+html.dark .user-hero,
+html.dark .marketing-hero,
+html.dark .report-hero,
+html.dark .record-hero,
+html.dark .detail-hero,
+html.dark .ranking-hero,
+html.dark .role-hero,
+html.dark .growth-hero,
+html.dark .banner-hero,
+html.dark .manage-hero,
+html.dark .dict-hero,
+html.dark .coupon-hero,
+html.dark .level-hero,
+html.dark .config-hero,
+html.dark .order-hero,
+html.dark .checkout-hero,
+html.dark .ops-hero,
+html.dark .kitchen-hero {
+  box-shadow:
+    0 28px 52px rgba(0, 0, 0, 0.34),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+html.dark .log-hero__eyebrow,
+html.dark .order-list-hero__eyebrow,
+html.dark .stat-hero__eyebrow,
+html.dark .user-hero__eyebrow,
+html.dark .marketing-hero__eyebrow,
+html.dark .report-hero__eyebrow,
+html.dark .record-hero__eyebrow,
+html.dark .detail-hero__eyebrow,
+html.dark .ranking-hero__eyebrow,
+html.dark .role-hero__eyebrow,
+html.dark .growth-hero__eyebrow,
+html.dark .banner-hero__eyebrow,
+html.dark .manage-hero__eyebrow,
+html.dark .dict-hero__eyebrow,
+html.dark .coupon-hero__eyebrow,
+html.dark .level-hero__eyebrow,
+html.dark .config-hero__eyebrow,
+html.dark .order-hero__eyebrow,
+html.dark .checkout-hero__eyebrow,
+html.dark .ops-hero__eyebrow,
+html.dark .kitchen-hero__eyebrow {
+  color: rgba(206, 216, 236, 0.72) !important;
+}
+
+html.dark .log-hero__title,
+html.dark .order-list-hero__title,
+html.dark .stat-hero__title,
+html.dark .user-hero__title,
+html.dark .marketing-hero__title,
+html.dark .report-hero__title,
+html.dark .record-hero__title,
+html.dark .detail-hero__title,
+html.dark .ranking-hero__title,
+html.dark .role-hero__title,
+html.dark .growth-hero__title,
+html.dark .banner-hero__title,
+html.dark .manage-hero__title,
+html.dark .dict-hero__title,
+html.dark .coupon-hero__title,
+html.dark .level-hero__title,
+html.dark .config-hero__title,
+html.dark .order-hero__title,
+html.dark .checkout-hero__title,
+html.dark .ops-hero__title,
+html.dark .kitchen-hero__title {
+  color: rgba(241, 246, 255, 0.96) !important;
+}
+
+html.dark .log-hero__desc,
+html.dark .order-list-hero__desc,
+html.dark .stat-hero__desc,
+html.dark .user-hero__desc,
+html.dark .marketing-hero__desc,
+html.dark .report-hero__desc,
+html.dark .record-hero__desc,
+html.dark .detail-hero__desc,
+html.dark .ranking-hero__desc,
+html.dark .role-hero__desc,
+html.dark .growth-hero__desc,
+html.dark .banner-hero__desc,
+html.dark .manage-hero__desc,
+html.dark .dict-hero__desc,
+html.dark .coupon-hero__desc,
+html.dark .level-hero__desc,
+html.dark .config-hero__desc,
+html.dark .order-hero__desc,
+html.dark .checkout-hero__desc,
+html.dark .ops-hero__desc,
+html.dark .kitchen-hero__desc {
+  color: rgba(206, 216, 236, 0.78) !important;
+}
+
+html.dark .log-hero__badge,
+html.dark .order-list-hero__badge,
+html.dark .user-hero__badge,
+html.dark .report-hero__badge,
+html.dark .record-hero__badge,
+html.dark .detail-hero__badge,
+html.dark .ranking-hero__badge,
+html.dark .role-hero__badge,
+html.dark .growth-hero__badge,
+html.dark .banner-hero__badge,
+html.dark .manage-hero__badge,
+html.dark .dict-hero__badge,
+html.dark .coupon-hero__badge,
+html.dark .config-hero__badge,
+html.dark .checkout-hero__badge,
+html.dark .ops-hero__badge,
+html.dark .marketing-hero__metric,
+html.dark .level-hero__stat,
+html.dark .kitchen-hero__stat,
+html.dark .order-hero__stat,
+html.dark .metric-card,
+html.dark .asset-card,
+html.dark .panel-card {
+  background: rgba(255, 255, 255, 0.04) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 18px 30px rgba(0, 0, 0, 0.24);
+}
+
+html.dark .log-hero__badge span,
+html.dark .order-list-hero__badge span,
+html.dark .user-hero__badge span,
+html.dark .report-hero__badge span,
+html.dark .record-hero__badge span,
+html.dark .detail-hero__badge span,
+html.dark .ranking-hero__badge span,
+html.dark .role-hero__badge span,
+html.dark .growth-hero__badge span,
+html.dark .banner-hero__badge span,
+html.dark .manage-hero__badge span,
+html.dark .dict-hero__badge span,
+html.dark .coupon-hero__badge span,
+html.dark .config-hero__badge span,
+html.dark .checkout-hero__badge span,
+html.dark .ops-hero__badge span {
+  color: rgba(206, 216, 236, 0.72) !important;
+}
+
+html.dark .log-hero__badge strong,
+html.dark .order-list-hero__badge strong,
+html.dark .user-hero__badge strong,
+html.dark .report-hero__badge strong,
+html.dark .record-hero__badge strong,
+html.dark .detail-hero__badge strong,
+html.dark .ranking-hero__badge strong,
+html.dark .role-hero__badge strong,
+html.dark .growth-hero__badge strong,
+html.dark .banner-hero__badge strong,
+html.dark .manage-hero__badge strong,
+html.dark .dict-hero__badge strong,
+html.dark .coupon-hero__badge strong,
+html.dark .config-hero__badge strong,
+html.dark .checkout-hero__badge strong,
+html.dark .ops-hero__badge strong {
+  color: rgba(241, 246, 255, 0.96) !important;
+}
+
+.dashboard-hero,
+.table-manage-hero,
+.review-hero {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(var(--admin-accent-rgb), 0.14) !important;
+  box-shadow:
+    0 24px 46px rgba(var(--admin-accent-rgb), 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.74);
+}
+
+.dashboard-hero::after,
+.table-manage-hero::after,
+.review-hero::after {
+  content: '';
+  position: absolute;
+  right: -48px;
+  top: -56px;
+  width: 200px;
+  height: 200px;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(var(--admin-accent-rgb), 0.18) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.dashboard-title,
+.table-manage-hero__title {
+  letter-spacing: -0.02em;
+}
+
+.dashboard-badge,
+.table-manage-hero__badge {
+  backdrop-filter: blur(10px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.68),
+    0 14px 28px rgba(var(--admin-accent-rgb), 0.08);
+}
+
+.log-hero + .n-card,
+.order-list-hero + .n-card,
+.user-hero + .n-card,
+.role-hero + .n-card,
+.coupon-hero + .n-card,
+.manage-hero + .n-card,
+.dict-hero + .n-card,
+.config-hero + .n-card,
+.table-manage-hero + .n-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(var(--admin-accent-rgb), 0.1) !important;
+  background:
+    radial-gradient(circle at top left, rgba(var(--admin-accent-rgb), 0.06), transparent 22%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(247, 251, 255, 0.96)) !important;
+  box-shadow:
+    0 20px 36px rgba(var(--admin-accent-rgb), 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.82);
+}
+
+html.dark .dashboard-hero,
+html.dark .table-manage-hero,
+html.dark .review-hero {
+  box-shadow:
+    0 28px 52px rgba(0, 0, 0, 0.34),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+html.dark .table-manage-hero {
+  background:
+    radial-gradient(circle at top right, rgba(var(--admin-accent-rgb), 0.18), transparent 24%) !important,
+    linear-gradient(135deg, rgba(8, 12, 20, 0.98), rgba(14, 19, 30, 0.98)) !important;
+}
+
+html.dark .table-manage-hero__eyebrow,
+html.dark .dashboard-kicker,
+html.dark .review-meta {
+  color: rgba(183, 198, 228, 0.68) !important;
+}
+
+html.dark .table-manage-hero__title,
+html.dark .dashboard-title,
+html.dark .review-score-text {
+  color: rgba(241, 246, 255, 0.96) !important;
+}
+
+html.dark .table-manage-hero__desc,
+html.dark .dashboard-copy,
+html.dark .review-note {
+  color: rgba(206, 216, 236, 0.76) !important;
+}
+
+html.dark .table-manage-hero__badge,
+html.dark .dashboard-badge {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+html.dark .table-manage-hero__badge span,
+html.dark .dashboard-badge__label {
+  color: rgba(183, 198, 228, 0.68) !important;
+}
+
+html.dark .table-manage-hero__badge strong,
+html.dark .dashboard-badge__value {
+  color: #dbe5ff !important;
+}
+
+html.dark .theme-preset-panel__title {
+  color: rgba(241, 246, 255, 0.96) !important;
+}
+
+html.dark .theme-preset-panel__desc {
+  color: rgba(206, 216, 236, 0.78) !important;
+}
+
+html.dark .log-hero + .n-card,
+html.dark .order-list-hero + .n-card,
+html.dark .user-hero + .n-card,
+html.dark .role-hero + .n-card,
+html.dark .coupon-hero + .n-card,
+html.dark .manage-hero + .n-card,
+html.dark .dict-hero + .n-card,
+html.dark .config-hero + .n-card,
+html.dark .table-manage-hero + .n-card {
+  background:
+    radial-gradient(circle at top left, rgba(var(--admin-accent-rgb), 0.08), transparent 22%),
+    linear-gradient(180deg, rgba(10, 14, 22, 0.96), rgba(14, 19, 30, 0.96)) !important;
+  border-color: rgba(255, 255, 255, 0.06) !important;
+  box-shadow:
+    0 22px 40px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.user-list-card .n-card-header,
+.role-list-card .n-card-header,
+.banner-list-card .n-card-header,
+.dict-list-card .n-card-header,
+.manage-list-card .n-card-header,
+.config-list-card .n-card-header,
+.coupon-list-card .n-card-header,
+.coupon-detail-card .n-card-header,
+.mq-list-card .n-card-header {
+  padding-bottom: 14px !important;
+  margin-bottom: 14px;
+  border-bottom: 1px solid rgba(var(--admin-accent-rgb), 0.08);
+}
+
+.user-list-card .n-card-header__main,
+.role-list-card .n-card-header__main,
+.banner-list-card .n-card-header__main,
+.dict-list-card .n-card-header__main,
+.manage-list-card .n-card-header__main,
+.config-list-card .n-card-header__main,
+.coupon-list-card .n-card-header__main,
+.coupon-detail-card .n-card-header__main,
+.mq-list-card .n-card-header__main {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: color-mix(in srgb, var(--admin-accent-strong) 56%, #1b2d45);
+}
+
+.user-list-card .n-card__content,
+.role-list-card .n-card__content,
+.banner-list-card .n-card__content,
+.dict-list-card .n-card__content,
+.manage-list-card .n-card__content,
+.config-list-card .n-card__content,
+.coupon-list-card .n-card__content,
+.coupon-detail-card .n-card__content,
+.mq-list-card .n-card__content {
+  color: color-mix(in srgb, var(--admin-accent-strong) 56%, #1b2d45);
+}
+
+.user-list-card .n-data-table,
+.role-list-card .n-data-table,
+.banner-list-card .n-data-table,
+.dict-list-card .n-data-table,
+.manage-list-card .n-data-table,
+.config-list-card .n-data-table,
+.coupon-list-card .n-data-table,
+.coupon-detail-card .n-data-table,
+.mq-list-card .n-data-table {
+  border-radius: 20px;
+  border: 1px solid rgba(var(--admin-accent-rgb), 0.1);
+  background:
+    radial-gradient(circle at top right, rgba(var(--admin-accent-rgb), 0.08), transparent 20%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(244, 249, 255, 0.98));
+  box-shadow:
+    0 18px 34px rgba(var(--admin-accent-rgb), 0.07),
+    inset 0 1px 0 rgba(255, 255, 255, 0.78);
+}
+
+.user-list-card .n-data-table .n-data-table-base-table-header,
+.role-list-card .n-data-table .n-data-table-base-table-header,
+.banner-list-card .n-data-table .n-data-table-base-table-header,
+.dict-list-card .n-data-table .n-data-table-base-table-header,
+.manage-list-card .n-data-table .n-data-table-base-table-header,
+.config-list-card .n-data-table .n-data-table-base-table-header,
+.coupon-list-card .n-data-table .n-data-table-base-table-header,
+.coupon-detail-card .n-data-table .n-data-table-base-table-header,
+.mq-list-card .n-data-table .n-data-table-base-table-header {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(236, 245, 255, 0.98));
+}
+
+.user-list-card .n-data-table .n-data-table-th,
+.role-list-card .n-data-table .n-data-table-th,
+.banner-list-card .n-data-table .n-data-table-th,
+.dict-list-card .n-data-table .n-data-table-th,
+.manage-list-card .n-data-table .n-data-table-th,
+.config-list-card .n-data-table .n-data-table-th,
+.coupon-list-card .n-data-table .n-data-table-th,
+.coupon-detail-card .n-data-table .n-data-table-th,
+.mq-list-card .n-data-table .n-data-table-th {
+  padding-top: 15px;
+  padding-bottom: 15px;
+  color: color-mix(in srgb, var(--admin-accent-strong) 64%, #20314b);
+  font-size: 13px;
+  font-weight: 700;
+  border-bottom-color: rgba(var(--admin-accent-rgb), 0.08) !important;
+}
+
+.user-list-card .n-data-table .n-data-table-td,
+.role-list-card .n-data-table .n-data-table-td,
+.banner-list-card .n-data-table .n-data-table-td,
+.dict-list-card .n-data-table .n-data-table-td,
+.manage-list-card .n-data-table .n-data-table-td,
+.config-list-card .n-data-table .n-data-table-td,
+.coupon-list-card .n-data-table .n-data-table-td,
+.coupon-detail-card .n-data-table .n-data-table-td,
+.mq-list-card .n-data-table .n-data-table-td {
+  padding-top: 14px;
+  padding-bottom: 14px;
+  color: color-mix(in srgb, var(--admin-accent-strong) 28%, #26364d);
+  border-bottom-color: rgba(var(--admin-accent-rgb), 0.06) !important;
+}
+
+.user-list-card .n-data-table .n-data-table-tr:not(.n-data-table-tr--summary):nth-child(even) td,
+.role-list-card .n-data-table .n-data-table-tr:not(.n-data-table-tr--summary):nth-child(even) td,
+.banner-list-card .n-data-table .n-data-table-tr:not(.n-data-table-tr--summary):nth-child(even) td,
+.dict-list-card .n-data-table .n-data-table-tr:not(.n-data-table-tr--summary):nth-child(even) td,
+.manage-list-card .n-data-table .n-data-table-tr:not(.n-data-table-tr--summary):nth-child(even) td,
+.config-list-card .n-data-table .n-data-table-tr:not(.n-data-table-tr--summary):nth-child(even) td,
+.coupon-list-card .n-data-table .n-data-table-tr:not(.n-data-table-tr--summary):nth-child(even) td,
+.coupon-detail-card .n-data-table .n-data-table-tr:not(.n-data-table-tr--summary):nth-child(even) td,
+.mq-list-card .n-data-table .n-data-table-tr:not(.n-data-table-tr--summary):nth-child(even) td {
+  background: rgba(243, 249, 255, 0.78);
+}
+
+.user-list-card .n-data-table .n-data-table-tbody .n-data-table-tr:hover td,
+.role-list-card .n-data-table .n-data-table-tbody .n-data-table-tr:hover td,
+.banner-list-card .n-data-table .n-data-table-tbody .n-data-table-tr:hover td,
+.dict-list-card .n-data-table .n-data-table-tbody .n-data-table-tr:hover td,
+.manage-list-card .n-data-table .n-data-table-tbody .n-data-table-tr:hover td,
+.config-list-card .n-data-table .n-data-table-tbody .n-data-table-tr:hover td,
+.coupon-list-card .n-data-table .n-data-table-tbody .n-data-table-tr:hover td,
+.coupon-detail-card .n-data-table .n-data-table-tbody .n-data-table-tr:hover td,
+.mq-list-card .n-data-table .n-data-table-tbody .n-data-table-tr:hover td {
+  background: rgba(var(--admin-accent-rgb), 0.06) !important;
+}
+
+html.dark .user-list-card .n-card-header,
+html.dark .role-list-card .n-card-header,
+html.dark .banner-list-card .n-card-header,
+html.dark .dict-list-card .n-card-header,
+html.dark .manage-list-card .n-card-header,
+html.dark .config-list-card .n-card-header,
+html.dark .coupon-list-card .n-card-header,
+html.dark .coupon-detail-card .n-card-header,
+html.dark .mq-list-card .n-card-header {
+  border-bottom-color: rgba(255, 255, 255, 0.06);
+}
+
+html.dark .user-list-card .n-card-header__main,
+html.dark .role-list-card .n-card-header__main,
+html.dark .banner-list-card .n-card-header__main,
+html.dark .dict-list-card .n-card-header__main,
+html.dark .manage-list-card .n-card-header__main,
+html.dark .config-list-card .n-card-header__main,
+html.dark .coupon-list-card .n-card-header__main,
+html.dark .coupon-detail-card .n-card-header__main,
+html.dark .mq-list-card .n-card-header__main {
+  color: rgba(241, 246, 255, 0.96);
+}
+
+html.dark .user-list-card .n-card__content,
+html.dark .role-list-card .n-card__content,
+html.dark .banner-list-card .n-card__content,
+html.dark .dict-list-card .n-card__content,
+html.dark .manage-list-card .n-card__content,
+html.dark .config-list-card .n-card__content,
+html.dark .coupon-list-card .n-card__content,
+html.dark .coupon-detail-card .n-card__content,
+html.dark .mq-list-card .n-card__content {
+  color: rgba(241, 246, 255, 0.96);
+}
+
+html.dark .user-list-card .n-data-table,
+html.dark .role-list-card .n-data-table,
+html.dark .banner-list-card .n-data-table,
+html.dark .dict-list-card .n-data-table,
+html.dark .manage-list-card .n-data-table,
+html.dark .config-list-card .n-data-table,
+html.dark .coupon-list-card .n-data-table,
+html.dark .coupon-detail-card .n-data-table,
+html.dark .mq-list-card .n-data-table {
+  border-color: rgba(var(--admin-accent-rgb), 0.16);
+  background:
+    radial-gradient(circle at top right, rgba(var(--admin-accent-rgb), 0.14), transparent 18%),
+    linear-gradient(180deg, rgba(8, 13, 22, 0.98), rgba(13, 19, 31, 0.98));
+  box-shadow:
+    0 24px 40px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+html.dark .user-list-card .n-data-table .n-data-table-wrapper,
+html.dark .role-list-card .n-data-table .n-data-table-wrapper,
+html.dark .banner-list-card .n-data-table .n-data-table-wrapper,
+html.dark .dict-list-card .n-data-table .n-data-table-wrapper,
+html.dark .manage-list-card .n-data-table .n-data-table-wrapper,
+html.dark .config-list-card .n-data-table .n-data-table-wrapper,
+html.dark .coupon-list-card .n-data-table .n-data-table-wrapper,
+html.dark .coupon-detail-card .n-data-table .n-data-table-wrapper,
+html.dark .mq-list-card .n-data-table .n-data-table-wrapper,
+html.dark .user-list-card .n-data-table .n-data-table-base-table,
+html.dark .role-list-card .n-data-table .n-data-table-base-table,
+html.dark .banner-list-card .n-data-table .n-data-table-base-table,
+html.dark .dict-list-card .n-data-table .n-data-table-base-table,
+html.dark .manage-list-card .n-data-table .n-data-table-base-table,
+html.dark .config-list-card .n-data-table .n-data-table-base-table,
+html.dark .coupon-list-card .n-data-table .n-data-table-base-table,
+html.dark .coupon-detail-card .n-data-table .n-data-table-base-table,
+html.dark .mq-list-card .n-data-table .n-data-table-base-table,
+html.dark .user-list-card .n-data-table .n-data-table-base-table-body,
+html.dark .role-list-card .n-data-table .n-data-table-base-table-body,
+html.dark .banner-list-card .n-data-table .n-data-table-base-table-body,
+html.dark .dict-list-card .n-data-table .n-data-table-base-table-body,
+html.dark .manage-list-card .n-data-table .n-data-table-base-table-body,
+html.dark .config-list-card .n-data-table .n-data-table-base-table-body,
+html.dark .coupon-list-card .n-data-table .n-data-table-base-table-body,
+html.dark .coupon-detail-card .n-data-table .n-data-table-base-table-body,
+html.dark .mq-list-card .n-data-table .n-data-table-base-table-body {
+  background: transparent !important;
+}
+
+html.dark .user-list-card .n-data-table .n-data-table-base-table-header,
+html.dark .role-list-card .n-data-table .n-data-table-base-table-header,
+html.dark .banner-list-card .n-data-table .n-data-table-base-table-header,
+html.dark .dict-list-card .n-data-table .n-data-table-base-table-header,
+html.dark .manage-list-card .n-data-table .n-data-table-base-table-header,
+html.dark .config-list-card .n-data-table .n-data-table-base-table-header,
+html.dark .coupon-list-card .n-data-table .n-data-table-base-table-header,
+html.dark .coupon-detail-card .n-data-table .n-data-table-base-table-header,
+html.dark .mq-list-card .n-data-table .n-data-table-base-table-header {
+  background: linear-gradient(180deg, rgba(20, 28, 44, 0.98), rgba(13, 19, 31, 0.98));
+}
+
+html.dark .user-list-card .n-data-table .n-data-table-th,
+html.dark .role-list-card .n-data-table .n-data-table-th,
+html.dark .banner-list-card .n-data-table .n-data-table-th,
+html.dark .dict-list-card .n-data-table .n-data-table-th,
+html.dark .manage-list-card .n-data-table .n-data-table-th,
+html.dark .config-list-card .n-data-table .n-data-table-th,
+html.dark .coupon-list-card .n-data-table .n-data-table-th,
+html.dark .coupon-detail-card .n-data-table .n-data-table-th,
+html.dark .mq-list-card .n-data-table .n-data-table-th {
+  background: rgba(18, 26, 41, 0.94);
+  color: rgba(236, 242, 255, 0.92);
+  border-bottom-color: rgba(var(--admin-accent-rgb), 0.14) !important;
+}
+
+html.dark .user-list-card .n-data-table .n-data-table-td,
+html.dark .role-list-card .n-data-table .n-data-table-td,
+html.dark .banner-list-card .n-data-table .n-data-table-td,
+html.dark .dict-list-card .n-data-table .n-data-table-td,
+html.dark .manage-list-card .n-data-table .n-data-table-td,
+html.dark .config-list-card .n-data-table .n-data-table-td,
+html.dark .coupon-list-card .n-data-table .n-data-table-td,
+html.dark .coupon-detail-card .n-data-table .n-data-table-td,
+html.dark .mq-list-card .n-data-table .n-data-table-td {
+  background: rgba(11, 16, 26, 0.78);
+  color: rgba(220, 228, 242, 0.9);
+  border-bottom-color: rgba(var(--admin-accent-rgb), 0.1) !important;
+}
+
+html.dark .user-list-card .n-data-table .n-data-table-tr:not(.n-data-table-tr--summary):nth-child(even) td,
+html.dark .role-list-card .n-data-table .n-data-table-tr:not(.n-data-table-tr--summary):nth-child(even) td,
+html.dark .banner-list-card .n-data-table .n-data-table-tr:not(.n-data-table-tr--summary):nth-child(even) td,
+html.dark .dict-list-card .n-data-table .n-data-table-tr:not(.n-data-table-tr--summary):nth-child(even) td,
+html.dark .manage-list-card .n-data-table .n-data-table-tr:not(.n-data-table-tr--summary):nth-child(even) td,
+html.dark .config-list-card .n-data-table .n-data-table-tr:not(.n-data-table-tr--summary):nth-child(even) td,
+html.dark .coupon-list-card .n-data-table .n-data-table-tr:not(.n-data-table-tr--summary):nth-child(even) td,
+html.dark .coupon-detail-card .n-data-table .n-data-table-tr:not(.n-data-table-tr--summary):nth-child(even) td,
+html.dark .mq-list-card .n-data-table .n-data-table-tr:not(.n-data-table-tr--summary):nth-child(even) td {
+  background: rgba(var(--admin-accent-rgb), 0.056);
+}
+
+html.dark .user-list-card .n-data-table .n-data-table-tbody .n-data-table-tr:hover td,
+html.dark .role-list-card .n-data-table .n-data-table-tbody .n-data-table-tr:hover td,
+html.dark .banner-list-card .n-data-table .n-data-table-tbody .n-data-table-tr:hover td,
+html.dark .dict-list-card .n-data-table .n-data-table-tbody .n-data-table-tr:hover td,
+html.dark .manage-list-card .n-data-table .n-data-table-tbody .n-data-table-tr:hover td,
+html.dark .config-list-card .n-data-table .n-data-table-tbody .n-data-table-tr:hover td,
+html.dark .coupon-list-card .n-data-table .n-data-table-tbody .n-data-table-tr:hover td,
+html.dark .coupon-detail-card .n-data-table .n-data-table-tbody .n-data-table-tr:hover td,
+html.dark .mq-list-card .n-data-table .n-data-table-tbody .n-data-table-tr:hover td {
+  background: rgba(var(--admin-accent-rgb), 0.13) !important;
+}
+
+html .dashboard-hero.dashboard-hero,
+html .order-list-hero.order-list-hero,
+html .detail-hero.detail-hero,
+html .order-hero.order-hero,
+html .checkout-hero.checkout-hero,
+html .ops-hero.ops-hero,
+html .kitchen-hero.kitchen-hero,
+html .marketing-hero.marketing-hero,
+html .level-hero.level-hero,
+html .record-hero.record-hero,
+html .growth-hero.growth-hero,
+html .ranking-hero.ranking-hero,
+html .report-hero.report-hero,
+html .table-manage-hero.table-manage-hero,
+html .board-hero.board-hero {
+  background:
+    radial-gradient(circle at top right, rgba(var(--admin-accent-rgb), 0.2), transparent 24%),
+    linear-gradient(135deg, rgba(252, 254, 255, 0.98), rgba(228, 239, 255, 0.98)) !important;
+  border: 1px solid rgba(var(--admin-accent-rgb), 0.14) !important;
+  box-shadow:
+    0 26px 48px rgba(var(--admin-accent-rgb), 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.82) !important;
+}
+
+html .dashboard-kicker,
+html .order-list-hero__eyebrow,
+html .detail-hero__eyebrow,
+html .order-hero__eyebrow,
+html .checkout-hero__eyebrow,
+html .ops-hero__eyebrow,
+html .kitchen-hero__eyebrow,
+html .marketing-hero__eyebrow,
+html .level-hero__eyebrow,
+html .record-hero__eyebrow,
+html .growth-hero__eyebrow,
+html .ranking-hero__eyebrow,
+html .report-hero__eyebrow,
+html .table-manage-hero__eyebrow,
+html .board-hero__eyebrow {
+  color: rgba(var(--admin-accent-rgb), 0.74) !important;
+}
+
+html .dashboard-title,
+html .order-list-hero__title,
+html .detail-hero__title,
+html .order-hero__title,
+html .checkout-hero__title,
+html .ops-hero__title,
+html .kitchen-hero__title,
+html .marketing-hero__title,
+html .level-hero__title,
+html .record-hero__title,
+html .growth-hero__title,
+html .ranking-hero__title,
+html .report-hero__title,
+html .table-manage-hero__title,
+html .board-hero__title {
+  color: color-mix(in srgb, var(--admin-accent-strong) 58%, #1b2d45) !important;
+}
+
+html .dashboard-copy,
+html .order-list-hero__desc,
+html .detail-hero__desc,
+html .order-hero__desc,
+html .checkout-hero__desc,
+html .ops-hero__desc,
+html .kitchen-hero__desc,
+html .marketing-hero__desc,
+html .level-hero__desc,
+html .record-hero__desc,
+html .growth-hero__desc,
+html .ranking-hero__desc,
+html .report-hero__desc,
+html .table-manage-hero__desc,
+html .board-hero__desc {
+  color: color-mix(in srgb, var(--admin-accent-strong) 28%, #44556f) !important;
+}
+
+html .dashboard-badge,
+html .order-list-hero__badge,
+html .detail-hero__badge,
+html .checkout-hero__badge,
+html .ops-hero__badge,
+html .record-hero__badge,
+html .growth-hero__badge,
+html .ranking-hero__badge,
+html .report-hero__badge,
+html .table-manage-hero__badge,
+html .board-hero__focus,
+html .order-hero__stat,
+html .kitchen-hero__stat,
+html .level-hero__stat,
+html .table-manage-hero__stat,
+html .board-hero__stat,
+html .dashboard-pulse__item,
+html .marketing-hero__metric {
+  background: rgba(255, 255, 255, 0.78) !important;
+  border: 1px solid rgba(var(--admin-accent-rgb), 0.12) !important;
+  box-shadow:
+    0 18px 34px rgba(var(--admin-accent-rgb), 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.82) !important;
+}
+
+html .dashboard-badge__label,
+html .order-list-hero__badge span,
+html .detail-hero__badge span,
+html .checkout-hero__badge span,
+html .ops-hero__badge span,
+html .record-hero__badge span,
+html .growth-hero__badge span,
+html .ranking-hero__badge span,
+html .report-hero__badge span,
+html .table-manage-hero__badge span,
+html .table-manage-hero__badge small,
+html .board-hero__focus span,
+html .board-hero__focus small,
+html .order-hero__stat span,
+html .kitchen-hero__stat span,
+html .level-hero__stat span,
+html .table-manage-hero__stat span,
+html .table-manage-hero__stat small,
+html .board-hero__stat span,
+html .board-hero__stat small,
+html .dashboard-pulse__item span,
+html .dashboard-pulse__item small,
+html .marketing-hero__metric-label {
+  color: rgba(var(--admin-accent-rgb), 0.74) !important;
+}
+
+html .dashboard-badge__value,
+html .order-list-hero__badge strong,
+html .detail-hero__badge strong,
+html .checkout-hero__badge strong,
+html .ops-hero__badge strong,
+html .record-hero__badge strong,
+html .growth-hero__badge strong,
+html .ranking-hero__badge strong,
+html .report-hero__badge strong,
+html .table-manage-hero__badge strong,
+html .board-hero__focus strong,
+html .order-hero__stat strong,
+html .kitchen-hero__stat strong,
+html .level-hero__stat strong,
+html .table-manage-hero__stat strong,
+html .board-hero__stat strong,
+html .dashboard-pulse__item strong,
+html .marketing-hero__metric-value,
+html .marketing-hero__metric[data-tone='primary'] .marketing-hero__metric-value,
+html .marketing-hero__metric[data-tone='warning'] .marketing-hero__metric-value {
+  color: var(--admin-accent-strong) !important;
+}
+
+html.dark .dashboard-hero.dashboard-hero,
+html.dark .order-list-hero.order-list-hero,
+html.dark .detail-hero.detail-hero,
+html.dark .order-hero.order-hero,
+html.dark .checkout-hero.checkout-hero,
+html.dark .ops-hero.ops-hero,
+html.dark .kitchen-hero.kitchen-hero,
+html.dark .marketing-hero.marketing-hero,
+html.dark .level-hero.level-hero,
+html.dark .record-hero.record-hero,
+html.dark .growth-hero.growth-hero,
+html.dark .ranking-hero.ranking-hero,
+html.dark .report-hero.report-hero,
+html.dark .table-manage-hero.table-manage-hero,
+html.dark .board-hero.board-hero {
+  background:
+    radial-gradient(circle at top right, rgba(var(--admin-accent-rgb), 0.16), transparent 24%),
+    linear-gradient(135deg, rgba(4, 6, 10, 0.99), rgba(10, 13, 19, 0.99)) !important;
+  border-color: rgba(255, 255, 255, 0.06) !important;
+  box-shadow:
+    0 30px 56px rgba(0, 0, 0, 0.42),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
+}
+
+html.dark .dashboard-kicker,
+html.dark .order-list-hero__eyebrow,
+html.dark .detail-hero__eyebrow,
+html.dark .order-hero__eyebrow,
+html.dark .checkout-hero__eyebrow,
+html.dark .ops-hero__eyebrow,
+html.dark .kitchen-hero__eyebrow,
+html.dark .marketing-hero__eyebrow,
+html.dark .level-hero__eyebrow,
+html.dark .record-hero__eyebrow,
+html.dark .growth-hero__eyebrow,
+html.dark .ranking-hero__eyebrow,
+html.dark .report-hero__eyebrow,
+html.dark .table-manage-hero__eyebrow,
+html.dark .board-hero__eyebrow {
+  color: rgba(183, 198, 228, 0.68) !important;
+}
+
+html.dark .dashboard-title,
+html.dark .order-list-hero__title,
+html.dark .detail-hero__title,
+html.dark .order-hero__title,
+html.dark .checkout-hero__title,
+html.dark .ops-hero__title,
+html.dark .kitchen-hero__title,
+html.dark .marketing-hero__title,
+html.dark .level-hero__title,
+html.dark .record-hero__title,
+html.dark .growth-hero__title,
+html.dark .ranking-hero__title,
+html.dark .report-hero__title,
+html.dark .table-manage-hero__title,
+html.dark .board-hero__title {
+  color: rgba(241, 246, 255, 0.96) !important;
+}
+
+html.dark .dashboard-copy,
+html.dark .order-list-hero__desc,
+html.dark .detail-hero__desc,
+html.dark .order-hero__desc,
+html.dark .checkout-hero__desc,
+html.dark .ops-hero__desc,
+html.dark .kitchen-hero__desc,
+html.dark .marketing-hero__desc,
+html.dark .level-hero__desc,
+html.dark .record-hero__desc,
+html.dark .growth-hero__desc,
+html.dark .ranking-hero__desc,
+html.dark .report-hero__desc,
+html.dark .table-manage-hero__desc,
+html.dark .board-hero__desc {
+  color: rgba(209, 220, 241, 0.72) !important;
+}
+
+html.dark .dashboard-badge,
+html.dark .order-list-hero__badge,
+html.dark .detail-hero__badge,
+html.dark .checkout-hero__badge,
+html.dark .ops-hero__badge,
+html.dark .record-hero__badge,
+html.dark .growth-hero__badge,
+html.dark .ranking-hero__badge,
+html.dark .report-hero__badge,
+html.dark .table-manage-hero__badge,
+html.dark .board-hero__focus,
+html.dark .order-hero__stat,
+html.dark .kitchen-hero__stat,
+html.dark .level-hero__stat,
+html.dark .table-manage-hero__stat,
+html.dark .board-hero__stat,
+html.dark .dashboard-pulse__item,
+html.dark .marketing-hero__metric {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  box-shadow:
+    0 24px 42px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
+}
+
+html.dark .dashboard-badge__label,
+html.dark .order-list-hero__badge span,
+html.dark .detail-hero__badge span,
+html.dark .checkout-hero__badge span,
+html.dark .ops-hero__badge span,
+html.dark .record-hero__badge span,
+html.dark .growth-hero__badge span,
+html.dark .ranking-hero__badge span,
+html.dark .report-hero__badge span,
+html.dark .table-manage-hero__badge span,
+html.dark .table-manage-hero__badge small,
+html.dark .board-hero__focus span,
+html.dark .board-hero__focus small,
+html.dark .order-hero__stat span,
+html.dark .kitchen-hero__stat span,
+html.dark .level-hero__stat span,
+html.dark .table-manage-hero__stat span,
+html.dark .table-manage-hero__stat small,
+html.dark .board-hero__stat span,
+html.dark .board-hero__stat small,
+html.dark .dashboard-pulse__item span,
+html.dark .dashboard-pulse__item small,
+html.dark .marketing-hero__metric-label {
+  color: rgba(183, 198, 228, 0.68) !important;
+}
+
+html.dark .dashboard-badge__value,
+html.dark .order-list-hero__badge strong,
+html.dark .detail-hero__badge strong,
+html.dark .checkout-hero__badge strong,
+html.dark .ops-hero__badge strong,
+html.dark .record-hero__badge strong,
+html.dark .growth-hero__badge strong,
+html.dark .ranking-hero__badge strong,
+html.dark .report-hero__badge strong,
+html.dark .table-manage-hero__badge strong,
+html.dark .board-hero__focus strong,
+html.dark .order-hero__stat strong,
+html.dark .kitchen-hero__stat strong,
+html.dark .level-hero__stat strong,
+html.dark .table-manage-hero__stat strong,
+html.dark .board-hero__stat strong,
+html.dark .dashboard-pulse__item strong,
+html.dark .marketing-hero__metric-value,
+html.dark .marketing-hero__metric[data-tone='primary'] .marketing-hero__metric-value,
+html.dark .marketing-hero__metric[data-tone='warning'] .marketing-hero__metric-value {
+  color: #dbe5ff !important;
+}
+
+@media (max-width: 900px) {
+  .log-hero__head,
+  .order-list-hero__head,
+  .stat-hero__head,
+  .user-hero__head,
+  .report-hero__head,
+  .record-hero__head,
+  .detail-hero__head,
+  .ranking-hero__head,
+  .role-hero__head,
+  .growth-hero__head,
+  .banner-hero__head,
+  .manage-hero__head,
+  .dict-hero__head,
+  .coupon-hero__head,
+  .level-hero__head,
+  .config-hero__head,
+  .order-hero__head,
+  .checkout-hero__head,
+  .ops-hero__head,
+  .kitchen-hero__head {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+  }
+
+  .log-hero__badge,
+  .order-list-hero__badge,
+  .user-hero__badge,
+  .report-hero__badge,
+  .record-hero__badge,
+  .detail-hero__badge,
+  .ranking-hero__badge,
+  .role-hero__badge,
+  .growth-hero__badge,
+  .banner-hero__badge,
+  .manage-hero__badge,
+  .dict-hero__badge,
+  .coupon-hero__badge,
+  .config-hero__badge,
+  .checkout-hero__badge,
+  .ops-hero__badge {
+    min-width: 0;
+    width: 100%;
+  }
+}
+
+/* 表格行 hover 过渡 */
+.n-data-table .n-data-table-tbody tr {
+  transition: background-color 0.15s ease, transform 0.15s ease;
+}
+.n-data-table .n-data-table-tbody tr:hover {
+  background: rgba(var(--admin-accent-rgb), 0.035);
+  transform: translateX(2px);
+}
+
+.n-data-table .n-data-table-tr:not(.n-data-table-tr--summary):nth-child(even) td {
+  background: rgba(243, 249, 255, 0.7);
+}
+
+/* 输入框 focus 发光 */
+.n-input--focus,
+.n-input.n-input--focus {
+  box-shadow: 0 0 0 3px rgba(var(--admin-accent-rgb), 0.12);
+}
+
+/* 按钮 hover 上浮 */
+.n-button:not(.n-button--disabled):hover {
+  transform: translateY(-1px);
+}
+.n-button {
+  border-radius: 14px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.n-button--default-type {
+  border-color: rgba(var(--admin-accent-rgb), 0.12) !important;
+  background: color-mix(in srgb, var(--admin-layout-start) 26%, white) !important;
+}
+
+.n-button--primary-type {
+  border-color: rgba(var(--admin-accent-rgb), 0.92) !important;
+  background: linear-gradient(180deg, var(--admin-accent-gradient-start), var(--admin-accent-gradient-end)) !important;
+  color: #fff !important;
+  box-shadow: 0 14px 28px rgba(var(--admin-accent-rgb), 0.28);
+}
+
+.n-button--primary-type:not(.n-button--disabled):hover {
+  border-color: rgba(var(--admin-accent-rgb), 0.92) !important;
+  background: linear-gradient(180deg, var(--admin-accent-strong), var(--admin-accent-gradient-end)) !important;
+}
+
+.n-button--success-type,
+.n-button--info-type,
+.n-button--warning-type,
+.n-button--error-type {
+  color: #fff !important;
+}
+
+.n-button--success-type {
+  border-color: #2f8f6b !important;
+  background: linear-gradient(180deg, #52b38b, #2f8f6b) !important;
+  box-shadow: 0 10px 18px rgba(var(--admin-success-rgb), 0.22);
+}
+
+.n-button--info-type {
+  border-color: #2f7a8a !important;
+  background: linear-gradient(180deg, #56a6b6, #2f7a8a) !important;
+  box-shadow: 0 10px 18px rgba(var(--admin-info-rgb), 0.22);
+}
+
+.n-button--warning-type {
+  border-color: #d18a22 !important;
+  background: linear-gradient(180deg, #e7aa45, #d18a22) !important;
+  box-shadow: 0 10px 18px rgba(var(--admin-warning-rgb), 0.22);
+}
+
+.n-button--error-type {
+  border-color: #c7463b !important;
+  background: linear-gradient(180deg, #da675d, #c7463b) !important;
+  box-shadow: 0 10px 18px rgba(var(--admin-error-rgb), 0.2);
+}
+
+/* 下拉选择器选项 hover 过渡 */
+.n-base-select-option {
+  transition: background-color 0.15s ease;
+}
+
+.n-pagination .n-pagination-item,
+.n-pagination .n-pagination-item-link {
+  border-radius: 12px !important;
+  border: 1px solid rgba(var(--admin-accent-rgb), 0.08);
+  background: color-mix(in srgb, var(--admin-layout-start) 24%, white);
+}
+
+.n-pagination .n-pagination-item:not(.n-pagination-item--disabled):hover,
+.n-pagination .n-pagination-item-link:not(.n-pagination-item--disabled):hover {
+  border-color: rgba(var(--admin-accent-rgb), 0.18);
+  background: rgba(var(--admin-accent-rgb), 0.06);
+}
+
+.n-pagination .n-pagination-item--active {
+  color: var(--admin-accent-strong) !important;
+  background: rgba(var(--admin-accent-rgb), 0.12) !important;
+  border-color: rgba(var(--admin-accent-rgb), 0.18) !important;
+}
+
+.n-tag {
+  border-radius: 999px;
+}
+
+.n-tag.n-tag--success-type {
+  color: #2f8f6b !important;
+  background: #edf7f1 !important;
+  border-color: #b7e1cc !important;
+}
+
+.n-tag.n-tag--info-type {
+  color: #2f7a8a !important;
+  background: #edf6f7 !important;
+  border-color: #b8d7de !important;
+}
+
+.n-tag.n-tag--warning-type {
+  color: #d18a22 !important;
+  background: #fcf5e8 !important;
+  border-color: #ebd09d !important;
+}
+
+.n-tag.n-tag--error-type {
+  color: #c7463b !important;
+  background: #fbefee !important;
+  border-color: #e9b9b5 !important;
+}
+
+.n-tag.n-tag--default-type {
+  color: #163a70 !important;
+  background: rgba(var(--admin-accent-rgb), 0.08) !important;
+  border-color: rgba(var(--admin-accent-rgb), 0.12) !important;
+}
+
+.n-modal.n-card,
+.n-drawer .n-card {
+  border-radius: 24px;
+}
+
+.n-modal-mask {
+  backdrop-filter: blur(6px);
+  background: rgba(10, 27, 54, 0.24) !important;
+}
+
+.n-modal .n-card > .n-card-header,
+.n-drawer .n-card > .n-card-header {
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(var(--admin-accent-rgb), 0.08);
+}
+
+.n-modal .n-card > .n-card__content,
+.n-drawer .n-card > .n-card__content {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(243, 249, 255, 0.78));
+}
+
+/* 弹窗入场微缩放 */
+.n-modal {
+  animation: modal-in 0.25s ease-out;
+}
+@keyframes modal-in {
+  from { opacity: 0; transform: scale(0.95) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* 统一压缩业务页 HERO，高频页避免头部过高 */
+.n-card[class*='-hero'] > .n-card__content,
+.n-card[class$='-hero'] > .n-card__content {
+  padding-top: 18px !important;
+  padding-bottom: 18px !important;
+}
+
+[class*='-hero__eyebrow'],
+[class$='-hero__eyebrow'] {
+  margin-bottom: 6px !important;
+  letter-spacing: 0.18em !important;
+}
+
+[class*='-hero__head'],
+[class$='-hero__head'] {
+  gap: 14px !important;
+}
+
+[class*='-hero__title'],
+[class$='-hero__title'] {
+  font-size: 22px !important;
+  line-height: 1.24 !important;
+}
+
+[class*='-hero__desc'],
+[class$='-hero__desc'] {
+  margin-top: 6px !important;
+  font-size: 13px !important;
+  line-height: 1.6 !important;
+}
+
+[class*='-hero__badge'],
+[class$='-hero__badge'],
+[class*='-hero__stat'],
+[class$='-hero__stat'],
+[class*='-hero__metric'],
+[class$='-hero__metric'] {
+  min-width: 0 !important;
+  padding: 12px 14px !important;
+  border-radius: 16px !important;
+}
+
+[class*='-hero__badge'] span,
+[class$='-hero__badge'] span,
+[class*='-hero__stat'] span,
+[class$='-hero__stat'] span,
+[class*='-hero__metric-label'],
+[class$='-hero__metric-label'] {
+  font-size: 11px !important;
+}
+
+[class*='-hero__badge'] strong,
+[class$='-hero__badge'] strong,
+[class*='-hero__stat'] strong,
+[class$='-hero__stat'] strong,
+[class*='-hero__metric-value'],
+[class$='-hero__metric-value'] {
+  margin-top: 6px !important;
+  font-size: 22px !important;
+  line-height: 1.08 !important;
+}
+
+[class*='-hero__stats'],
+[class$='-hero__stats'],
+[class*='-hero__metrics'],
+[class$='-hero__metrics'] {
+  gap: 10px !important;
+}
+
+@media (max-width: 767px) {
+  .n-card[class*='-hero'] > .n-card__content,
+  .n-card[class$='-hero'] > .n-card__content {
+    padding-top: 14px !important;
+    padding-bottom: 14px !important;
+  }
+
+  [class*='-hero__title'],
+  [class$='-hero__title'] {
+    font-size: 18px !important;
+  }
+
+  [class*='-hero__desc'],
+  [class$='-hero__desc'] {
+    font-size: 12px !important;
+  }
+
+  [class*='-hero__badge'],
+  [class$='-hero__badge'],
+  [class*='-hero__stat'],
+  [class$='-hero__stat'],
+  [class*='-hero__metric'],
+  [class$='-hero__metric'] {
+    padding: 10px 12px !important;
+    border-radius: 14px !important;
+  }
+
+  [class*='-hero__badge'] strong,
+  [class$='-hero__badge'] strong,
+  [class*='-hero__stat'] strong,
+  [class$='-hero__stat'] strong,
+  [class*='-hero__metric-value'],
+  [class$='-hero__metric-value'] {
+    font-size: 18px !important;
+  }
+}

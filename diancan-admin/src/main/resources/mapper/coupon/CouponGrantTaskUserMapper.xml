@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.scaffold.modules.coupon.mapper.CouponGrantTaskUserMapper">
+
+    <insert id="batchInsert">
+        INSERT INTO coupon_grant_task_user
+        (id, task_id, user_id, username, phone, grant_status, create_by, update_by, create_time, update_time, deleted)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.id},
+            #{item.taskId},
+            #{item.userId},
+            #{item.username},
+            #{item.phone},
+            #{item.grantStatus},
+            #{item.createBy},
+            #{item.updateBy},
+            #{item.createTime},
+            #{item.updateTime},
+            #{item.deleted}
+            )
+        </foreach>
+    </insert>
+
+</mapper>

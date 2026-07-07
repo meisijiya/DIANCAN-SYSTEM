@@ -1,0 +1,38 @@
+{
+  "official": true,
+  "name": "青岚绿",
+  "desc": "更稳重的门店经营主题，弱化攻击性，适合长时间值班和后台录单。",
+  "version": "2.1.0",
+  "themeScheme": "light",
+  "themeColor": "#109c56",
+  "themeRadius": 14,
+  "isInfoFollowPrimary": true,
+  "otherColor": {
+    "info": "#0eae96",
+    "success": "#109c56",
+    "warning": "#d59a14",
+    "error": "#d95d52"
+  },
+  "tokens": {
+    "light": {
+      "colors": {
+        "container": "rgb(245, 252, 247)",
+        "layout": "rgb(218, 241, 227)",
+        "inverted": "rgb(20, 50, 41)",
+        "base-text": "rgb(25, 56, 45)"
+      },
+      "boxShadow": {
+        "header": "0 14px 32px rgb(16, 156, 86, 0.1)",
+        "sider": "12px 0 28px 0 rgb(16, 156, 86, 0.08)",
+        "tab": "0 10px 24px rgb(16, 156, 86, 0.08)"
+      }
+    },
+    "dark": {
+      "colors": {
+        "container": "rgb(27, 31, 28)",
+        "layout": "rgb(17, 21, 18)",
+        "base-text": "rgb(225, 236, 229)"
+      }
+    }
+  }
+}

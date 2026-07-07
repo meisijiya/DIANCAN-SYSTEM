@@ -1,0 +1,41 @@
+<view class="page">
+  <view class="page-glow page-glow-a"></view>
+  <view class="page-glow page-glow-b"></view>
+  <view class="result-card">
+    <view class="result-icon {{ok ? 'success' : 'fail'}}">
+      <text>{{ok ? '✓' : '✕'}}</text>
+    </view>
+
+    <view class="result-title">{{ok ? '操作成功' : '操作失败'}}</view>
+    <view class="result-sub">{{type === 'review' ? '反馈已记录' : '订单流程已更新'}}</view>
+
+    <view class="result-desc" wx:if="{{type === 'review'}}">感谢你的反馈，欢迎再次光临！</view>
+    <view class="result-desc" wx:else>可在订单页继续查看支付和出餐状态</view>
+    <view class="result-desc member-tip" wx:if="{{ok && type !== 'review'}}">支付完成后可前往会员中心查看积分与成长值累计</view>
+
+    <view class="reward-card" wx:if="{{ok && type !== 'review' && orderId}}">
+      <view class="reward-card__title">本次会员到账</view>
+      <view class="reward-card__loading" wx:if="{{rewardLoading}}">正在同步会员奖励...</view>
+      <block wx:elif="{{rewardSummary}}">
+        <view class="reward-grid">
+          <view class="reward-metric">
+            <text class="reward-value">+{{rewardSummary.pointsReward || 0}}</text>
+            <text class="reward-label">积分</text>
+          </view>
+          <view class="reward-metric">
+            <text class="reward-value">+{{rewardSummary.growthReward || 0}}</text>
+            <text class="reward-label">成长值</text>
+          </view>
+        </view>
+        <view class="reward-note" wx:if="{{rewardSummary.settled}}">本次支付奖励已入账，可前往会员中心查看明细。</view>
+        <view class="reward-note reward-note--muted" wx:else>会员奖励正在处理或本单未产生奖励，可稍后到会员中心查看。</view>
+      </block>
+    </view>
+
+    <view class="result-actions">
+      <button class="btn-outline" bindtap="backHome">返回首页</button>
+      <button class="btn-primary" bindtap="goOrder">查看订单</button>
+    </view>
+    <button class="btn-member" wx:if="{{ok && type !== 'review'}}" bindtap="goMember">查看会员中心</button>
+  </view>
+</view>

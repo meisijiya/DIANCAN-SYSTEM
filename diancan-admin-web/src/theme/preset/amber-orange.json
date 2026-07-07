@@ -1,0 +1,38 @@
+{
+  "official": true,
+  "name": "琥珀橙",
+  "desc": "餐饮氛围感最强的一套主题，适合促销活动、套餐运营和收银台展示。",
+  "version": "2.1.0",
+  "themeScheme": "light",
+  "themeColor": "#e85a00",
+  "themeRadius": 14,
+  "isInfoFollowPrimary": true,
+  "otherColor": {
+    "info": "#ef9800",
+    "success": "#1f9d67",
+    "warning": "#e85a00",
+    "error": "#d94841"
+  },
+  "tokens": {
+    "light": {
+      "colors": {
+        "container": "rgb(255, 248, 242)",
+        "layout": "rgb(251, 230, 208)",
+        "inverted": "rgb(84, 41, 16)",
+        "base-text": "rgb(92, 46, 19)"
+      },
+      "boxShadow": {
+        "header": "0 14px 32px rgb(232, 90, 0, 0.1)",
+        "sider": "12px 0 28px 0 rgb(232, 90, 0, 0.08)",
+        "tab": "0 10px 24px rgb(232, 90, 0, 0.08)"
+      }
+    },
+    "dark": {
+      "colors": {
+        "container": "rgb(39, 26, 19)",
+        "layout": "rgb(28, 18, 13)",
+        "base-text": "rgb(249, 235, 223)"
+      }
+    }
+  }
+}

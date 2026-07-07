@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.scaffold.modules.coupon.mapper.CouponGrantTaskMapper">
+
+    <select id="selectByIdForUpdate" resultType="com.scaffold.modules.coupon.entity.CouponGrantTask">
+        SELECT *
+        FROM coupon_grant_task
+        WHERE id = #{id}
+          AND deleted = 0
+        FOR UPDATE
+    </select>
+
+</mapper>

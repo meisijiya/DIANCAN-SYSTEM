@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "我的评价",
+  "usingComponents": {
+    "star-rating": "/components/star-rating/index",
+    "empty-state": "/components/empty-state/index"
+  }
+}

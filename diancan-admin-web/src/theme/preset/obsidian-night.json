@@ -1,0 +1,47 @@
+{
+  "official": true,
+  "name": "曜石暗夜",
+  "desc": "低亮度值守主题，强调对比度和聚焦感，适合夜间前台与后厨监看。",
+  "version": "2.0.0",
+  "themeScheme": "dark",
+  "themeColor": "#6d8cff",
+  "themeRadius": 14,
+  "isInfoFollowPrimary": true,
+  "sider": {
+    "inverted": true
+  },
+  "otherColor": {
+    "info": "#5cc8ff",
+    "success": "#4ad295",
+    "warning": "#ffba57",
+    "error": "#ff7b72"
+  },
+  "tokens": {
+    "light": {
+      "colors": {
+        "container": "rgb(238, 243, 255)",
+        "layout": "rgb(228, 235, 249)",
+        "inverted": "rgb(18, 27, 45)",
+        "base-text": "rgb(24, 40, 69)"
+      },
+      "boxShadow": {
+        "header": "0 12px 30px rgb(109, 140, 255, 0.08)",
+        "sider": "12px 0 28px 0 rgb(109, 140, 255, 0.06)",
+        "tab": "0 10px 24px rgb(109, 140, 255, 0.06)"
+      }
+    },
+    "dark": {
+      "colors": {
+        "container": "rgb(10, 14, 22)",
+        "layout": "rgb(3, 5, 10)",
+        "inverted": "rgb(1, 3, 8)",
+        "base-text": "rgb(236, 242, 255)"
+      },
+      "boxShadow": {
+        "header": "0 14px 32px rgb(0, 0, 0, 0.46)",
+        "sider": "10px 0 24px 0 rgb(0, 0, 0, 0.52)",
+        "tab": "0 10px 24px rgb(0, 0, 0, 0.44)"
+      }
+    }
+  }
+}

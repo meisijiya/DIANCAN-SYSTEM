@@ -1,0 +1,85 @@
+# 主配置文件
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+spring:
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+  profiles:
+    active: dev
+  application:
+    name: backend-scaffold
+
+rocketmq:
+  name-server: ${ROCKETMQ_NAME_SERVER:127.0.0.1:9876}
+  producer:
+    group: ${ROCKETMQ_PRODUCER_GROUP:coupon-grant-producer-group}
+
+coupon:
+  grant:
+    mq:
+      enabled: true
+      topic: coupon-grant-topic
+      dispatch-tag: TASK_DISPATCH
+      batch-tag: TASK_BATCH
+      batch-size: 500
+      dispatch-limit: 100
+      max-retry-count: 16
+      sending-timeout-minutes: 5
+      consume-timeout-minutes: 10
+      dispatch-consumer-group: coupon-grant-dispatch-group
+      batch-consumer-group: coupon-grant-batch-group
+
+# Sa-Token 配置
+sa-token:
+  # token 名称
+  token-name: Authorization
+  # token 有效期（秒），默认30天
+  timeout: 2592000
+  # token 最低活跃频率（秒），超过此时间无操作则 token 失效
+  active-timeout: -1
+  # 是否允许同一账号多地同时登录
+  is-concurrent: true
+  # 在多人登录同一账号时，是否共用一个 token
+  is-share: true
+  # token 风格
+  token-style: uuid
+  # 是否输出操作日志
+  is-log: false
+
+# MyBatis-Plus 配置
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/**/*.xml
+  type-aliases-package: com.scaffold.modules.*.entity
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      id-type: assign_id
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+
+# Knife4j 配置
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+  api-docs:
+    path: /v3/api-docs
+  group-configs:
+    - group: 'default'
+      paths-to-match: '/**'
+      packages-to-scan: com.scaffold.modules
+
+knife4j:
+  enable: true
+  setting:
+    language: zh_cn

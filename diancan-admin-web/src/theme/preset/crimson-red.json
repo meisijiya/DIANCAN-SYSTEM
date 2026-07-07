@@ -1,0 +1,38 @@
+{
+  "official": true,
+  "name": "绯曜红",
+  "desc": "强调动作与提醒的高对比主题，适合活动冲刺、异常监控和关键告警场景。",
+  "version": "2.1.0",
+  "themeScheme": "light",
+  "themeColor": "#d61f45",
+  "themeRadius": 14,
+  "isInfoFollowPrimary": true,
+  "otherColor": {
+    "info": "#ef6c2f",
+    "success": "#1f9d67",
+    "warning": "#d58a16",
+    "error": "#d61f45"
+  },
+  "tokens": {
+    "light": {
+      "colors": {
+        "container": "rgb(255, 246, 248)",
+        "layout": "rgb(251, 226, 232)",
+        "inverted": "rgb(82, 25, 25)",
+        "base-text": "rgb(88, 31, 31)"
+      },
+      "boxShadow": {
+        "header": "0 14px 32px rgb(214, 31, 69, 0.1)",
+        "sider": "12px 0 28px 0 rgb(214, 31, 69, 0.08)",
+        "tab": "0 10px 24px rgb(214, 31, 69, 0.08)"
+      }
+    },
+    "dark": {
+      "colors": {
+        "container": "rgb(40, 23, 24)",
+        "layout": "rgb(28, 16, 18)",
+        "base-text": "rgb(248, 231, 231)"
+      }
+    }
+  }
+}

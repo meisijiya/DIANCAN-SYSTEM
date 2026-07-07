@@ -1,0 +1,223 @@
+<view class="menu-page">
+  <view class="page-glow page-glow-a"></view>
+  <view class="page-glow page-glow-b"></view>
+  <view class="top-card">
+    <view class="menu-hero" style="padding-top: {{statusBarHeight + navBarHeight + 8}}px;">
+      <view class="menu-hero__topline">
+        <view class="menu-hero__title">{{tableDisplayCode}} · 点餐中</view>
+        <view class="hero-badge-row">
+          <view class="hero-badge">{{heroStatusText}}</view>
+        </view>
+        <view class="hero-count">{{cartSummary.totalCount}} 件已选</view>
+      </view>
+      <view class="menu-hero__desc">{{menuHeroTitle}}</view>
+      <view class="hero-chip-row">
+        <view class="hero-chip">今日可点 {{totalDishCount}} 道</view>
+        <view class="hero-chip">点过 {{orderedDishCount}} 道</view>
+        <view class="hero-chip">推荐 {{recommendDishCount}} 道</view>
+      </view>
+
+      <view class="filter-card compact">
+        <view class="search-shell">
+          <view class="search-icon">⌕</view>
+          <input class="search-input" placeholder="搜索菜品、口味、配料" value="{{keyword}}" bindinput="onKeywordInput" />
+        </view>
+        <view class="quick-filter-row">
+          <view class="quick-filter {{quickFilter === 'all' ? 'active' : ''}}" data-filter="all" bindtap="selectQuickFilter">全部</view>
+          <view class="quick-filter {{quickFilter === 'recommend' ? 'active' : ''}}" data-filter="recommend" bindtap="selectQuickFilter">推荐</view>
+          <view class="quick-filter {{quickFilter === 'ordered' ? 'active' : ''}}" data-filter="ordered" bindtap="selectQuickFilter">点过</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="layout">
+    <scroll-view class="left-side" scroll-y scroll-with-animation scroll-into-view="{{categoryScrollIntoView}}" show-scrollbar="{{false}}">
+      <view id="category-all" class="cat-item {{activeCategoryId === null ? 'active' : ''}}" bindtap="selectAllCategory">
+        <view class="cat-item__icon">全部</view>
+        <view class="cat-item__copy">
+          <text class="cat-item__label">全部菜品</text>
+        </view>
+        <text class="cat-item__active-dot" wx:if="{{activeCategoryId === null}}"></text>
+      </view>
+      <view
+        wx:for="{{categories}}"
+        wx:key="id"
+        id="category-{{item._idStr}}"
+        class="cat-item {{activeCategoryId === item._idStr ? 'active' : ''}}"
+        data-id="{{item.id}}"
+        bindtap="selectCategory"
+      >
+        <view class="cat-item__icon">
+          <image wx:if="{{item.imageView}}" class="cat-item__image" src="{{item.imageView}}" mode="aspectFill" lazy-load />
+          <text wx:else>{{item.shortLabel}}</text>
+        </view>
+        <view class="cat-item__copy">
+          <text class="cat-item__label">{{item.name}}</text>
+        </view>
+        <text class="cat-item__active-dot" wx:if="{{activeCategoryId === item._idStr}}"></text>
+      </view>
+      <view class="cat-scroll-tail">
+        <view class="cat-scroll-tail__line"></view>
+        <view class="cat-scroll-tail__text">继续下滑查看更多分类</view>
+      </view>
+    </scroll-view>
+
+    <scroll-view class="right-side" scroll-y show-scrollbar="{{false}}">
+      <view class="right-surface">
+        <view class="dish-card" wx:for="{{dishList}}" wx:key="id" bindtap="openDetail" data-id="{{item.id}}">
+          <image class="thumb" src="{{item.imageView}}" mode="aspectFill" lazy-load />
+          <view class="info">
+            <view class="dish-meta-row">
+              <text class="meta-pill">{{item.categoryName}}</text>
+              <text class="meta-pill spice">{{item.spiceLabel}}</text>
+              <text class="meta-pill" wx:if="{{item.preparationTime}}">{{item.preparationTime}} 分钟</text>
+            </view>
+
+            <view class="dish-topline">
+              <view class="dish-name">{{item.name}}</view>
+              <view class="dish-sales">月售{{item.monthlySales || 0}}</view>
+            </view>
+
+            <view class="dish-sub">{{item.briefText}}</view>
+
+            <view class="dish-bottom">
+              <view class="dish-bottom__main">
+                <view class="dish-tags">
+                  <text class="mini-tag rec" wx:if="{{item._recommended}}">推荐</text>
+                  <text class="mini-tag had" wx:if="{{item._ordered}}">点过</text>
+                  <text class="soldout-tag" wx:if="{{item.soldOutFlag}}">售罄</text>
+                </view>
+                <view class="dish-price-row">
+                  <view class="dish-price">¥{{item.price}}</view>
+                  <text class="dish-unit">/份起</text>
+                </view>
+              </view>
+              <button
+                class="spec-btn {{item.soldOutFlag ? 'disabled' : ''}}"
+                disabled="{{item.soldOutFlag}}"
+                data-id="{{item.id}}"
+                catchtap="openDetail"
+              >
+                {{item.soldOutFlag ? '售罄' : '选规格'}}
+              </button>
+            </view>
+          </view>
+        </view>
+
+        <empty-state wx:if="{{visibleDishCount === 0}}" text="没有找到匹配的菜品，换个关键词试试" icon="/assets/tabbar/menu.png" />
+      </view>
+    </scroll-view>
+  </view>
+
+  <view class="cart-feedback {{cartFeedbackVisible ? 'show' : ''}}" wx:if="{{cartFeedbackVisible}}">
+    {{cartFeedbackText}}
+  </view>
+
+  <view class="cart-bar safe-bottom" wx:if="{{table}}">
+    <view class="bar-info" bindtap="goCart">
+      <view class="bar-icon">🛒</view>
+      <view class="bar-copy">
+        <view class="bar-sub">已点 {{cartSummary.totalCount}} 份菜品</view>
+        <view class="bar-price">¥{{cartSummary.totalPrice}}</view>
+      </view>
+    </view>
+    <view class="bar-btn-wrap">
+      <button class="bar-btn" bindtap="goCart">去结算</button>
+    </view>
+  </view>
+
+  <view class="mask sheet-mask" wx:if="{{detailVisible}}" bindtap="closeDetail">
+    <view class="popup sheet-popup" catchtap="noop">
+      <view class="popup-handle"></view>
+      <view class="popup-scroll">
+        <view class="popup-hero">
+          <image class="popup-img" src="{{detailDish.imageView}}" mode="aspectFill" />
+          <view class="popup-copy">
+            <view class="popup-tag-row">
+              <text class="popup-tag">{{detailDish.categoryName}}</text>
+              <text class="popup-tag spice">{{detailDish.spiceLabel}}</text>
+              <text class="popup-tag" wx:if="{{detailDish.preparationTime}}">{{detailDish.preparationTime}} 分钟</text>
+            </view>
+            <view class="popup-title">{{detailDish.name}}</view>
+            <view class="popup-price">¥{{detailDish.price}}</view>
+            <view class="popup-meta" wx:if="{{detailDish.description}}">{{detailDish.description}}</view>
+          </view>
+        </view>
+
+        <view class="popup-section" wx:if="{{detailHasIngredients}}">
+          <view class="section-head">
+            <view class="section-title">配料参考</view>
+            <view class="section-sub">下单前先看主要食材，避免重复确认。</view>
+          </view>
+          <view class="ingredient-row">
+            <text class="ingredient-chip" wx:for="{{detailDish.ingredientsList}}" wx:key="index">{{item}}</text>
+          </view>
+        </view>
+
+        <view class="popup-section">
+          <view class="section-head">
+            <view class="section-title">选数量</view>
+            <view class="section-sub">确认份数后加入购物车，购物车里再统一下单。</view>
+          </view>
+          <view class="qty-panel">
+            <view class="qty-btn qty-btn-minus" bindtap="decreaseDetailQty">
+              <text class="qty-icon">−</text>
+            </view>
+            <view class="qty-num">{{detailQty}}</view>
+            <view class="qty-btn qty-btn-plus" bindtap="increaseDetailQty">
+              <text class="qty-icon">＋</text>
+            </view>
+          </view>
+        </view>
+
+        <view class="popup-section">
+          <view class="section-head">
+            <view class="section-title">口味要求</view>
+            <view class="section-sub">例如少辣、不要香菜、先上热菜。</view>
+          </view>
+          <textarea
+            class="remark-input"
+            maxlength="120"
+            auto-height
+            placeholder="请输入你的备注"
+            value="{{detailRemark}}"
+            bindinput="onDetailRemarkInput"
+          />
+        </view>
+      </view>
+
+      <view class="popup-actions">
+        <button class="act-add" bindtap="confirmDetailAdd">加入购物车</button>
+      </view>
+    </view>
+  </view>
+
+  <view class="mask" wx:if="{{showLoginPanel}}" bindtap="closeLoginPanel">
+    <view class="login-popup" catchtap="noop">
+      <view class="login-popup-icon">登录</view>
+      <view class="login-popup-title">手机号登录</view>
+      <view class="login-popup-desc">登录后可下单、加入购物车</view>
+      <view class="agreement-row" bindtap="toggleAgreeProtocol">
+        <view class="agreement-check {{agreeProtocol ? 'checked' : ''}}">
+          <text wx:if="{{agreeProtocol}}">✓</text>
+        </view>
+        <view class="agreement-text">
+          已阅读并同意
+          <text class="agreement-link" catchtap="openUserAgreement">《用户协议》</text>
+          和
+          <text class="agreement-link" catchtap="openPrivacyPolicy">《隐私政策》</text>
+        </view>
+      </view>
+      <button
+        class="btn-primary login-popup-btn {{!agreeProtocol ? 'login-popup-btn--disabled' : ''}}"
+        disabled="{{!agreeProtocol}}"
+        open-type="getPhoneNumber"
+        bindgetphonenumber="handlePhoneLogin"
+      >
+        手机号快捷登录
+      </button>
+      <view class="login-popup-cancel" bindtap="closeLoginPanel">暂不登录</view>
+    </view>
+  </view>
+</view>

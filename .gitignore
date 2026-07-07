@@ -1,0 +1,43 @@
+# ===== IDE =====
+.idea/
+#diancan-admin/src/main/resources/application-dev.yml
+.vscode/
+*.iml
+*.swp
+*.swo
+
+# ===== 操作系统 =====
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ===== Java / Maven（后端）=====
+diancan-admin/target/
+diancan-admin/logs/
+diancan-admin/docs/
+diancan-admin/*.log
+diancan-admin/.mvn/
+diancan-admin/mvnw
+diancan-admin/mvnw.cmd
+diancan-admin/application-local.yml
+
+# ===== Node / 前端 =====
+diancan-admin-web/node_modules/
+diancan-admin-web/dist/
+diancan-admin-web/dist-ssr/
+diancan-admin-web/coverage/
+diancan-admin-web/.env.local
+diancan-admin-web/.env.*.local
+diancan-admin-web/package-lock.json
+diancan-admin-web/yarn.lock
+diancan-admin-web/.VSCodeCounter/
+
+# ===== 日志 =====
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# ===== Kiro =====
+.kiro/

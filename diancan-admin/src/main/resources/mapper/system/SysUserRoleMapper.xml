@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.scaffold.modules.system.mapper.SysUserRoleMapper">
+
+    <!-- 根据用户ID删除关联 -->
+    <delete id="deleteByUserId">
+        DELETE FROM sys_user_role WHERE user_id = #{userId}
+    </delete>
+
+    <!-- 根据角色ID统计关联数量 -->
+    <select id="countByRoleId" resultType="int">
+        SELECT COUNT(*) FROM sys_user_role WHERE role_id = #{roleId}
+    </select>
+
+    <!-- 根据角色ID查询用户ID列表 -->
+    <select id="selectUserIdsByRoleId" resultType="java.lang.Long">
+        SELECT user_id FROM sys_user_role WHERE role_id = #{roleId}
+    </select>
+
+    <!-- 根据角色ID删除关联 -->
+    <delete id="deleteByRoleId">
+        DELETE FROM sys_user_role WHERE role_id = #{roleId}
+    </delete>
+
+    <!-- 批量插入用户角色关联 -->
+    <insert id="batchInsertByRoleId">
+        INSERT INTO sys_user_role (role_id, user_id) VALUES
+        <foreach collection="userIds" item="userId" separator=",">
+            (#{roleId}, #{userId})
+        </foreach>
+    </insert>
+
+</mapper>
