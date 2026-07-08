@@ -31,7 +31,6 @@ import org.springframework.test.context.ActiveProfiles;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -204,7 +203,7 @@ class DineInFlowIntegrationTest {
     }
 
     @Test
-    void adminCreateOrder_shouldBeIdempotentByClientOrderNo() {
+    void adminCreatePreOrder_shouldCreateIndependentOrders() {
         final String suffix = String.valueOf(System.currentTimeMillis());
 
         DishCategoryCreateDTO categoryDTO = new DishCategoryCreateDTO();
@@ -239,12 +238,9 @@ class DineInFlowIntegrationTest {
                 .findFirst()
                 .orElseThrow();
 
-        String clientOrderNo = "OFF" + UUID.randomUUID().toString().replace("-", "").substring(0, 20);
-
         AdminOrderCreateDTO dto = new AdminOrderCreateDTO();
         dto.setTableId(table.getId());
         dto.setTableCode(table.getCode());
-        dto.setClientOrderNo(clientOrderNo);
         dto.setPaymentMode(1);
         dto.setOrderType(0);
         dto.setPreOrder(true);
@@ -258,8 +254,8 @@ class DineInFlowIntegrationTest {
         OrderVO second = orderService.createAdminOrder(dto);
 
         assertNotNull(first.getId());
-        assertEquals(first.getId(), second.getId(), "同 clientOrderNo 重复提交应返回同一订单");
-        assertEquals(clientOrderNo, first.getOrderNo());
-        assertEquals(clientOrderNo, second.getOrderNo());
+        assertNotNull(second.getId());
+        assertNotEquals(first.getId(), second.getId(), "当前管理端预订单重复提交应生成独立订单");
+        assertNotEquals(first.getOrderNo(), second.getOrderNo(), "当前管理端预订单会生成新的订单编号");
     }
 }
