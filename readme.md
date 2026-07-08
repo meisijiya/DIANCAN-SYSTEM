@@ -56,9 +56,6 @@ flowchart TB
             TABLE[桌台服务]
             ORDER[订单服务]
             MEMBER[会员服务]
-            MKT[营销服务]
-            DEVICE[设备服务]
-            REPORT[报表服务]
         end
     end
 
@@ -67,8 +64,10 @@ flowchart TB
         REDIS[(Redis)]
         MQ[(RocketMQ)]
         MINIO[(MinIO)]
-        WS[(WebSocket)]
     end
+
+    Top --> Center
+    Center --> Bottom
 
     style Top fill:#55c5c7,stroke:#333,stroke-width:2px,color:#111
     style Center fill:#ffc98f,stroke:#333,stroke-width:2px,color:#111
@@ -289,7 +288,7 @@ diancan-system
 ## 系统架构
 
 ```mermaid
-flowchart LR
+flowchart TB
     subgraph Top[应用层]
         MINI[微信小程序]
         ADMIN[管理端]
@@ -313,9 +312,6 @@ flowchart LR
             B2[桌台服务]
             B3[订单服务]
             B4[会员服务]
-            B5[营销服务]
-            B6[设备服务]
-            B7[报表服务]
         end
     end
 
@@ -324,8 +320,10 @@ flowchart LR
         CACHE[(Redis)]
         ROCKET[(RocketMQ)]
         OSS[(MinIO)]
-        PUSH[(WebSocket / STOMP)]
     end
+
+    Top --> Middle
+    Middle --> Bottom
 
     style Top fill:#55c5c7,stroke:#333,stroke-width:2px,color:#111
     style Middle fill:#ffc98f,stroke:#333,stroke-width:2px,color:#111
@@ -345,9 +343,6 @@ flowchart TB
         B[桌台识别]
         C[菜单浏览]
         D[加入购物车]
-        E[提交订单]
-        F[支付加菜]
-        G[评价反馈]
     end
 
     subgraph Core[中台层]
@@ -357,19 +352,23 @@ flowchart TB
         STATE[状态流转]
     end
 
-    subgraph Store[执行层]
+    subgraph Store[业务层]
         ACCEPT[前台接单]
         KITCHEN[后厨处理]
         PRINT[小票打印]
         SERVE[出餐催菜]
-        TABLE[桌台更新]
     end
 
     subgraph Result[存储层]
         REPORT[经营报表]
         REVIEW[评价分析]
         DATA[经营数据]
+        FEEDBACK[评价反馈]
     end
+
+    User --> Core
+    Core --> Store
+    Store --> Result
 
     style User fill:#55c5c7,stroke:#333,stroke-width:2px,color:#111
     style Core fill:#ffc98f,stroke:#333,stroke-width:2px,color:#111
