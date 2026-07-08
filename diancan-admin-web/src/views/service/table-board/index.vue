@@ -1234,6 +1234,34 @@ onUnmounted(() => {
   --board-chip-bg: rgba(var(--admin-accent-rgb), 0.08);
   --board-chip-border: rgba(var(--admin-accent-rgb), 0.12);
   --board-chip-text: var(--admin-accent-strong);
+  --table-status-free-bg:
+    radial-gradient(circle at top, rgba(47, 143, 107, 0.18) 0%, transparent 54%),
+    linear-gradient(180deg, rgba(239, 249, 244, 0.98), rgba(229, 245, 237, 0.98));
+  --table-status-busy-bg:
+    radial-gradient(circle at top, rgba(217, 72, 95, 0.16) 0%, transparent 54%),
+    linear-gradient(180deg, rgba(255, 245, 247, 0.98), rgba(255, 237, 241, 0.98));
+  --table-status-paid-bg:
+    radial-gradient(circle at top, rgba(20, 163, 255, 0.16) 0%, transparent 54%),
+    linear-gradient(180deg, rgba(239, 249, 255, 0.98), rgba(231, 244, 255, 0.98));
+  --table-status-cleaning-bg:
+    radial-gradient(circle at top, rgba(221, 139, 28, 0.18) 0%, transparent 54%),
+    linear-gradient(180deg, rgba(255, 248, 239, 0.98), rgba(255, 242, 225, 0.98));
+  --table-status-free-border: rgba(47, 143, 107, 0.34);
+  --table-status-busy-border: rgba(217, 72, 95, 0.3);
+  --table-status-paid-border: rgba(20, 163, 255, 0.3);
+  --table-status-cleaning-border: rgba(221, 139, 28, 0.34);
+  --table-status-free-chip: rgba(240, 251, 246, 0.84);
+  --table-status-busy-chip: rgba(255, 244, 246, 0.84);
+  --table-status-paid-chip: rgba(241, 250, 255, 0.84);
+  --table-status-cleaning-chip: rgba(255, 247, 237, 0.84);
+  --table-status-free-chip-text: #1d6f52;
+  --table-status-busy-chip-text: #b93a51;
+  --table-status-paid-chip-text: #0f78b8;
+  --table-status-cleaning-chip-text: #b06a11;
+  --table-status-free-glow: rgba(47, 143, 107, 0.2);
+  --table-status-busy-glow: rgba(217, 72, 95, 0.2);
+  --table-status-paid-glow: rgba(20, 163, 255, 0.22);
+  --table-status-cleaning-glow: rgba(221, 139, 28, 0.22);
   overflow: hidden;
   backdrop-filter: blur(16px);
   background: var(--board-surface-bg) !important;
@@ -2497,6 +2525,34 @@ html.dark .board-card {
   --board-chip-bg: rgba(var(--admin-accent-rgb), 0.16);
   --board-chip-border: rgba(var(--admin-accent-rgb), 0.2);
   --board-chip-text: #dbe5ff;
+  --table-status-free-bg:
+    radial-gradient(circle at top, rgba(47, 143, 107, 0.2) 0%, transparent 50%),
+    linear-gradient(180deg, rgba(10, 24, 22, 0.96), rgba(7, 16, 18, 0.98));
+  --table-status-busy-bg:
+    radial-gradient(circle at top, rgba(217, 72, 95, 0.22) 0%, transparent 52%),
+    linear-gradient(180deg, rgba(28, 14, 20, 0.96), rgba(18, 9, 14, 0.98));
+  --table-status-paid-bg:
+    radial-gradient(circle at top, rgba(20, 163, 255, 0.22) 0%, transparent 52%),
+    linear-gradient(180deg, rgba(10, 18, 30, 0.96), rgba(7, 12, 21, 0.98));
+  --table-status-cleaning-bg:
+    radial-gradient(circle at top, rgba(221, 139, 28, 0.22) 0%, transparent 52%),
+    linear-gradient(180deg, rgba(30, 20, 10, 0.96), rgba(20, 13, 7, 0.98));
+  --table-status-free-border: color-mix(in srgb, var(--table-status-free-accent) 48%, rgba(255, 255, 255, 0.16));
+  --table-status-busy-border: color-mix(in srgb, var(--table-status-busy-accent) 48%, rgba(255, 255, 255, 0.16));
+  --table-status-paid-border: color-mix(in srgb, var(--table-status-paid-accent) 48%, rgba(255, 255, 255, 0.16));
+  --table-status-cleaning-border: color-mix(in srgb, var(--table-status-cleaning-accent) 48%, rgba(255, 255, 255, 0.16));
+  --table-status-free-chip: rgba(10, 32, 27, 0.72);
+  --table-status-busy-chip: rgba(37, 14, 21, 0.72);
+  --table-status-paid-chip: rgba(10, 20, 36, 0.72);
+  --table-status-cleaning-chip: rgba(39, 24, 10, 0.72);
+  --table-status-free-chip-text: rgba(194, 237, 218, 0.92);
+  --table-status-busy-chip-text: rgba(255, 204, 214, 0.92);
+  --table-status-paid-chip-text: rgba(190, 228, 255, 0.92);
+  --table-status-cleaning-chip-text: rgba(255, 222, 181, 0.92);
+  --table-status-free-glow: rgba(47, 143, 107, 0.18);
+  --table-status-busy-glow: rgba(217, 72, 95, 0.18);
+  --table-status-paid-glow: rgba(20, 163, 255, 0.2);
+  --table-status-cleaning-glow: rgba(221, 139, 28, 0.2);
   background:
     radial-gradient(circle at top right, rgba(var(--admin-accent-rgb), 0.14), transparent 24%),
     linear-gradient(180deg, rgba(8, 12, 20, 0.96), rgba(14, 19, 30, 0.98)) !important;
