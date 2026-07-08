@@ -70,24 +70,8 @@ flowchart TB
         WS[(WebSocket)]
     end
 
-    Top --> Platform
-    Top --> Core
-    SAFE --- Platform
-    OPSM --- Core
-    AUTH --> REDIS
-    GATEWAY --> REDIS
-    SOCKET --> WS
-    CONFIG --> REDIS
-    DISH --> MYSQL
-    DISH --> MINIO
-    TABLE --> MYSQL
-    ORDER --> MYSQL
-    ORDER --> MQ
-    MEMBER --> MYSQL
-    MKT --> MYSQL
-    MKT --> MQ
-    DEVICE --> MYSQL
-    REPORT --> MYSQL
+    Top --> Center
+    Center --> Bottom
 
     style Top fill:#55c5c7,stroke:#333,stroke-width:2px,color:#111
     style Center fill:#ffc98f,stroke:#333,stroke-width:2px,color:#111
@@ -346,25 +330,8 @@ flowchart LR
         PUSH[(WebSocket / STOMP)]
     end
 
-    Top --> Support
-    Top --> Biz
-    SAFE --- Support
-    RUNTIME --- Biz
-    S1 --> CACHE
-    S2 --> CACHE
-    S3 --> PUSH
-    S4 --> DB
-    B1 --> DB
-    B1 --> OSS
-    B2 --> DB
-    B3 --> DB
-    B3 --> ROCKET
-    B4 --> DB
-    B5 --> DB
-    B5 --> ROCKET
-    B6 --> DB
-    B6 --> PUSH
-    B7 --> DB
+    Top --> Middle
+    Middle --> Bottom
 
     style Top fill:#55c5c7,stroke:#333,stroke-width:2px,color:#111
     style Middle fill:#ffc98f,stroke:#333,stroke-width:2px,color:#111
@@ -410,18 +377,9 @@ flowchart TB
         DATA[经营数据]
     end
 
-    A --> B --> C --> D --> E --> F
-    E --> RULE --> ORDER --> STATE
-    ORDER --> MEMBER
-    STATE --> ACCEPT --> KITCHEN
-    KITCHEN --> PRINT --> SERVE --> TABLE
-    F --> STATE
-    TABLE --> G
-    G --> REVIEW
-    MEMBER --> REPORT
-    STATE --> REPORT
-    REPORT --> DATA
-    REVIEW --> DATA
+    User --> Core
+    Core --> Store
+    Store --> Result
 
     style User fill:#55c5c7,stroke:#333,stroke-width:2px,color:#111
     style Core fill:#ffc98f,stroke:#333,stroke-width:2px,color:#111
