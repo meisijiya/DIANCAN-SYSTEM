@@ -70,9 +70,6 @@ flowchart TB
         WS[(WebSocket)]
     end
 
-    Top --> Center
-    Center --> Bottom
-
     style Top fill:#55c5c7,stroke:#333,stroke-width:2px,color:#111
     style Center fill:#ffc98f,stroke:#333,stroke-width:2px,color:#111
     style Bottom fill:#8d8cf0,stroke:#333,stroke-width:2px,color:#111
@@ -330,9 +327,6 @@ flowchart LR
         PUSH[(WebSocket / STOMP)]
     end
 
-    Top --> Middle
-    Middle --> Bottom
-
     style Top fill:#55c5c7,stroke:#333,stroke-width:2px,color:#111
     style Middle fill:#ffc98f,stroke:#333,stroke-width:2px,color:#111
     style Bottom fill:#8d8cf0,stroke:#333,stroke-width:2px,color:#111
@@ -376,10 +370,6 @@ flowchart TB
         REVIEW[评价分析]
         DATA[经营数据]
     end
-
-    User --> Core
-    Core --> Store
-    Store --> Result
 
     style User fill:#55c5c7,stroke:#333,stroke-width:2px,color:#111
     style Core fill:#ffc98f,stroke:#333,stroke-width:2px,color:#111
