@@ -33,50 +33,66 @@
 
 ```mermaid
 flowchart TB
-    subgraph R1[ ]
+    subgraph Row1[ ]
         direction LR
         L1[应用层]
-        MINI[微信小程序]
-        WEB[管理后台]
-        SERVICE[服务收银]
-        BI[经营分析]
+        subgraph Layer1[ ]
+            direction LR
+            MINI[微信小程序]
+            WEB[管理后台]
+            SERVICE[服务收银]
+            BI[经营分析]
+        end
     end
 
-    subgraph R2[ ]
+    subgraph Row2[ ]
         direction LR
         L2[中台层]
-        SAFE[安全治理]
-        OPSM[运营治理]
-        AUTH[认证中心]
-        GATEWAY[接口网关]
+        subgraph Layer2[ ]
+            direction LR
+            SAFE[安全治理]
+            OPSM[运营治理]
+            AUTH[认证中心]
+            GATEWAY[接口网关]
+        end
     end
 
-    subgraph R3[ ]
+    subgraph Row3[ ]
         direction LR
         L3[业务层]
-        DISH[菜品服务]
-        TABLE[桌台服务]
-        ORDER[订单服务]
-        MEMBER[会员服务]
+        subgraph Layer3[ ]
+            direction LR
+            DISH[菜品服务]
+            TABLE[桌台服务]
+            ORDER[订单服务]
+            MEMBER[会员服务]
+        end
     end
 
-    subgraph R4[ ]
+    subgraph Row4[ ]
         direction LR
         L4[存储层]
-        MYSQL[(MySQL)]
-        REDIS[(Redis)]
-        MQ[(RocketMQ)]
-        MINIO[(MinIO)]
+        subgraph Layer4[ ]
+            direction LR
+            MYSQL[(MySQL)]
+            REDIS[(Redis)]
+            MQ[(RocketMQ)]
+            MINIO[(MinIO)]
+        end
     end
 
-    R1 --> R2
-    R2 --> R3
-    R3 --> R4
+    Row1 --> Row2
+    Row2 --> Row3
+    Row3 --> Row4
 
-    style R1 fill:#55c5c7,stroke:#333,stroke-width:2px,color:#111
-    style R2 fill:#ffc98f,stroke:#333,stroke-width:2px,color:#111
-    style R3 fill:#ffe353,stroke:#333,stroke-width:2px,color:#111
-    style R4 fill:#8d8cf0,stroke:#333,stroke-width:2px,color:#111
+    style Row1 fill:#ffffff,stroke:#ffffff,color:#111
+    style Row2 fill:#ffffff,stroke:#ffffff,color:#111
+    style Row3 fill:#ffffff,stroke:#ffffff,color:#111
+    style Row4 fill:#ffffff,stroke:#ffffff,color:#111
+    style Layer1 fill:#55c5c7,stroke:#333,stroke-width:2px,color:#111
+    style Layer2 fill:#ffc98f,stroke:#333,stroke-width:2px,color:#111
+    style Layer3 fill:#ffe353,stroke:#333,stroke-width:2px,color:#111
+    style Layer4 fill:#8d8cf0,stroke:#333,stroke-width:2px,color:#111
     style L1 fill:#ffffff,stroke:#ffffff,color:#111,font-weight:bold
     style L2 fill:#ffffff,stroke:#ffffff,color:#111,font-weight:bold
     style L3 fill:#ffffff,stroke:#ffffff,color:#111,font-weight:bold
@@ -294,50 +310,66 @@ diancan-system
 
 ```mermaid
 flowchart TB
-    subgraph R1[ ]
+    subgraph Row1[ ]
         direction LR
         L1[应用层]
-        MINI[微信小程序]
-        ADMIN[管理端]
-        CASHIER[服务收银]
-        MANAGE[运营中心]
+        subgraph Layer1[ ]
+            direction LR
+            MINI[微信小程序]
+            ADMIN[管理端]
+            CASHIER[服务收银]
+            MANAGE[运营中心]
+        end
     end
 
-    subgraph R2[ ]
+    subgraph Row2[ ]
         direction LR
         L2[中台层]
-        SAFE[安全管理]
-        RUNTIME[运行管理]
-        S1[认证中心]
-        S2[接口网关]
+        subgraph Layer2[ ]
+            direction LR
+            SAFE[安全管理]
+            RUNTIME[运行管理]
+            S1[认证中心]
+            S2[接口网关]
+        end
     end
 
-    subgraph R3[ ]
+    subgraph Row3[ ]
         direction LR
         L3[业务层]
-        B1[菜品服务]
-        B2[桌台服务]
-        B3[订单服务]
-        B4[会员服务]
+        subgraph Layer3[ ]
+            direction LR
+            B1[菜品服务]
+            B2[桌台服务]
+            B3[订单服务]
+            B4[会员服务]
+        end
     end
 
-    subgraph R4[ ]
+    subgraph Row4[ ]
         direction LR
         L4[存储层]
-        DB[(MySQL)]
-        CACHE[(Redis)]
-        ROCKET[(RocketMQ)]
-        OSS[(MinIO)]
+        subgraph Layer4[ ]
+            direction LR
+            DB[(MySQL)]
+            CACHE[(Redis)]
+            ROCKET[(RocketMQ)]
+            OSS[(MinIO)]
+        end
     end
 
-    R1 --> R2
-    R2 --> R3
-    R3 --> R4
+    Row1 --> Row2
+    Row2 --> Row3
+    Row3 --> Row4
 
-    style R1 fill:#55c5c7,stroke:#333,stroke-width:2px,color:#111
-    style R2 fill:#ffc98f,stroke:#333,stroke-width:2px,color:#111
-    style R3 fill:#ffe353,stroke:#333,stroke-width:2px,color:#111
-    style R4 fill:#8d8cf0,stroke:#333,stroke-width:2px,color:#111
+    style Row1 fill:#ffffff,stroke:#ffffff,color:#111
+    style Row2 fill:#ffffff,stroke:#ffffff,color:#111
+    style Row3 fill:#ffffff,stroke:#ffffff,color:#111
+    style Row4 fill:#ffffff,stroke:#ffffff,color:#111
+    style Layer1 fill:#55c5c7,stroke:#333,stroke-width:2px,color:#111
+    style Layer2 fill:#ffc98f,stroke:#333,stroke-width:2px,color:#111
+    style Layer3 fill:#ffe353,stroke:#333,stroke-width:2px,color:#111
+    style Layer4 fill:#8d8cf0,stroke:#333,stroke-width:2px,color:#111
     style L1 fill:#ffffff,stroke:#ffffff,color:#111,font-weight:bold
     style L2 fill:#ffffff,stroke:#ffffff,color:#111,font-weight:bold
     style L3 fill:#ffffff,stroke:#ffffff,color:#111,font-weight:bold
@@ -348,50 +380,66 @@ flowchart TB
 
 ```mermaid
 flowchart TB
-    subgraph R1[ ]
+    subgraph Row1[ ]
         direction LR
         L1[应用层]
-        A[扫码入桌]
-        B[桌台识别]
-        C[菜单浏览]
-        D[加入购物车]
+        subgraph Layer1[ ]
+            direction LR
+            A[扫码入桌]
+            B[桌台识别]
+            C[菜单浏览]
+            D[加入购物车]
+        end
     end
 
-    subgraph R2[ ]
+    subgraph Row2[ ]
         direction LR
         L2[中台层]
-        RULE[优惠校验]
-        ORDER[订单生成]
-        MEMBER[会员成长]
-        STATE[状态流转]
+        subgraph Layer2[ ]
+            direction LR
+            RULE[优惠校验]
+            ORDER[订单生成]
+            MEMBER[会员成长]
+            STATE[状态流转]
+        end
     end
 
-    subgraph R3[ ]
+    subgraph Row3[ ]
         direction LR
         L3[业务层]
-        ACCEPT[前台接单]
-        KITCHEN[后厨处理]
-        PRINT[小票打印]
-        SERVE[出餐催菜]
+        subgraph Layer3[ ]
+            direction LR
+            ACCEPT[前台接单]
+            KITCHEN[后厨处理]
+            PRINT[小票打印]
+            SERVE[出餐催菜]
+        end
     end
 
-    subgraph R4[ ]
+    subgraph Row4[ ]
         direction LR
         L4[存储层]
-        REPORT[经营报表]
-        REVIEW[评价分析]
-        DATA[经营数据]
-        FEEDBACK[评价反馈]
+        subgraph Layer4[ ]
+            direction LR
+            REPORT[经营报表]
+            REVIEW[评价分析]
+            DATA[经营数据]
+            FEEDBACK[评价反馈]
+        end
     end
 
-    R1 --> R2
-    R2 --> R3
-    R3 --> R4
+    Row1 --> Row2
+    Row2 --> Row3
+    Row3 --> Row4
 
-    style R1 fill:#55c5c7,stroke:#333,stroke-width:2px,color:#111
-    style R2 fill:#ffc98f,stroke:#333,stroke-width:2px,color:#111
-    style R3 fill:#ffe353,stroke:#333,stroke-width:2px,color:#111
-    style R4 fill:#8d8cf0,stroke:#333,stroke-width:2px,color:#111
+    style Row1 fill:#ffffff,stroke:#ffffff,color:#111
+    style Row2 fill:#ffffff,stroke:#ffffff,color:#111
+    style Row3 fill:#ffffff,stroke:#ffffff,color:#111
+    style Row4 fill:#ffffff,stroke:#ffffff,color:#111
+    style Layer1 fill:#55c5c7,stroke:#333,stroke-width:2px,color:#111
+    style Layer2 fill:#ffc98f,stroke:#333,stroke-width:2px,color:#111
+    style Layer3 fill:#ffe353,stroke:#333,stroke-width:2px,color:#111
+    style Layer4 fill:#8d8cf0,stroke:#333,stroke-width:2px,color:#111
     style L1 fill:#ffffff,stroke:#ffffff,color:#111,font-weight:bold
     style L2 fill:#ffffff,stroke:#ffffff,color:#111,font-weight:bold
     style L3 fill:#ffffff,stroke:#ffffff,color:#111,font-weight:bold
