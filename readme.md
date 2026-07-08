@@ -33,49 +33,54 @@
 
 ```mermaid
 flowchart TB
-    subgraph Top[应用层]
+    subgraph R1[ ]
+        direction LR
+        L1[应用层]
         MINI[微信小程序]
         WEB[管理后台]
         SERVICE[服务收银]
         BI[经营分析]
     end
 
-    subgraph Center[中台层]
+    subgraph R2[ ]
+        direction LR
+        L2[中台层]
         SAFE[安全治理]
         OPSM[运营治理]
-
-        subgraph Platform[支撑体系]
-            AUTH[认证中心]
-            GATEWAY[接口网关]
-            SOCKET[消息推送]
-            CONFIG[配置中心]
-        end
-
-        subgraph Core[业务体系]
-            DISH[菜品服务]
-            TABLE[桌台服务]
-            ORDER[订单服务]
-            MEMBER[会员服务]
-        end
+        AUTH[认证中心]
+        GATEWAY[接口网关]
     end
 
-    subgraph Bottom[存储层]
+    subgraph R3[ ]
+        direction LR
+        L3[业务层]
+        DISH[菜品服务]
+        TABLE[桌台服务]
+        ORDER[订单服务]
+        MEMBER[会员服务]
+    end
+
+    subgraph R4[ ]
+        direction LR
+        L4[存储层]
         MYSQL[(MySQL)]
         REDIS[(Redis)]
         MQ[(RocketMQ)]
         MINIO[(MinIO)]
     end
 
-    Top --> Center
-    Center --> Bottom
+    R1 --> R2
+    R2 --> R3
+    R3 --> R4
 
-    style Top fill:#55c5c7,stroke:#333,stroke-width:2px,color:#111
-    style Center fill:#ffc98f,stroke:#333,stroke-width:2px,color:#111
-    style Bottom fill:#8d8cf0,stroke:#333,stroke-width:2px,color:#111
-    style Platform fill:#7d8fda,stroke:#333,stroke-width:1.5px,color:#111
-    style Core fill:#7d8fda,stroke:#333,stroke-width:1.5px,color:#111
-    style SAFE fill:#ef4d4d,stroke:#333,stroke-width:1.5px,color:#111
-    style OPSM fill:#ef4d4d,stroke:#333,stroke-width:1.5px,color:#111
+    style R1 fill:#55c5c7,stroke:#333,stroke-width:2px,color:#111
+    style R2 fill:#ffc98f,stroke:#333,stroke-width:2px,color:#111
+    style R3 fill:#ffe353,stroke:#333,stroke-width:2px,color:#111
+    style R4 fill:#8d8cf0,stroke:#333,stroke-width:2px,color:#111
+    style L1 fill:#ffffff,stroke:#ffffff,color:#111,font-weight:bold
+    style L2 fill:#ffffff,stroke:#ffffff,color:#111,font-weight:bold
+    style L3 fill:#ffffff,stroke:#ffffff,color:#111,font-weight:bold
+    style L4 fill:#ffffff,stroke:#ffffff,color:#111,font-weight:bold
 ```
 
 ## 目录
@@ -289,91 +294,108 @@ diancan-system
 
 ```mermaid
 flowchart TB
-    subgraph Top[应用层]
+    subgraph R1[ ]
+        direction LR
+        L1[应用层]
         MINI[微信小程序]
         ADMIN[管理端]
         CASHIER[服务收银]
         MANAGE[运营中心]
     end
 
-    subgraph Middle[中台层]
+    subgraph R2[ ]
+        direction LR
+        L2[中台层]
         SAFE[安全管理]
         RUNTIME[运行管理]
-
-        subgraph Support[支撑体系]
-            S1[认证中心]
-            S2[接口网关]
-            S3[消息中心]
-            S4[权限日志]
-        end
-
-        subgraph Biz[业务体系]
-            B1[菜品服务]
-            B2[桌台服务]
-            B3[订单服务]
-            B4[会员服务]
-        end
+        S1[认证中心]
+        S2[接口网关]
     end
 
-    subgraph Bottom[存储层]
+    subgraph R3[ ]
+        direction LR
+        L3[业务层]
+        B1[菜品服务]
+        B2[桌台服务]
+        B3[订单服务]
+        B4[会员服务]
+    end
+
+    subgraph R4[ ]
+        direction LR
+        L4[存储层]
         DB[(MySQL)]
         CACHE[(Redis)]
         ROCKET[(RocketMQ)]
         OSS[(MinIO)]
     end
 
-    Top --> Middle
-    Middle --> Bottom
+    R1 --> R2
+    R2 --> R3
+    R3 --> R4
 
-    style Top fill:#55c5c7,stroke:#333,stroke-width:2px,color:#111
-    style Middle fill:#ffc98f,stroke:#333,stroke-width:2px,color:#111
-    style Bottom fill:#8d8cf0,stroke:#333,stroke-width:2px,color:#111
-    style Support fill:#7d8fda,stroke:#333,stroke-width:1.5px,color:#111
-    style Biz fill:#7d8fda,stroke:#333,stroke-width:1.5px,color:#111
-    style SAFE fill:#ef4d4d,stroke:#333,stroke-width:1.5px,color:#111
-    style RUNTIME fill:#ef4d4d,stroke:#333,stroke-width:1.5px,color:#111
+    style R1 fill:#55c5c7,stroke:#333,stroke-width:2px,color:#111
+    style R2 fill:#ffc98f,stroke:#333,stroke-width:2px,color:#111
+    style R3 fill:#ffe353,stroke:#333,stroke-width:2px,color:#111
+    style R4 fill:#8d8cf0,stroke:#333,stroke-width:2px,color:#111
+    style L1 fill:#ffffff,stroke:#ffffff,color:#111,font-weight:bold
+    style L2 fill:#ffffff,stroke:#ffffff,color:#111,font-weight:bold
+    style L3 fill:#ffffff,stroke:#ffffff,color:#111,font-weight:bold
+    style L4 fill:#ffffff,stroke:#ffffff,color:#111,font-weight:bold
 ```
 
 ## 页面与业务关系
 
 ```mermaid
 flowchart TB
-    subgraph User[应用层]
+    subgraph R1[ ]
+        direction LR
+        L1[应用层]
         A[扫码入桌]
         B[桌台识别]
         C[菜单浏览]
         D[加入购物车]
     end
 
-    subgraph Core[中台层]
+    subgraph R2[ ]
+        direction LR
+        L2[中台层]
         RULE[优惠校验]
         ORDER[订单生成]
         MEMBER[会员成长]
         STATE[状态流转]
     end
 
-    subgraph Store[业务层]
+    subgraph R3[ ]
+        direction LR
+        L3[业务层]
         ACCEPT[前台接单]
         KITCHEN[后厨处理]
         PRINT[小票打印]
         SERVE[出餐催菜]
     end
 
-    subgraph Result[存储层]
+    subgraph R4[ ]
+        direction LR
+        L4[存储层]
         REPORT[经营报表]
         REVIEW[评价分析]
         DATA[经营数据]
         FEEDBACK[评价反馈]
     end
 
-    User --> Core
-    Core --> Store
-    Store --> Result
+    R1 --> R2
+    R2 --> R3
+    R3 --> R4
 
-    style User fill:#55c5c7,stroke:#333,stroke-width:2px,color:#111
-    style Core fill:#ffc98f,stroke:#333,stroke-width:2px,color:#111
-    style Store fill:#ffe353,stroke:#333,stroke-width:2px,color:#111
-    style Result fill:#8d8cf0,stroke:#333,stroke-width:2px,color:#111
+    style R1 fill:#55c5c7,stroke:#333,stroke-width:2px,color:#111
+    style R2 fill:#ffc98f,stroke:#333,stroke-width:2px,color:#111
+    style R3 fill:#ffe353,stroke:#333,stroke-width:2px,color:#111
+    style R4 fill:#8d8cf0,stroke:#333,stroke-width:2px,color:#111
+    style L1 fill:#ffffff,stroke:#ffffff,color:#111,font-weight:bold
+    style L2 fill:#ffffff,stroke:#ffffff,color:#111,font-weight:bold
+    style L3 fill:#ffffff,stroke:#ffffff,color:#111,font-weight:bold
+    style L4 fill:#ffffff,stroke:#ffffff,color:#111,font-weight:bold
 ```
 
 ## 环境要求
