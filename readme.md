@@ -33,42 +33,51 @@
 
 ```mermaid
 flowchart TB
-    subgraph Client[终端入口]
-        MINI[微信小程序端<br/>顾客点餐 / 会员 / 订单]
-        WEB[管理端<br/>桌台 / 菜品 / 订单 / 营销]
+    subgraph Top[应用层]
+        MINI[微信小程序]
+        WEB[管理后台]
+        SERVICE[服务收银]
+        BI[经营分析]
     end
 
-    subgraph Server[业务中台 diancan-admin]
-        AUTH[认证鉴权]
-        DISH[菜品中心]
-        TABLE[桌台中心]
-        ORDER[订单中心]
-        MEMBER[会员中心]
-        MKT[营销中心]
-        DEVICE[打印与设备]
-        REPORT[评价与报表]
-        MSG[消息推送]
+    subgraph Center[中台层]
+        SAFE[安全治理]
+        OPSM[运营治理]
+
+        subgraph Platform[支撑体系]
+            AUTH[认证中心]
+            GATEWAY[接口网关]
+            SOCKET[消息推送]
+            CONFIG[配置中心]
+        end
+
+        subgraph Core[业务体系]
+            DISH[菜品服务]
+            TABLE[桌台服务]
+            ORDER[订单服务]
+            MEMBER[会员服务]
+            MKT[营销服务]
+            DEVICE[设备服务]
+            REPORT[报表服务]
+        end
     end
 
-    subgraph Infra[基础设施]
+    subgraph Bottom[存储层]
         MYSQL[(MySQL)]
         REDIS[(Redis)]
         MQ[(RocketMQ)]
         MINIO[(MinIO)]
+        WS[(WebSocket)]
     end
 
-    MINI --> ORDER
-    MINI --> MEMBER
-    MINI --> TABLE
-    WEB --> AUTH
-    WEB --> DISH
-    WEB --> TABLE
-    WEB --> ORDER
-    WEB --> MKT
-    WEB --> DEVICE
-    WEB --> REPORT
-
+    Top --> Platform
+    Top --> Core
+    SAFE --- Platform
+    OPSM --- Core
     AUTH --> REDIS
+    GATEWAY --> REDIS
+    SOCKET --> WS
+    CONFIG --> REDIS
     DISH --> MYSQL
     DISH --> MINIO
     TABLE --> MYSQL
@@ -79,7 +88,14 @@ flowchart TB
     MKT --> MQ
     DEVICE --> MYSQL
     REPORT --> MYSQL
-    MSG --> REDIS
+
+    style Top fill:#55c5c7,stroke:#333,stroke-width:2px,color:#111
+    style Center fill:#ffc98f,stroke:#333,stroke-width:2px,color:#111
+    style Bottom fill:#8d8cf0,stroke:#333,stroke-width:2px,color:#111
+    style Platform fill:#7d8fda,stroke:#333,stroke-width:1.5px,color:#111
+    style Core fill:#7d8fda,stroke:#333,stroke-width:1.5px,color:#111
+    style SAFE fill:#ef4d4d,stroke:#333,stroke-width:1.5px,color:#111
+    style OPSM fill:#ef4d4d,stroke:#333,stroke-width:1.5px,color:#111
 ```
 
 ## 目录
@@ -111,15 +127,32 @@ flowchart TB
 | 管理端 | `diancan-admin-web` | Vue 3 管理后台，面向运营、服务员、收银、后厨等角色 |
 | 微信小程序端 | `diancan-miniapp` | 顾客端小程序，提供点餐、购物车、订单、会员、优惠券、评价、反馈等能力 |
 
-## 页面截图
+## 管理端页面截图
 
 ### 管理端登录页
 
-![管理端登录页](./docs/images/readme-login.png)
+![管理端登录页](./docs/images/admin-login.png)
+
+### 管理端首页
+
+![管理端首页](./docs/images/admin-home.png)
+
+### 桌台看板页
+
+![桌台看板页](./docs/images/admin-zhuotai.png)
 
 ### 管理端主题设置页
 
-![管理端主题设置页](./docs/images/readme-theme.png)
+![管理端主题设置页](./docs/images/admin-theme.png)
+
+## 小程序页面截图
+
+<p align="center">
+  <img src="./docs/images/xiaochengxu-shouye.png" alt="小程序首页" width="24%">
+  <img src="./docs/images/xiaochengxu-diancan.png" alt="小程序点餐页" width="24%">
+  <img src="./docs/images/xiaochengxu-dingdan.png" alt="小程序订单页" width="24%">
+  <img src="./docs/images/xiaochengxu-wode.png" alt="小程序我的页" width="24%">
+</p>
 
 ## 三端一览
 
@@ -276,86 +309,124 @@ diancan-system
 
 ```mermaid
 flowchart LR
-    subgraph Access[接入层]
+    subgraph Top[应用层]
         MINI[微信小程序]
         ADMIN[管理端]
+        CASHIER[服务收银]
+        MANAGE[运营中心]
     end
 
-    subgraph Service[应用层]
-        S1[系统认证]
-        S2[菜品分类规格]
-        S3[桌区桌台二维码]
-        S4[购物车与订单]
-        S5[会员积分成长]
-        S6[优惠券与活动]
-        S7[打印机与后厨协同]
-        S8[评价反馈报表]
+    subgraph Middle[中台层]
+        SAFE[安全管理]
+        RUNTIME[运行管理]
+
+        subgraph Support[支撑体系]
+            S1[认证中心]
+            S2[接口网关]
+            S3[消息中心]
+            S4[权限日志]
+        end
+
+        subgraph Biz[业务体系]
+            B1[菜品服务]
+            B2[桌台服务]
+            B3[订单服务]
+            B4[会员服务]
+            B5[营销服务]
+            B6[设备服务]
+            B7[报表服务]
+        end
     end
 
-    subgraph Support[支撑层]
-        WS[WebSocket / STOMP]
-        TOKEN[Sa-Token]
-        ORM[MyBatis-Plus]
-    end
-
-    subgraph Data[数据与中间件]
+    subgraph Bottom[存储层]
         DB[(MySQL)]
         CACHE[(Redis)]
         ROCKET[(RocketMQ)]
         OSS[(MinIO)]
+        PUSH[(WebSocket / STOMP)]
     end
 
-    ADMIN --> S1
-    ADMIN --> S2
-    ADMIN --> S3
-    ADMIN --> S4
-    ADMIN --> S6
-    ADMIN --> S7
-    ADMIN --> S8
-    MINI --> S3
-    MINI --> S4
-    MINI --> S5
-    MINI --> S6
-    MINI --> S8
+    Top --> Support
+    Top --> Biz
+    SAFE --- Support
+    RUNTIME --- Biz
+    S1 --> CACHE
+    S2 --> CACHE
+    S3 --> PUSH
+    S4 --> DB
+    B1 --> DB
+    B1 --> OSS
+    B2 --> DB
+    B3 --> DB
+    B3 --> ROCKET
+    B4 --> DB
+    B5 --> DB
+    B5 --> ROCKET
+    B6 --> DB
+    B6 --> PUSH
+    B7 --> DB
 
-    S1 --> TOKEN
-    S2 --> ORM
-    S3 --> ORM
-    S4 --> ORM
-    S5 --> ORM
-    S6 --> ORM
-    S7 --> WS
-    S8 --> ORM
-
-    TOKEN --> CACHE
-    ORM --> DB
-    S4 --> ROCKET
-    S6 --> ROCKET
-    S2 --> OSS
+    style Top fill:#55c5c7,stroke:#333,stroke-width:2px,color:#111
+    style Middle fill:#ffc98f,stroke:#333,stroke-width:2px,color:#111
+    style Bottom fill:#8d8cf0,stroke:#333,stroke-width:2px,color:#111
+    style Support fill:#7d8fda,stroke:#333,stroke-width:1.5px,color:#111
+    style Biz fill:#7d8fda,stroke:#333,stroke-width:1.5px,color:#111
+    style SAFE fill:#ef4d4d,stroke:#333,stroke-width:1.5px,color:#111
+    style RUNTIME fill:#ef4d4d,stroke:#333,stroke-width:1.5px,color:#111
 ```
 
 ## 页面与业务关系
 
 ```mermaid
-flowchart LR
-    A[顾客扫码入桌] --> B[识别桌台与门店]
-    B --> C[浏览分类与菜品]
-    C --> D[加入购物车]
-    D --> E[提交订单]
-    E --> F[发起支付]
-    F --> G[生成正式订单]
-    G --> H[服务台接单]
-    H --> I[后厨处理 / 打印小票]
-    I --> J[出餐 / 催菜 / 加菜]
-    J --> K[桌台状态更新]
-    K --> L[顾客评价反馈]
+flowchart TB
+    subgraph User[应用层]
+        A[扫码入桌]
+        B[桌台识别]
+        C[菜单浏览]
+        D[加入购物车]
+        E[提交订单]
+        F[支付加菜]
+        G[评价反馈]
+    end
 
-    E --> M[优惠券校验]
-    G --> N[会员积分成长]
-    H --> O[管理端订单跟踪]
-    O --> K
-    L --> P[报表统计沉淀]
-    N --> P
+    subgraph Core[中台层]
+        RULE[优惠校验]
+        ORDER[订单生成]
+        MEMBER[会员成长]
+        STATE[状态流转]
+    end
+
+    subgraph Store[执行层]
+        ACCEPT[前台接单]
+        KITCHEN[后厨处理]
+        PRINT[小票打印]
+        SERVE[出餐催菜]
+        TABLE[桌台更新]
+    end
+
+    subgraph Result[存储层]
+        REPORT[经营报表]
+        REVIEW[评价分析]
+        DATA[经营数据]
+    end
+
+    A --> B --> C --> D --> E --> F
+    E --> RULE --> ORDER --> STATE
+    ORDER --> MEMBER
+    STATE --> ACCEPT --> KITCHEN
+    KITCHEN --> PRINT --> SERVE --> TABLE
+    F --> STATE
+    TABLE --> G
+    G --> REVIEW
+    MEMBER --> REPORT
+    STATE --> REPORT
+    REPORT --> DATA
+    REVIEW --> DATA
+
+    style User fill:#55c5c7,stroke:#333,stroke-width:2px,color:#111
+    style Core fill:#ffc98f,stroke:#333,stroke-width:2px,color:#111
+    style Store fill:#ffe353,stroke:#333,stroke-width:2px,color:#111
+    style Result fill:#8d8cf0,stroke:#333,stroke-width:2px,color:#111
 ```
 
 ## 环境要求
