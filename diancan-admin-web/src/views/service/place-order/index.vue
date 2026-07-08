@@ -29,6 +29,12 @@ const pendingOfflineCount = ref(0);
 // ==================== 桌台选择 ====================
 const tables = ref<Api.Business.DiningTable[]>([]);
 const selectedTableId = ref<number | null>(null);
+const tableStatusMetaMap: Record<number, { label: string; accent: string; tone: string; hint: string }> = {
+  0: { label: '空闲', accent: 'var(--table-status-free-accent)', tone: 'free', hint: '可直接开台点单' },
+  1: { label: '占用', accent: 'var(--table-status-busy-accent)', tone: 'busy', hint: '已有进行中订单，建议前往桌台看板加菜' },
+  2: { label: '已结账', accent: 'var(--table-status-paid-accent)', tone: 'paid', hint: '需先流转到待清洁后再开台' },
+  3: { label: '待清洁', accent: 'var(--table-status-cleaning-accent)', tone: 'cleaning', hint: '需先完成清洁收尾再继续接待' }
+};
 
 const tableOptions = computed<SelectOption[]>(() =>
   tables.value.map(t => ({
@@ -41,6 +47,17 @@ const selectedTable = computed(() => tables.value.find(t => t.id === selectedTab
 const selectedTableHasActiveOrder = computed(() => selectedTable.value?.status === 1);
 const selectedTableIsPaid = computed(() => selectedTable.value?.status === 2);
 const selectedTableIsToClean = computed(() => selectedTable.value?.status === 3);
+const selectedTableStatusMeta = computed(() => {
+  if (!selectedTable.value) return null;
+  return tableStatusMetaMap[selectedTable.value.status] || tableStatusMetaMap[0];
+});
+const selectedTableNoticeList = computed(() => {
+  const notices: string[] = [];
+  if (selectedTableHasActiveOrder.value) notices.push('当前桌台已有进行中订单，请到桌台看板加菜');
+  if (selectedTableIsPaid.value) notices.push('当前桌台已结账，请先完成清洁流转后再开台点单');
+  if (selectedTableIsToClean.value) notices.push('当前桌台待清洁，请先完成清洁后再开台点单');
+  return notices;
+});
 
 function initSelectedTableFromRoute() {
   const tableId = Number(route.query.tableId || 0);
@@ -406,18 +423,6 @@ onUnmounted(() => {
             :disabled="loading"
             style="width: 280px;"
           />
-          <NTag v-if="selectedTable" type="info">
-            {{ selectedTable.areaName || '未分区' }} · {{ selectedTable.name }}（{{ selectedTable.code }}）
-          </NTag>
-          <NTag v-if="selectedTableIsPaid" type="warning">
-            当前桌台已结账，请先完成清洁流转后再开台点单
-          </NTag>
-          <NTag v-if="selectedTableIsToClean" type="warning">
-            当前桌台待清洁，请先完成清洁后再开台点单
-          </NTag>
-          <NTag v-if="selectedTableHasActiveOrder" type="warning">
-            当前桌台已有进行中订单，请到桌台看板加菜
-          </NTag>
           <NInput
             :value="searchKeyword"
             placeholder="搜索菜品..."
@@ -432,6 +437,37 @@ onUnmounted(() => {
             </NButton>
           </NBadge>
         </NSpace>
+      </NCard>
+
+      <NCard :bordered="false" class="table-selection-surface">
+        <div v-if="selectedTable && selectedTableStatusMeta" class="table-selection-card" :data-tone="selectedTableStatusMeta.tone">
+          <div class="table-selection-card__main">
+            <div class="table-selection-card__eyebrow">ACTIVE TABLE</div>
+            <div class="table-selection-card__title">
+              {{ selectedTable.areaName || '未分区' }} · {{ selectedTable.name }}（{{ selectedTable.code }}）
+            </div>
+            <div class="table-selection-card__meta">
+              <span>{{ selectedTable.capacity }} 人位</span>
+              <span>{{ selectedTableStatusMeta.hint }}</span>
+            </div>
+          </div>
+          <div class="table-selection-card__side">
+            <NTag :bordered="false" :style="{ background: selectedTableStatusMeta.accent, color: '#fff' }">
+              {{ selectedTableStatusMeta.label }}
+            </NTag>
+          </div>
+          <div v-if="selectedTableNoticeList.length" class="table-selection-card__alerts">
+            <span v-for="notice in selectedTableNoticeList" :key="notice">{{ notice }}</span>
+          </div>
+        </div>
+        <div v-else class="table-selection-card table-selection-card--empty">
+          <div class="table-selection-card__eyebrow">ACTIVE TABLE</div>
+          <div class="table-selection-card__title">先选择桌台，再开始点单</div>
+          <div class="table-selection-card__meta">
+            <span>支持按区域、桌名和编号搜索</span>
+            <span>选中后会展示当前桌态和接待限制</span>
+          </div>
+        </div>
       </NCard>
 
       <NGrid :cols="24" :x-gap="16">
@@ -638,6 +674,102 @@ onUnmounted(() => {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(239, 247, 255, 0.96)) !important;
 }
 
+.table-selection-surface {
+  background:
+    radial-gradient(circle at top right, rgba(var(--admin-accent-rgb), 0.08), transparent 26%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(244, 249, 255, 0.92)) !important;
+}
+
+.table-selection-card {
+  --table-card-accent: var(--table-status-free-accent);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: start;
+  padding: 2px;
+  border-radius: 20px;
+}
+
+.table-selection-card[data-tone='free'] {
+  --table-card-accent: var(--table-status-free-accent);
+}
+
+.table-selection-card[data-tone='busy'] {
+  --table-card-accent: var(--table-status-busy-accent);
+}
+
+.table-selection-card[data-tone='paid'] {
+  --table-card-accent: var(--table-status-paid-accent);
+}
+
+.table-selection-card[data-tone='cleaning'] {
+  --table-card-accent: var(--table-status-cleaning-accent);
+}
+
+.table-selection-card--empty {
+  grid-template-columns: 1fr;
+}
+
+.table-selection-card__main {
+  min-width: 0;
+}
+
+.table-selection-card__eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  color: color-mix(in srgb, var(--table-card-accent) 62%, #5e708b);
+}
+
+.table-selection-card__title {
+  margin-top: 6px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #123055;
+}
+
+.table-selection-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.table-selection-card__meta span,
+.table-selection-card__alerts span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 0 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.table-selection-card__meta span {
+  color: color-mix(in srgb, var(--table-card-accent) 58%, #38506f);
+  background: color-mix(in srgb, var(--table-card-accent) 10%, white);
+  border: 1px solid color-mix(in srgb, var(--table-card-accent) 18%, rgba(15, 111, 255, 0.08));
+}
+
+.table-selection-card__side {
+  display: flex;
+  align-items: flex-start;
+}
+
+.table-selection-card__alerts {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.table-selection-card__alerts span {
+  color: color-mix(in srgb, var(--table-card-accent) 68%, #314a69);
+  background: color-mix(in srgb, var(--table-card-accent) 12%, white);
+  border: 1px solid color-mix(in srgb, var(--table-card-accent) 22%, rgba(15, 111, 255, 0.08));
+}
+
 .dish-skeleton-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -789,6 +921,10 @@ onUnmounted(() => {
     width: 100%;
   }
 
+  .table-selection-card {
+    grid-template-columns: 1fr;
+  }
+
   .dish-skeleton-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -827,6 +963,34 @@ html.dark .order-hero__stat strong {
 
 html.dark .order-toolbar {
   background: linear-gradient(180deg, rgba(9, 13, 21, 0.96), rgba(14, 19, 30, 0.98)) !important;
+}
+
+html.dark .table-selection-surface {
+  background:
+    radial-gradient(circle at top right, rgba(var(--admin-accent-rgb), 0.12), transparent 26%),
+    linear-gradient(180deg, rgba(9, 13, 21, 0.96), rgba(14, 19, 30, 0.98)) !important;
+}
+
+html.dark .table-selection-card__eyebrow {
+  color: color-mix(in srgb, var(--table-card-accent) 58%, rgba(203, 217, 244, 0.82));
+}
+
+html.dark .table-selection-card__title {
+  color: rgba(241, 246, 255, 0.96);
+}
+
+html.dark .table-selection-card__meta span,
+html.dark .table-selection-card__alerts span {
+  color: rgba(230, 238, 252, 0.92);
+  border-color: color-mix(in srgb, var(--table-card-accent) 24%, rgba(255, 255, 255, 0.08));
+}
+
+html.dark .table-selection-card__meta span {
+  background: color-mix(in srgb, var(--table-card-accent) 16%, rgba(8, 13, 22, 0.92));
+}
+
+html.dark .table-selection-card__alerts span {
+  background: color-mix(in srgb, var(--table-card-accent) 18%, rgba(8, 13, 22, 0.96));
 }
 
 html.dark .dish-card {

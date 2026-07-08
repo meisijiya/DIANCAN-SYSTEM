@@ -31,11 +31,11 @@ const filterArea = ref<string | null>(null);
 const boardViewMode = ref<'overview' | 'standard' | 'focus'>('overview');
 
 /** 桌台状态配置 */
-const statusConfig: Record<number, { label: string; shortLabel: string; color: string; bg: string; border: string }> = {
-  0: { label: '空闲', shortLabel: '闲', color: '#2f8f6b', bg: '#edf7f1', border: '#b7e1cc' },
-  1: { label: '占用', shortLabel: '占', color: '#d9485f', bg: '#fff0f2', border: '#f2b8c2' },
-  2: { label: '已结账', shortLabel: '结', color: '#14a3ff', bg: '#e9f8ff', border: '#bce8ff' },
-  3: { label: '待清洁', shortLabel: '洁', color: '#dd8b1c', bg: '#fff5e8', border: '#f0cf96' }
+const statusConfig: Record<number, { label: string; shortLabel: string; color: string }> = {
+  0: { label: '空闲', shortLabel: '闲', color: '#2f8f6b' },
+  1: { label: '占用', shortLabel: '占', color: '#d9485f' },
+  2: { label: '已结账', shortLabel: '结', color: '#14a3ff' },
+  3: { label: '待清洁', shortLabel: '洁', color: '#dd8b1c' }
 };
 
 const areaMetaMap = computed(() => {
@@ -683,7 +683,6 @@ onUnmounted(() => {
                       <div
                         class="table-card table-card--overview"
                         :data-status="t.status"
-                        :style="{ background: getStatus(t.status).bg, borderColor: getStatus(t.status).border, cursor: 'pointer', '--table-accent': getStatus(t.status).color }"
                         @click="handleTableClick(t)"
                       >
                         <span class="table-card__area">{{ t.areaName || '未分区' }}</span>
@@ -726,7 +725,6 @@ onUnmounted(() => {
                           class="table-card"
                           :class="[`table-card--${boardViewMode}`]"
                           :data-status="t.status"
-                          :style="{ background: getStatus(t.status).bg, borderColor: getStatus(t.status).border, cursor: 'pointer', '--table-accent': getStatus(t.status).color }"
                           @click="handleTableClick(t)"
                         >
                           <NTag
@@ -960,33 +958,35 @@ onUnmounted(() => {
                         v-else-if="String((selectedTable?.status === 0 ? quickOrderForm.dishId : quickAddForm.dishId)) === String(dish.id)"
                         class="drawer-dish-card__feedback"
                       >
-                        已选中，待加入清单
+                        已选中，可在底部直接加入清单
                       </div>
                     </button>
                   </div>
                   <NEmpty v-else description="没有匹配到可用菜品" style="padding: 20px 0 8px;" />
                 </div>
 
-                <NSpace v-if="selectedTable?.status === 0" vertical :size="12" style="margin-top: 16px;">
-                  <NInputNumber v-model:value="quickOrderForm.quantity" :min="1" style="width: 100%;" />
-                  <NInput v-model:value="quickOrderForm.remark" placeholder="备注（可选）" />
-                  <NButton secondary type="primary" block @click="addQuickOrderDish">加入点单清单</NButton>
-                </NSpace>
-
-                <NSpace v-else vertical :size="12" style="margin-top: 16px;">
-                  <NInputNumber v-model:value="quickAddForm.quantity" :min="1" style="width: 100%;" />
-                  <NInput v-model:value="quickAddForm.remark" placeholder="备注（可选）" />
-                  <NButton secondary type="primary" block @click="addQuickAddDishToCart">加入加菜清单</NButton>
-                </NSpace>
-
-                <div class="drawer-dish-preview" v-if="selectedTable?.status === 0 ? selectedQuickOrderDish : selectedQuickAddDish">
-                  <div>
-                    <strong>{{ (selectedTable?.status === 0 ? selectedQuickOrderDish : selectedQuickAddDish)?.name }}</strong>
-                    <span>¥{{ (selectedTable?.status === 0 ? selectedQuickOrderDish : selectedQuickAddDish)?.price.toFixed(2) }}</span>
+                <div class="drawer-quick-compose">
+                  <div class="drawer-dish-preview" v-if="selectedTable?.status === 0 ? selectedQuickOrderDish : selectedQuickAddDish">
+                    <div>
+                      <strong>{{ (selectedTable?.status === 0 ? selectedQuickOrderDish : selectedQuickAddDish)?.name }}</strong>
+                      <span>¥{{ (selectedTable?.status === 0 ? selectedQuickOrderDish : selectedQuickAddDish)?.price.toFixed(2) }}</span>
+                    </div>
+                    <NTag v-if="(selectedTable?.status === 0 ? selectedQuickOrderDish : selectedQuickAddDish)?.categoryName" size="small">
+                      {{ (selectedTable?.status === 0 ? selectedQuickOrderDish : selectedQuickAddDish)?.categoryName }}
+                    </NTag>
                   </div>
-                  <NTag v-if="(selectedTable?.status === 0 ? selectedQuickOrderDish : selectedQuickAddDish)?.categoryName" size="small">
-                    {{ (selectedTable?.status === 0 ? selectedQuickOrderDish : selectedQuickAddDish)?.categoryName }}
-                  </NTag>
+
+                  <NSpace v-if="selectedTable?.status === 0" vertical :size="12" class="drawer-quick-compose__form">
+                    <NInputNumber v-model:value="quickOrderForm.quantity" :min="1" style="width: 100%;" />
+                    <NInput v-model:value="quickOrderForm.remark" placeholder="备注（可选）" />
+                    <NButton secondary type="primary" block class="drawer-quick-compose__button" @click="addQuickOrderDish">加入点单清单</NButton>
+                  </NSpace>
+
+                  <NSpace v-else vertical :size="12" class="drawer-quick-compose__form">
+                    <NInputNumber v-model:value="quickAddForm.quantity" :min="1" style="width: 100%;" />
+                    <NInput v-model:value="quickAddForm.remark" placeholder="备注（可选）" />
+                    <NButton secondary type="primary" block class="drawer-quick-compose__button" @click="addQuickAddDishToCart">加入加菜清单</NButton>
+                  </NSpace>
                 </div>
 
                 <div class="drawer-cart" v-if="selectedTable?.status === 0 ? quickOrderCart.length > 0 : quickAddCart.length > 0">
@@ -1017,13 +1017,14 @@ onUnmounted(() => {
                 </div>
 
                 <NButton
-                  type="primary"
+                  type="success"
                   block
-                  style="margin-top: 16px;"
+                  class="drawer-quick-compose__button drawer-quick-compose__confirm"
                   @click="selectedTable?.status === 0 ? handleQuickPlaceOrder() : handleQuickAddDish()"
                 >
                   {{ selectedTable?.status === 0 ? '确认点单' : '确认加菜' }}
                 </NButton>
+
               </div>
             </template>
 
@@ -1716,6 +1717,12 @@ onUnmounted(() => {
 }
 
 .table-card {
+  --table-accent: var(--table-status-free-accent);
+  --table-card-bg: var(--table-status-free-bg);
+  --table-card-border: var(--table-status-free-border);
+  --table-chip-bg: var(--table-status-free-chip);
+  --table-chip-text: var(--table-status-free-chip-text);
+  --table-glow: var(--table-status-free-glow);
   position: relative;
   border: 2px solid;
   border-radius: 24px;
@@ -1728,11 +1735,50 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  cursor: pointer;
+  background: var(--table-card-bg);
+  border-color: var(--table-card-border);
   box-shadow:
     0 24px 54px rgba(15, 57, 119, 0.16),
     0 10px 24px rgba(8, 27, 58, 0.08),
     inset 0 1px 0 rgba(255, 255, 255, 0.78);
   isolation: isolate;
+}
+
+.table-card[data-status='0'] {
+  --table-accent: var(--table-status-free-accent);
+  --table-card-bg: var(--table-status-free-bg);
+  --table-card-border: var(--table-status-free-border);
+  --table-chip-bg: var(--table-status-free-chip);
+  --table-chip-text: var(--table-status-free-chip-text);
+  --table-glow: var(--table-status-free-glow);
+}
+
+.table-card[data-status='1'] {
+  --table-accent: var(--table-status-busy-accent);
+  --table-card-bg: var(--table-status-busy-bg);
+  --table-card-border: var(--table-status-busy-border);
+  --table-chip-bg: var(--table-status-busy-chip);
+  --table-chip-text: var(--table-status-busy-chip-text);
+  --table-glow: var(--table-status-busy-glow);
+}
+
+.table-card[data-status='2'] {
+  --table-accent: var(--table-status-paid-accent);
+  --table-card-bg: var(--table-status-paid-bg);
+  --table-card-border: var(--table-status-paid-border);
+  --table-chip-bg: var(--table-status-paid-chip);
+  --table-chip-text: var(--table-status-paid-chip-text);
+  --table-glow: var(--table-status-paid-glow);
+}
+
+.table-card[data-status='3'] {
+  --table-accent: var(--table-status-cleaning-accent);
+  --table-card-bg: var(--table-status-cleaning-bg);
+  --table-card-border: var(--table-status-cleaning-border);
+  --table-chip-bg: var(--table-status-cleaning-chip);
+  --table-chip-text: var(--table-status-cleaning-chip-text);
+  --table-glow: var(--table-status-cleaning-glow);
 }
 
 .table-card--overview {
@@ -1749,6 +1795,8 @@ onUnmounted(() => {
 .table-card:hover {
   transform: translateY(-8px);
   box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--table-accent) 16%, transparent),
+    0 0 24px var(--table-glow),
     0 30px 62px rgba(15, 57, 119, 0.2),
     0 16px 30px rgba(8, 27, 58, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.86);
@@ -1783,9 +1831,9 @@ onUnmounted(() => {
   padding: 3px 8px;
   overflow: hidden;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.72);
-  border: 1px solid rgba(15, 111, 255, 0.1);
-  color: #163a70;
+  background: var(--table-chip-bg);
+  border: 1px solid color-mix(in srgb, var(--table-accent) 18%, rgba(255, 255, 255, 0.62));
+  color: var(--table-chip-text);
   font-size: 10px;
   font-weight: 700;
   text-overflow: ellipsis;
@@ -1831,9 +1879,9 @@ onUnmounted(() => {
   padding: 4px 8px;
   border-radius: 999px;
   font-size: 10px;
-  color: #456180;
-  background: rgba(255, 255, 255, 0.64);
-  border: 1px solid rgba(15, 111, 255, 0.08);
+  color: var(--table-chip-text);
+  background: color-mix(in srgb, var(--table-chip-bg) 90%, white);
+  border: 1px solid color-mix(in srgb, var(--table-accent) 16%, rgba(255, 255, 255, 0.56));
 }
 
 .table-action {
@@ -1912,37 +1960,37 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 10px;
 }
 
 .drawer-summary__label {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   color: #173d69;
 }
 
 .drawer-summary__meta {
   display: flex;
-  gap: 10px;
-  margin-top: 12px;
+  gap: 8px;
+  margin-top: 8px;
   flex-wrap: wrap;
 }
 
 .drawer-summary__meta span {
-  padding: 4px 10px;
+  padding: 3px 9px;
   border-radius: 999px;
-  font-size: 12px;
+  font-size: 11px;
   color: rgba(23, 61, 105, 0.72);
   background: rgba(255, 255, 255, 0.7);
   border: 1px solid rgba(15, 111, 255, 0.1);
 }
 
 .drawer-summary__notice {
-  margin-top: 14px;
-  padding: 10px 12px;
-  border-radius: 16px;
-  font-size: 12px;
-  line-height: 1.7;
+  margin-top: 10px;
+  padding: 8px 10px;
+  border-radius: 14px;
+  font-size: 11px;
+  line-height: 1.55;
   color: rgba(133, 74, 12, 0.92);
   background: rgba(255, 245, 232, 0.92);
   border: 1px solid rgba(221, 139, 28, 0.16);
@@ -1950,8 +1998,15 @@ onUnmounted(() => {
 
 .drawer-summary__clean-actions {
   display: flex;
-  gap: 10px;
-  margin-top: 14px;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.drawer-summary__clean-actions :deep(.n-button) {
+  min-width: 0;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 12px;
 }
 
 .drawer-mode-switch {
@@ -2097,7 +2152,6 @@ onUnmounted(() => {
 }
 
 .drawer-dish-preview {
-  margin-top: 16px;
   padding: 12px 14px;
   border-radius: 18px;
   display: flex;
@@ -2121,6 +2175,36 @@ onUnmounted(() => {
   margin-top: 4px;
   font-size: 12px;
   color: #5b7195;
+}
+
+.drawer-quick-compose {
+  position: sticky;
+  bottom: 0;
+  z-index: 3;
+  margin-top: 16px;
+  padding-top: 12px;
+  background:
+    linear-gradient(180deg, rgba(250, 253, 255, 0) 0%, rgba(250, 253, 255, 0.92) 16%, rgba(250, 253, 255, 0.98) 100%);
+  backdrop-filter: blur(8px);
+}
+
+.drawer-quick-compose__form {
+  margin-top: 12px;
+  padding: 14px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(15, 111, 255, 0.1);
+  box-shadow:
+    0 14px 26px rgba(15, 57, 119, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.86);
+}
+
+.drawer-quick-compose__button {
+  width: 100%;
+}
+
+.drawer-quick-compose__confirm {
+  margin-top: 16px;
 }
 
 .drawer-order-card {
@@ -2538,6 +2622,19 @@ html.dark .drawer-order-items__item span {
   color: rgba(170, 186, 216, 0.72);
 }
 
+html.dark .drawer-quick-compose {
+  background:
+    linear-gradient(180deg, rgba(9, 13, 21, 0) 0%, rgba(9, 13, 21, 0.92) 16%, rgba(9, 13, 21, 0.98) 100%);
+}
+
+html.dark .drawer-quick-compose__form {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 16px 28px rgba(0, 0, 0, 0.24),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
 html.dark .drawer-dish-card--in-cart {
   border-color: rgba(var(--admin-accent-rgb), 0.26);
   box-shadow:
@@ -2568,13 +2665,11 @@ html.dark .board-filter-item span {
 
 html.dark .table-meta span {
   color: rgba(235, 241, 255, 0.94);
-  background: rgba(10, 18, 31, 0.5);
   border-color: rgba(255, 255, 255, 0.12);
 }
 
 html.dark .table-card__area {
   color: rgba(244, 247, 255, 0.96);
-  background: rgba(10, 18, 31, 0.58);
   border-color: rgba(255, 255, 255, 0.12);
 }
 
@@ -2594,39 +2689,11 @@ html.dark .drawer-cart__head span {
 }
 
 html.dark .table-card {
-  border-color: color-mix(in srgb, var(--table-accent) 48%, rgba(255, 255, 255, 0.16)) !important;
-  background:
-    radial-gradient(circle at top, color-mix(in srgb, var(--table-accent) 18%, transparent) 0%, transparent 48%),
-    linear-gradient(180deg, rgba(13, 21, 34, 0.96), rgba(8, 13, 22, 0.98)) !important;
   box-shadow:
     0 0 0 1px color-mix(in srgb, var(--table-accent) 18%, transparent),
     0 24px 54px rgba(0, 0, 0, 0.28),
     0 10px 24px rgba(0, 0, 0, 0.18),
     inset 0 1px 0 rgba(255, 255, 255, 0.04);
-}
-
-html.dark .table-card[data-status='0'] {
-  background:
-    radial-gradient(circle at top, rgba(47, 143, 107, 0.2) 0%, transparent 50%),
-    linear-gradient(180deg, rgba(10, 24, 22, 0.96), rgba(7, 16, 18, 0.98)) !important;
-}
-
-html.dark .table-card[data-status='1'] {
-  background:
-    radial-gradient(circle at top, rgba(217, 72, 95, 0.22) 0%, transparent 52%),
-    linear-gradient(180deg, rgba(28, 14, 20, 0.96), rgba(18, 9, 14, 0.98)) !important;
-}
-
-html.dark .table-card[data-status='2'] {
-  background:
-    radial-gradient(circle at top, rgba(20, 163, 255, 0.22) 0%, transparent 52%),
-    linear-gradient(180deg, rgba(10, 18, 30, 0.96), rgba(7, 12, 21, 0.98)) !important;
-}
-
-html.dark .table-card[data-status='3'] {
-  background:
-    radial-gradient(circle at top, rgba(221, 139, 28, 0.22) 0%, transparent 52%),
-    linear-gradient(180deg, rgba(30, 20, 10, 0.96), rgba(20, 13, 7, 0.98)) !important;
 }
 
 html.dark .table-card__halo {
@@ -2653,66 +2720,11 @@ html.dark .table-icon {
   filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.22));
 }
 
-html.dark .table-card[data-status='0'] .table-meta span,
-html.dark .table-card[data-status='0'] .table-card__area {
-  background: rgba(10, 32, 27, 0.72);
-}
-
-html.dark .table-card[data-status='1'] .table-meta span,
-html.dark .table-card[data-status='1'] .table-card__area {
-  background: rgba(37, 14, 21, 0.72);
-}
-
-html.dark .table-card[data-status='2'] .table-meta span,
-html.dark .table-card[data-status='2'] .table-card__area {
-  background: rgba(10, 20, 36, 0.72);
-}
-
-html.dark .table-card[data-status='3'] .table-meta span,
-html.dark .table-card[data-status='3'] .table-card__area {
-  background: rgba(39, 24, 10, 0.72);
-}
-
 html.dark .table-card:hover {
   border-color: color-mix(in srgb, var(--table-accent) 64%, rgba(255, 255, 255, 0.22)) !important;
   box-shadow:
     0 0 0 1px color-mix(in srgb, var(--table-accent) 24%, transparent),
-    0 30px 62px rgba(0, 0, 0, 0.36),
-    0 16px 30px rgba(0, 0, 0, 0.22),
-    inset 0 1px 0 rgba(255, 255, 255, 0.06);
-}
-
-html.dark .table-card[data-status='0']:hover {
-  box-shadow:
-    0 0 0 1px rgba(47, 143, 107, 0.3),
-    0 0 26px rgba(47, 143, 107, 0.18),
-    0 30px 62px rgba(0, 0, 0, 0.36),
-    0 16px 30px rgba(0, 0, 0, 0.22),
-    inset 0 1px 0 rgba(255, 255, 255, 0.06);
-}
-
-html.dark .table-card[data-status='1']:hover {
-  box-shadow:
-    0 0 0 1px rgba(217, 72, 95, 0.3),
-    0 0 26px rgba(217, 72, 95, 0.18),
-    0 30px 62px rgba(0, 0, 0, 0.36),
-    0 16px 30px rgba(0, 0, 0, 0.22),
-    inset 0 1px 0 rgba(255, 255, 255, 0.06);
-}
-
-html.dark .table-card[data-status='2']:hover {
-  box-shadow:
-    0 0 0 1px rgba(20, 163, 255, 0.32),
-    0 0 26px rgba(20, 163, 255, 0.2),
-    0 30px 62px rgba(0, 0, 0, 0.36),
-    0 16px 30px rgba(0, 0, 0, 0.22),
-    inset 0 1px 0 rgba(255, 255, 255, 0.06);
-}
-
-html.dark .table-card[data-status='3']:hover {
-  box-shadow:
-    0 0 0 1px rgba(221, 139, 28, 0.32),
-    0 0 26px rgba(221, 139, 28, 0.2),
+    0 0 26px var(--table-glow),
     0 30px 62px rgba(0, 0, 0, 0.36),
     0 16px 30px rgba(0, 0, 0, 0.22),
     inset 0 1px 0 rgba(255, 255, 255, 0.06);

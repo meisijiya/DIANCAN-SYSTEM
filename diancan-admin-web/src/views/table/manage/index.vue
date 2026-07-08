@@ -46,11 +46,11 @@ const rules = {
   name: { required: true, message: '请输入桌台名称', trigger: 'blur' }
 };
 
-const statusMap: Record<number, { label: string; type: 'success' | 'error' | 'warning' | 'info' }> = {
-  0: { label: '空闲', type: 'success' },
-  1: { label: '占用', type: 'error' },
-  2: { label: '已结账', type: 'info' },
-  3: { label: '待清洁', type: 'warning' }
+const statusMap: Record<number, { label: string; type: 'success' | 'error' | 'warning' | 'info'; accent: string; tone: string }> = {
+  0: { label: '空闲', type: 'success', accent: 'var(--table-status-free-accent)', tone: 'success' },
+  1: { label: '占用', type: 'error', accent: 'var(--table-status-busy-accent)', tone: 'error' },
+  2: { label: '已结账', type: 'info', accent: 'var(--table-status-paid-accent)', tone: 'info' },
+  3: { label: '待清洁', type: 'warning', accent: 'var(--table-status-cleaning-accent)', tone: 'warning' }
 };
 
 const statusFilterOptions = [
@@ -128,6 +128,14 @@ const filteredData = computed(() => {
   });
 });
 
+const statusSummaryChips = computed(() => [
+  { key: 'all', label: '全部', count: filteredData.value.length, tone: 'default' },
+  { key: '0', label: '空闲', count: filteredData.value.filter(item => item.status === 0).length, tone: 'success' },
+  { key: '1', label: '占用', count: filteredData.value.filter(item => item.status === 1).length, tone: 'error' },
+  { key: '2', label: '已结账', count: filteredData.value.filter(item => item.status === 2).length, tone: 'info' },
+  { key: '3', label: '待清洁', count: filteredData.value.filter(item => item.status === 3).length, tone: 'warning' }
+]);
+
 const columns: DataTableColumns<Api.Business.DiningTable> = [
   { title: '桌台编号', key: 'code', width: 100 },
   { title: '桌台名称', key: 'name', width: 120 },
@@ -136,8 +144,18 @@ const columns: DataTableColumns<Api.Business.DiningTable> = [
   {
     title: '状态', key: 'status', width: 100,
     render(row) {
-      const s = statusMap[row.status] || { label: '未知', type: 'info' as const };
-      return h(NTag, { type: s.type }, { default: () => s.label });
+      const s = statusMap[row.status] || { label: '未知', type: 'info' as const, accent: 'var(--table-status-paid-accent)', tone: 'info' };
+      return h(
+        NTag,
+        {
+          bordered: false,
+          style: {
+            color: '#fff',
+            background: s.accent
+          }
+        },
+        { default: () => s.label }
+      );
     }
   },
   {
@@ -420,6 +438,20 @@ onUnmounted(() => {
           <em>支持按桌台编号、名称、状态和区域联筛</em>
         </div>
       </div>
+      <div class="table-manage-status-strip">
+        <button
+          v-for="chip in statusSummaryChips"
+          :key="chip.key"
+          type="button"
+          class="table-manage-status-chip"
+          :data-tone="chip.tone"
+          :class="{ 'table-manage-status-chip--active': filterStatus === chip.key || (chip.key === 'all' && filterStatus === 'all') }"
+          @click="filterStatus = chip.key"
+        >
+          <span>{{ chip.label }}</span>
+          <strong>{{ chip.count }}</strong>
+        </button>
+      </div>
       <div v-if="qrTask" class="task-panel" :class="taskThemeClass">
         <div class="task-panel__meta">
           <div class="task-panel__ratio">{{ qrTask.completed || 0 }}/{{ qrTask.total || 0 }}</div>
@@ -605,6 +637,62 @@ onUnmounted(() => {
   margin-bottom: 12px;
 }
 
+.table-manage-status-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.table-manage-status-chip {
+  --chip-accent: rgba(var(--admin-accent-rgb), 0.78);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 38px;
+  padding: 0 14px;
+  border: 1px solid rgba(var(--admin-accent-rgb), 0.1);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.74);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.table-manage-status-chip[data-tone='success'] {
+  --chip-accent: var(--table-status-free-accent);
+}
+
+.table-manage-status-chip[data-tone='error'] {
+  --chip-accent: var(--table-status-busy-accent);
+}
+
+.table-manage-status-chip[data-tone='info'] {
+  --chip-accent: var(--table-status-paid-accent);
+}
+
+.table-manage-status-chip[data-tone='warning'] {
+  --chip-accent: var(--table-status-cleaning-accent);
+}
+
+.table-manage-status-chip span {
+  font-size: 12px;
+  color: color-mix(in srgb, var(--chip-accent) 46%, #52657f);
+}
+
+.table-manage-status-chip strong {
+  font-size: 14px;
+  color: color-mix(in srgb, var(--chip-accent) 72%, #163457);
+}
+
+.table-manage-status-chip:hover,
+.table-manage-status-chip--active {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--chip-accent) 28%, rgba(var(--admin-accent-rgb), 0.12));
+  box-shadow:
+    0 14px 24px color-mix(in srgb, var(--chip-accent) 12%, rgba(15, 57, 119, 0.08)),
+    inset 0 0 0 1px color-mix(in srgb, var(--chip-accent) 10%, rgba(255, 255, 255, 0.8));
+}
+
 .table-manage-toolbar__summary {
   display: flex;
   align-items: center;
@@ -771,6 +859,11 @@ onUnmounted(() => {
     align-items: flex-start;
   }
 
+  .table-manage-status-chip {
+    width: calc(50% - 4px);
+    justify-content: space-between;
+  }
+
   .table-manage-hero__badge {
     min-width: 0;
     width: 100%;
@@ -813,6 +906,26 @@ html.dark .table-manage-toolbar__summary {
 html.dark .table-manage-hero__stat strong,
 html.dark .table-manage-toolbar__summary strong {
   color: rgba(241, 246, 255, 0.96);
+}
+
+html.dark .table-manage-status-chip {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+html.dark .table-manage-status-chip span {
+  color: color-mix(in srgb, var(--chip-accent) 52%, rgba(214, 225, 247, 0.84));
+}
+
+html.dark .table-manage-status-chip strong {
+  color: color-mix(in srgb, var(--chip-accent) 66%, rgba(241, 246, 255, 0.96));
+}
+
+html.dark .table-manage-status-chip:hover,
+html.dark .table-manage-status-chip--active {
+  box-shadow:
+    0 18px 30px rgba(0, 0, 0, 0.24),
+    inset 0 0 0 1px color-mix(in srgb, var(--chip-accent) 18%, rgba(255, 255, 255, 0.08));
 }
 
 html.dark .table-area-form-tip {
