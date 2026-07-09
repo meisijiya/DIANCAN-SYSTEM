@@ -1,6 +1,6 @@
 .page {
-  --pay-red: #8f1f24;
-  --pay-red-deep: #6f171c;
+  --wechat-green: #07c160;
+  --wechat-green-deep: #06ad56;
   min-height: 100vh;
   position: relative;
   background:
@@ -205,15 +205,15 @@
 }
 
 .pay-method.wechat {
-  border: 1rpx solid rgba(143, 31, 36, 0.10);
-  background: #f8ecec;
+  border: 1rpx solid rgba(7, 193, 96, 0.14);
+  background: rgba(7, 193, 96, 0.08);
 }
 
 .method-icon {
   width: 56rpx;
   height: 56rpx;
   border-radius: 18rpx;
-  background: linear-gradient(135deg, #8f1f24 0%, #6f171c 100%);
+  background: linear-gradient(135deg, #07c160 0%, #06ad56 100%);
   color: #f7fcf3;
   display: flex;
   align-items: center;
@@ -234,7 +234,7 @@
   width: 40rpx;
   height: 40rpx;
   border-radius: 50%;
-  background: var(--pay-red);
+  background: var(--wechat-green);
   color: #fff;
   display: flex;
   align-items: center;
@@ -248,7 +248,7 @@
   height: 88rpx;
   border-radius: 24rpx;
   font-size: 32rpx;
-  background: linear-gradient(135deg, #8f1f24 0%, #6f171c 100%);
+  background: linear-gradient(135deg, #07c160 0%, #06ad56 100%);
 }
 
 .pay-status {

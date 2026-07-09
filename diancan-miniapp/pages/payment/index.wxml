@@ -4,8 +4,8 @@
 
   <view class="payment-hero">
     <view class="hero-chip">确认支付</view>
-    <view class="hero-title">确认后开始推进出餐</view>
-    <view class="hero-desc">保留我们现有支付能力，只把页面视觉切成参考小程序那种简洁确认流。</view>
+    <view class="hero-title">确认本单支付信息</view>
+    <view class="hero-desc">确认金额后发起微信支付，支付成功后自动返回结果页。</view>
   </view>
 
   <view class="order-summary" wx:if="{{order}}">

@@ -14,10 +14,16 @@ function addCartItem(tableId, dishId, quantity = 1, remark = '') {
 }
 
 function updateCartItem(dishId, tableId, quantity, remark) {
+  const query = [`tableId=${encodeURIComponent(tableId)}`];
+  if (quantity !== undefined && quantity !== null) {
+    query.push(`quantity=${encodeURIComponent(quantity)}`);
+  }
+  if (remark !== undefined && remark !== null) {
+    query.push(`remark=${encodeURIComponent(remark)}`);
+  }
   return request({
-    url: `/cart/item/${dishId}`,
-    method: 'PUT',
-    params: { tableId, quantity, remark }
+    url: `/cart/item/${dishId}?${query.join('&')}`,
+    method: 'PUT'
   });
 }
 

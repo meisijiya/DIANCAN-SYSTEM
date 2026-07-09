@@ -49,6 +49,11 @@ function pickLatestPendingOrder(orders) {
   return orders.find(order => Number(order.status) === 0) || null;
 }
 
+function normalizeDishId(value) {
+  if (value === null || value === undefined) return '';
+  return String(value);
+}
+
 Page({
   data: {
     tableId: null,
@@ -147,16 +152,24 @@ Page({
   },
 
   onRemarkInput(e) {
-    const dishId = Number(e.currentTarget.dataset.id);
+    const dishId = normalizeDishId(e.currentTarget.dataset.id);
     const value = e.detail.value;
-    const items = this.data.cart.items.map((it) => (it.dishId === dishId ? { ...it, remark: value } : it));
+    const items = this.data.cart.items.map((it) => (
+      normalizeDishId(it.dishId) === dishId ? { ...it, remark: value } : it
+    ));
     this.setData({ 'cart.items': items });
   },
 
   async saveRemark(e) {
-    const item = e.currentTarget.dataset.item;
+    const dishId = normalizeDishId(e.currentTarget.dataset.id);
+    const item = this.data.cart.items.find(it => normalizeDishId(it.dishId) === dishId);
+    if (!item) {
+      wx.showToast({ title: '未找到当前菜品', icon: 'none' });
+      return;
+    }
     try {
-      await cartApi.updateCartItem(item.dishId, this.data.tableId, undefined, item.remark || '');
+      await cartApi.updateCartItem(item.dishId, this.data.tableId, undefined, item.remark ?? '');
+      await this.loadCart();
       wx.showToast({ title: '备注已保存', icon: 'none' });
     } catch (err) {
       wx.showToast({ title: err.message || '备注保存失败', icon: 'none' });
