@@ -7,12 +7,7 @@
     <view class="hero-main" style="padding-top: {{statusBarHeight + navBarHeight + 20}}rpx;">
       <view class="hero-topline">
         <view class="hero-chip">{{table ? '桌台已绑定' : '堂食点餐'}}</view>
-        <view class="hero-scene">{{loggedIn ? 'VIP 已登录' : 'VIP 待登录'}}</view>
-      </view>
-
-      <view class="hero-actions">
-        <button class="hero-btn hero-btn-primary" bindtap="scanTableCode">扫桌台二维码</button>
-        <button class="hero-btn hero-btn-secondary" bindtap="goMember">注册 VIP</button>
+        <view class="hero-scene">{{loggedIn ? '已登录' : '未登录'}}</view>
       </view>
     </view>
   </view>

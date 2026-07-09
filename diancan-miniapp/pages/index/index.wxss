@@ -100,33 +100,6 @@
   display: none;
 }
 
-.hero-actions {
-  display: flex;
-  gap: 18rpx;
-  margin-top: 22rpx;
-}
-
-.hero-btn {
-  flex: 1;
-  height: 86rpx;
-  line-height: 86rpx;
-  border: none;
-  border-radius: 999rpx;
-  font-size: 28rpx;
-  font-weight: 700;
-}
-
-.hero-btn-primary {
-  background: #fbfcf8;
-  color: var(--home-red);
-}
-
-.hero-btn-secondary {
-  background: rgba(87, 18, 22, 0.22);
-  color: #f7fcf3;
-  backdrop-filter: blur(12rpx);
-}
-
 .content-wrap {
   padding: 10rpx 24rpx 44rpx;
 }

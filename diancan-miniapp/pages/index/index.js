@@ -1,7 +1,6 @@
 const bannerApi = require('../../api/banner');
 const couponApi = require('../../api/coupon');
 const dishApi = require('../../api/dish');
-const memberApi = require('../../api/member');
 const tableApi = require('../../api/table');
 const { KEYS, get, set } = require('../../utils/storage');
 const { isLoggedIn, wxLogin, phoneLogin } = require('../../utils/auth');
@@ -35,7 +34,6 @@ Page({
     banners: [],
     coupons: [],
     categories: [],
-    memberCenter: null,
     heroTitle: '今天吃点招牌热菜',
     heroDesc: '首页先看活动、领券，再去点餐。',
     heroTag: '堂食点餐',
@@ -74,10 +72,9 @@ Page({
     }
 
     if (loggedIn) {
-      this.loadMemberPreview();
       this.loadCouponPreview();
     } else {
-      this.setData({ coupons: [], memberCenter: null });
+      this.setData({ coupons: [] });
     }
   },
 
@@ -123,15 +120,6 @@ Page({
       });
     } catch (err) {
       this.setData({ coupons: [] });
-    }
-  },
-
-  async loadMemberPreview() {
-    try {
-      const memberCenter = await memberApi.getMemberCenter();
-      this.setData({ memberCenter: memberCenter || null });
-    } catch (err) {
-      this.setData({ memberCenter: null });
     }
   },
 
@@ -276,26 +264,6 @@ Page({
     wx.switchTab({ url: '/pages/menu/index' });
   },
 
-  scanTableCode() {
-    wx.scanCode({
-      onlyFromCamera: true,
-      success: async (res) => {
-        const content = res.result || '';
-        const parsedCode = this.extractTableCode({ code: content });
-        if (!parsedCode) {
-          wx.showToast({ title: '未识别到桌台码', icon: 'none' });
-          return;
-        }
-        this.setData({ tableCode: parsedCode, loading: true, sceneEntry: true });
-        this.refreshHeroState();
-        await this.autoBind(parsedCode);
-      },
-      fail: () => {
-        wx.showToast({ title: '扫码失败', icon: 'none' });
-      }
-    });
-  },
-
   goOrder() {
     if (!isLoggedIn()) {
       this.setData({ showLoginPanel: true });
@@ -310,14 +278,6 @@ Page({
       return;
     }
     wx.navigateTo({ url: '/pages/coupon/index' });
-  },
-
-  goMember() {
-    if (!isLoggedIn()) {
-      this.setData({ showLoginPanel: true });
-      return;
-    }
-    wx.navigateTo({ url: '/pages/member/index' });
   },
 
   goTablePage() {
