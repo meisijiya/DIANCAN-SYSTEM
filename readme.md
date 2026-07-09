@@ -31,73 +31,34 @@
 
 ## 项目概览
 
+点餐系统不是单一后台 Demo，而是围绕门店堂食场景构建的三端协同业务系统。顾客通过微信小程序完成扫码入桌、点餐、支付、评价，门店员工通过管理端处理桌台、订单、后厨、收银，后端统一承载交易、会员、营销、消息与报表能力。
+
 ```mermaid
-flowchart TB
-    subgraph Row1[ ]
-        direction LR
-        L1[应用层]
-        subgraph Layer1[ ]
-            direction LR
-            MINI[微信小程序]
-            WEB[管理后台]
-            SERVICE[服务收银]
-            BI[经营分析]
-        end
+flowchart LR
+    subgraph SYSTEM[点餐系统]
+        MINI[微信小程序]
+        ADMIN[管理端]
+        BACKEND[Spring Boot 后端]
     end
 
-    subgraph Row2[ ]
-        direction LR
-        L2[中台层]
-        subgraph Layer2[ ]
-            direction LR
-            SAFE[安全治理]
-            OPSM[运营治理]
-            AUTH[认证中心]
-            GATEWAY[接口网关]
-        end
-    end
+    CUSTOMER[顾客] --> MINI
+    STAFF[服务员 / 收银员 / 后厨] --> ADMIN
+    MANAGER[店长 / 运营] --> ADMIN
 
-    subgraph Row3[ ]
-        direction LR
-        L3[业务层]
-        subgraph Layer3[ ]
-            direction LR
-            DISH[菜品服务]
-            TABLE[桌台服务]
-            ORDER[订单服务]
-            MEMBER[会员服务]
-        end
-    end
-
-    subgraph Row4[ ]
-        direction LR
-        L4[存储层]
-        subgraph Layer4[ ]
-            direction LR
-            MYSQL[(MySQL)]
-            REDIS[(Redis)]
-            MQ[(RocketMQ)]
-            MINIO[(MinIO)]
-        end
-    end
-
-    Row1 --> Row2
-    Row2 --> Row3
-    Row3 --> Row4
-
-    style Row1 fill:#ffffff,stroke:#ffffff,color:#111
-    style Row2 fill:#ffffff,stroke:#ffffff,color:#111
-    style Row3 fill:#ffffff,stroke:#ffffff,color:#111
-    style Row4 fill:#ffffff,stroke:#ffffff,color:#111
-    style Layer1 fill:#55c5c7,stroke:#333,stroke-width:2px,color:#111
-    style Layer2 fill:#ffc98f,stroke:#333,stroke-width:2px,color:#111
-    style Layer3 fill:#ffe353,stroke:#333,stroke-width:2px,color:#111
-    style Layer4 fill:#8d8cf0,stroke:#333,stroke-width:2px,color:#111
-    style L1 fill:#ffffff,stroke:#ffffff,color:#111,font-weight:bold
-    style L2 fill:#ffffff,stroke:#ffffff,color:#111,font-weight:bold
-    style L3 fill:#ffffff,stroke:#ffffff,color:#111,font-weight:bold
-    style L4 fill:#ffffff,stroke:#ffffff,color:#111,font-weight:bold
+    MINI --> BACKEND
+    ADMIN --> BACKEND
+    BACKEND --> MYSQL[(MySQL)]
+    BACKEND --> REDIS[(Redis)]
+    BACKEND --> MQ[(RocketMQ)]
+    BACKEND --> MINIO[(MinIO)]
 ```
+
+| 视角 | 说明 |
+| --- | --- |
+| 业务对象 | 顾客、服务员、收银员、后厨、店长、运营 |
+| 核心场景 | 扫码入桌、菜单浏览、购物车下单、支付结算、后厨出餐、会员运营、评价反馈 |
+| 交付形态 | `diancan-miniapp` 顾客端、`diancan-admin-web` 管理端、`diancan-admin` 后端 |
+| 架构定位 | 一个面向门店堂食业务的三端协同系统，不是单页演示项目，也不是已拆分微服务集群 |
 
 ## 目录
 
@@ -308,143 +269,103 @@ diancan-system
 
 ## 系统架构
 
+从当前仓库结构看，系统采用的是“`Vue 管理端 + 微信小程序 + Spring Boot 单体后端`”架构。后端并未拆成独立微服务，而是按业务域在单体应用内部做模块化组织，这也是当前代码最真实的技术形态。
+
 ```mermaid
 flowchart TB
-    subgraph Row1[ ]
-        direction LR
-        L1[应用层]
-        subgraph Layer1[ ]
-            direction LR
-            MINI[微信小程序]
-            ADMIN[管理端]
-            CASHIER[服务收银]
-            MANAGE[运营中心]
-        end
+    subgraph ACCESS[接入层]
+        MINI[微信小程序]
+        ADMIN[Vue 管理端]
     end
 
-    subgraph Row2[ ]
-        direction LR
-        L2[中台层]
-        subgraph Layer2[ ]
-            direction LR
-            SAFE[安全管理]
-            RUNTIME[运行管理]
-            S1[认证中心]
-            S2[接口网关]
-        end
+    subgraph INTERACTION[交互层]
+        API[REST API]
+        WS[WebSocket / STOMP]
     end
 
-    subgraph Row3[ ]
-        direction LR
-        L3[业务层]
-        subgraph Layer3[ ]
-            direction LR
-            B1[菜品服务]
-            B2[桌台服务]
-            B3[订单服务]
-            B4[会员服务]
-        end
+    subgraph APPLICATION[应用服务层：diancan-admin]
+        SYSTEM[认证 / 菜单 / 角色 / 日志]
+        STORE[菜品 / 分类 / 规格 / 桌区 / 桌台 / 轮播图]
+        TRADE[购物车 / 订单 / 支付]
+        FULFILL[后厨 / 打印 / 消息推送]
+        CRM[会员 / 积分 / 成长 / 优惠券]
+        OPS[评价 / 反馈 / 报表 / 审计]
     end
 
-    subgraph Row4[ ]
-        direction LR
-        L4[存储层]
-        subgraph Layer4[ ]
-            direction LR
-            DB[(MySQL)]
-            CACHE[(Redis)]
-            ROCKET[(RocketMQ)]
-            OSS[(MinIO)]
-        end
+    subgraph INFRA[基础设施层]
+        MYSQL[(MySQL)]
+        REDIS[(Redis)]
+        MQ[(RocketMQ)]
+        MINIO[(MinIO)]
+        WECHAT[微信小程序 / 微信支付]
     end
 
-    Row1 --> Row2
-    Row2 --> Row3
-    Row3 --> Row4
+    MINI --> API
+    ADMIN --> API
+    ADMIN --> WS
 
-    style Row1 fill:#ffffff,stroke:#ffffff,color:#111
-    style Row2 fill:#ffffff,stroke:#ffffff,color:#111
-    style Row3 fill:#ffffff,stroke:#ffffff,color:#111
-    style Row4 fill:#ffffff,stroke:#ffffff,color:#111
-    style Layer1 fill:#55c5c7,stroke:#333,stroke-width:2px,color:#111
-    style Layer2 fill:#ffc98f,stroke:#333,stroke-width:2px,color:#111
-    style Layer3 fill:#ffe353,stroke:#333,stroke-width:2px,color:#111
-    style Layer4 fill:#8d8cf0,stroke:#333,stroke-width:2px,color:#111
-    style L1 fill:#ffffff,stroke:#ffffff,color:#111,font-weight:bold
-    style L2 fill:#ffffff,stroke:#ffffff,color:#111,font-weight:bold
-    style L3 fill:#ffffff,stroke:#ffffff,color:#111,font-weight:bold
-    style L4 fill:#ffffff,stroke:#ffffff,color:#111,font-weight:bold
+    API --> SYSTEM
+    API --> STORE
+    API --> TRADE
+    API --> FULFILL
+    API --> CRM
+    API --> OPS
+    WS --> TRADE
+    WS --> FULFILL
+
+    SYSTEM --> MYSQL
+    STORE --> MYSQL
+    TRADE --> MYSQL
+    FULFILL --> MYSQL
+    CRM --> MYSQL
+    OPS --> MYSQL
+
+    SYSTEM --> REDIS
+    TRADE --> REDIS
+    CRM --> REDIS
+
+    FULFILL --> MQ
+    CRM --> MQ
+    STORE --> MINIO
+    TRADE --> WECHAT
 ```
+
+| 层次 | 当前实现 |
+| --- | --- |
+| 前端接入 | 管理端负责门店运营与服务流程，小程序负责顾客自助点餐与会员触达 |
+| 后端形态 | `diancan-admin` 是单体应用，按 `dish`、`table`、`order`、`payment`、`member`、`coupon`、`review` 等业务域拆分 |
+| 实时与异步 | WebSocket / STOMP 负责页面实时通知，RocketMQ 负责异步消息与解耦 |
+| 数据与文件 | MySQL 存核心业务数据，Redis 承担缓存与状态能力，MinIO 承担文件存储 |
 
 ## 页面与业务关系
 
+下面这张图不再按“技术分层”去画，而是按门店点餐的真实业务闭环去画。重点不是页面放在哪一层，而是哪一类页面在业务链路的哪个阶段参与协同。
+
 ```mermaid
-flowchart TB
-    subgraph Row1[ ]
-        direction LR
-        L1[应用层]
-        subgraph Layer1[ ]
-            direction LR
-            A[扫码入桌]
-            B[桌台识别]
-            C[菜单浏览]
-            D[加入购物车]
-        end
-    end
+flowchart LR
+    STAGE1[1. 入桌与引流] --> STAGE2[2. 点餐与交易] --> STAGE3[3. 履约与出餐] --> STAGE4[4. 评价与复盘]
+    DOMAIN[会员与营销] -.交易激励.-> STAGE2
+    DOMAIN -.复购运营.-> STAGE4
 
-    subgraph Row2[ ]
-        direction LR
-        L2[中台层]
-        subgraph Layer2[ ]
-            direction LR
-            RULE[优惠校验]
-            ORDER[订单生成]
-            MEMBER[会员成长]
-            STATE[状态流转]
-        end
-    end
-
-    subgraph Row3[ ]
-        direction LR
-        L3[业务层]
-        subgraph Layer3[ ]
-            direction LR
-            ACCEPT[前台接单]
-            KITCHEN[后厨处理]
-            PRINT[小票打印]
-            SERVE[出餐催菜]
-        end
-    end
-
-    subgraph Row4[ ]
-        direction LR
-        L4[存储层]
-        subgraph Layer4[ ]
-            direction LR
-            REPORT[经营报表]
-            REVIEW[评价分析]
-            DATA[经营数据]
-            FEEDBACK[评价反馈]
-        end
-    end
-
-    Row1 --> Row2
-    Row2 --> Row3
-    Row3 --> Row4
-
-    style Row1 fill:#ffffff,stroke:#ffffff,color:#111
-    style Row2 fill:#ffffff,stroke:#ffffff,color:#111
-    style Row3 fill:#ffffff,stroke:#ffffff,color:#111
-    style Row4 fill:#ffffff,stroke:#ffffff,color:#111
-    style Layer1 fill:#55c5c7,stroke:#333,stroke-width:2px,color:#111
-    style Layer2 fill:#ffc98f,stroke:#333,stroke-width:2px,color:#111
-    style Layer3 fill:#ffe353,stroke:#333,stroke-width:2px,color:#111
-    style Layer4 fill:#8d8cf0,stroke:#333,stroke-width:2px,color:#111
-    style L1 fill:#ffffff,stroke:#ffffff,color:#111,font-weight:bold
-    style L2 fill:#ffffff,stroke:#ffffff,color:#111,font-weight:bold
-    style L3 fill:#ffffff,stroke:#ffffff,color:#111,font-weight:bold
-    style L4 fill:#ffffff,stroke:#ffffff,color:#111,font-weight:bold
+    STAGE1 --- MINI1[小程序：首页 / 桌台页]
+    STAGE1 --- ADMIN1[管理端：桌区 / 桌台管理]
+    STAGE2 --- MINI2[小程序：菜单 / 购物车 / 支付]
+    STAGE2 --- ADMIN2[管理端：下单台 / 订单处理 / 收银台]
+    STAGE3 --- ADMIN3[管理端：后厨 / 桌台看板 / 打印机]
+    STAGE3 --- BACK3[后端：订单 / 厨房 / 打印 / 消息]
+    STAGE4 --- MINI4[小程序：订单 / 评价 / 反馈]
+    STAGE4 --- ADMIN4[管理端：评价 / 反馈 / 营收报表]
+    DOMAIN --- MINI5[小程序：会员 / 积分 / 成长 / 优惠券 / 我的]
+    DOMAIN --- ADMIN5[管理端：会员 / 优惠券 / 轮播图]
 ```
+
+| 业务阶段 | 顾客端页面 | 管理端页面 | 支撑后端模块 |
+| --- | --- | --- | --- |
+| 入桌与引流 | `pages/index`、`pages/table` | `table/area`、`table/manage` | `table`、`banner` |
+| 点餐与交易 | `pages/menu`、`pages/cart`、`pages/payment` | `service/place-order`、`service/order-ops`、`service/checkout`、`order/list` | `dish`、`cart`、`order`、`payment` |
+| 履约与出餐 | 顾客侧主要感知订单状态 | `service/kitchen`、`service/table-board`、`device/printer` | `kitchen`、`print`、`mq` |
+| 会员与营销 | `pages/member`、`pages/member-points`、`pages/member-growth`、`pages/coupon`、`pages/profile` | `marketing/member`、`marketing/member-level`、`marketing/coupon`、`marketing/banner` | `member`、`coupon`、`banner` |
+| 评价与复盘 | `pages/review`、`pages/my-review`、`pages/feedback`、`pages/order` | `device/review`、`device/feedback`、`report/revenue`、`report/dish-ranking`、`report/table-turnover` | `review`、`feedback`、`report`、`audit` |
 
 ## 环境要求
 
