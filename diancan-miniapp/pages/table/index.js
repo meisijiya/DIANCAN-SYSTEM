@@ -1,6 +1,11 @@
 const tableApi = require('../../api/table');
-const { KEYS, get, set } = require('../../utils/storage');
+const { KEYS, get, setCurrentTable } = require('../../utils/storage');
 const { isLoggedIn, wxLogin, phoneLogin } = require('../../utils/auth');
+
+function normalizeTableCode(value) {
+  if (value === null || value === undefined) return '';
+  return String(value).trim().toUpperCase();
+}
 
 Page({
   data: {
@@ -15,13 +20,21 @@ Page({
   onLoad(options) {
     const code = this.extractCodeFromOptions(options || {});
     if (!code) return;
-    this.setData({ tableCode: code });
+    this.setData({ tableCode: code, autoLoadFromSceneDone: false });
   },
 
   onShow() {
     this.setData({ loggedIn: isLoggedIn() });
 
     const cachedTable = get(KEYS.TABLE);
+    const sceneTableCode = normalizeTableCode(this.data.tableCode);
+    const cachedTableCode = normalizeTableCode(cachedTable && cachedTable.code);
+    if (sceneTableCode && sceneTableCode !== cachedTableCode) {
+      this.setData({ table: null, autoLoadFromSceneDone: true });
+      this.loadTable(this.data.tableCode);
+      return;
+    }
+
     if (cachedTable) {
       this.setData({ table: cachedTable, tableCode: cachedTable.code || '' });
       return;
@@ -128,22 +141,31 @@ Page({
   },
 
   async loadTable() {
-    if (!this.data.tableCode) {
+    const tableCode = this.data.tableCode;
+    if (!tableCode) {
       wx.showToast({ title: '请输入桌号编码', icon: 'none' });
       return;
     }
+    const requestCode = normalizeTableCode(tableCode);
     wx.showLoading({ title: '加载中' });
     try {
-      const table = await tableApi.getTableByCode(this.data.tableCode);
-      this.setData({ table });
-      set(KEYS.TABLE, table);
+      const table = await tableApi.getTableByCode(tableCode);
+      if (requestCode !== normalizeTableCode(this.data.tableCode)) {
+        return;
+      }
 
-      if (table.status === 0) {
-        await tableApi.openTable(table.id);
+      const originalStatus = Number(table.status);
+      const boundTable = { ...table };
+      if (originalStatus === 0) {
+        await tableApi.openTable(boundTable.id);
+        boundTable.status = 1;
         wx.showToast({ title: '空闲桌台已自动开台', icon: 'none' });
       }
 
-      if (table.status === 1) {
+      setCurrentTable(boundTable);
+      this.setData({ table: boundTable, tableCode: boundTable.code || tableCode });
+
+      if (originalStatus === 1) {
         wx.showModal({
           title: '桌台已占用',
           content: '可选择加入该桌继续点餐，或联系服务员。',

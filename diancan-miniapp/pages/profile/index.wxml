@@ -50,10 +50,6 @@
     <block wx:else>
       <view class="identity-card__title">会员已登录</view>
       <view class="identity-card__desc">订单、优惠券、评价和会员服务都可以在这里查看</view>
-      <view class="identity-card__action-row">
-        <button class="identity-card__btn identity-card__btn--ghost" bindtap="goOrder">查看订单</button>
-        <button class="identity-card__btn identity-card__btn--danger" bindtap="handleLogout">切换账号</button>
-      </view>
     </block>
   </view>
 
@@ -91,8 +87,8 @@
         <view class="quick-item__label">完善资料</view>
       </view>
       <view class="quick-item" bindtap="handleQuickEntryAction">
-        <view class="quick-item__icon">{{loggedIn ? '切' : '反'}}</view>
-        <view class="quick-item__label">{{loggedIn ? '切换账号' : '意见反馈'}}</view>
+        <view class="quick-item__icon">反</view>
+        <view class="quick-item__label">意见反馈</view>
       </view>
     </view>
   </view>
@@ -130,6 +126,10 @@
           <text class="menu-arrow">›</text>
         </view>
       </view>
+    </view>
+
+    <view class="logout-section">
+      <button class="logout-btn" bindtap="handleLogout">退出登录</button>
     </view>
   </block>
 </view>

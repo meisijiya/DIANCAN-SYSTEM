@@ -2,7 +2,7 @@ const dishApi = require('../../api/dish');
 const cartApi = require('../../api/cart');
 const orderApi = require('../../api/order');
 const tableApi = require('../../api/table');
-const { KEYS, get } = require('../../utils/storage');
+const { KEYS, get, setCurrentTable } = require('../../utils/storage');
 const { isLoggedIn, wxLogin, phoneLogin } = require('../../utils/auth');
 const { formatPrice } = require('../../utils/format');
 
@@ -16,6 +16,11 @@ const SPICE_LABEL_MAP = {
 function normalizeId(v) {
   if (v === null || v === undefined) return '';
   return String(v);
+}
+
+function normalizeTableCode(value) {
+  if (value === null || value === undefined) return '';
+  return String(value).trim().toUpperCase();
 }
 
 function normalizeCategoryId(...values) {
@@ -148,20 +153,39 @@ Page({
   onShow() {
     const loggedIn = isLoggedIn();
     const table = get(KEYS.TABLE);
+    const sceneTableCode = normalizeTableCode(this.data.tableCode);
+    const cachedTableCode = normalizeTableCode(table && table.code);
+    const useCachedTable = !sceneTableCode || sceneTableCode === cachedTableCode;
+    const activeTable = useCachedTable ? table : null;
     this.setData({
       loggedIn,
-      table: table || null,
-      heroStatusText: table ? '桌台已就绪' : '等待绑定桌台',
-      menuHeroTitle: table ? `${table.name || table.code || '当前桌台'} 正在点餐` : '选好菜，再确认下单',
-      tableDisplayCode: table && table.code ? table.code : '未绑定'
+      table: activeTable || null,
+      heroStatusText: activeTable ? '桌台已就绪' : '等待绑定桌台',
+      menuHeroTitle: activeTable ? `${activeTable.name || activeTable.code || '当前桌台'} 正在点餐` : '选好菜，再确认下单',
+      tableDisplayCode: activeTable && activeTable.code ? activeTable.code : '未绑定'
     });
 
-    if (table) {
-      this.setData({ tableCode: table.code || '', showTableInput: false });
+    if (sceneTableCode && sceneTableCode !== cachedTableCode) {
+      this.setData(
+        {
+          orderedDishIds: [],
+          orderedDishCount: 0,
+          cartSummary: { totalCount: 0, totalPrice: '0.00' }
+        },
+        () => {
+          this.updateDishListFromState();
+        }
+      );
+      this.loadTable(this.data.tableCode);
+      return;
+    }
+
+    if (activeTable) {
+      this.setData({ tableCode: activeTable.code || '', showTableInput: false });
       this.loadMenu();
       this.loadOrderedDishIds();
       if (loggedIn) this.loadCart();
-    } else if (this.data.tableCode) {
+    } else if (sceneTableCode) {
       this.loadTable(this.data.tableCode);
     } else {
       this.loadMenu();
@@ -212,16 +236,35 @@ Page({
       wx.showToast({ title: '请输入桌号编码', icon: 'none' });
       return;
     }
+    const requestCode = normalizeTableCode(code);
     wx.showLoading({ title: '加载桌台' });
     try {
       const table = await tableApi.getTableByCode(code);
-      this.setData({ table, showTableInput: false });
-      wx.setStorageSync(KEYS.TABLE, table);
-      if (table.status === 0) await tableApi.openTable(table.id);
+      if (requestCode !== normalizeTableCode(this.data.tableCode)) {
+        return;
+      }
+
+      const boundTable = { ...table };
+      if (Number(boundTable.status) === 0) {
+        await tableApi.openTable(boundTable.id);
+        boundTable.status = 1;
+      }
+
+      setCurrentTable(boundTable);
+      this.setData({
+        table: boundTable,
+        tableCode: boundTable.code || code,
+        showTableInput: false,
+        heroStatusText: '桌台已就绪',
+        menuHeroTitle: `${boundTable.name || boundTable.code || '当前桌台'} 正在点餐`,
+        tableDisplayCode: boundTable.code || '未绑定'
+      });
       await this.loadMenu();
       await this.loadOrderedDishIds();
       if (isLoggedIn()) {
         await this.loadCart();
+      } else {
+        this.setData({ cartSummary: { totalCount: 0, totalPrice: '0.00' } });
       }
     } catch (err) {
       wx.showToast({ title: err.message || '桌台不存在', icon: 'none' });
@@ -320,7 +363,8 @@ Page({
   },
 
   async loadOrderedDishIds() {
-    if (!this.data.table) {
+    const currentTableId = Number((this.data.table || {}).id || 0);
+    if (!currentTableId) {
       this.setData({ orderedDishIds: [], orderedDishCount: 0 }, () => {
         this.updateDishListFromState();
       });
@@ -328,7 +372,11 @@ Page({
     }
 
     try {
-      const list = await orderApi.getTableOrders(this.data.table.id);
+      const list = await orderApi.getTableOrders(currentTableId);
+      if (currentTableId !== Number((this.data.table || {}).id || 0)) {
+        return;
+      }
+
       const orderedSet = new Set();
       (list || []).forEach(order => {
         (order.items || []).forEach(item => {
@@ -350,9 +398,14 @@ Page({
   },
 
   async loadCart() {
-    if (!this.data.table) return;
+    const currentTableId = Number((this.data.table || {}).id || 0);
+    if (!currentTableId) return;
     try {
-      const cart = await cartApi.getCart(this.data.table.id);
+      const cart = await cartApi.getCart(currentTableId);
+      if (currentTableId !== Number((this.data.table || {}).id || 0)) {
+        return;
+      }
+
       this.setData({
         cartSummary: {
           totalCount: cart.totalCount || 0,

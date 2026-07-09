@@ -22,9 +22,42 @@ function remove(key) {
   wx.removeStorageSync(key);
 }
 
+function normalizeTableIdentity(table) {
+  if (!table || typeof table !== 'object') return '';
+  const id = table.id === null || table.id === undefined ? '' : String(table.id).trim();
+  if (id) return id;
+  const code = table.code === null || table.code === undefined ? '' : String(table.code).trim();
+  return code;
+}
+
+function clearCurrentTableState() {
+  remove(KEYS.ORDER_ID);
+  remove(KEYS.ORDERED_DISH_IDS);
+  remove(KEYS.PERSON_COUNT);
+}
+
+function setCurrentTable(table) {
+  if (!table) {
+    remove(KEYS.TABLE);
+    clearCurrentTableState();
+    return;
+  }
+
+  const currentTable = get(KEYS.TABLE);
+  const currentIdentity = normalizeTableIdentity(currentTable);
+  const nextIdentity = normalizeTableIdentity(table);
+  if (currentIdentity && nextIdentity && currentIdentity !== nextIdentity) {
+    clearCurrentTableState();
+  }
+
+  set(KEYS.TABLE, table);
+}
+
 module.exports = {
   KEYS,
   get,
   set,
-  remove
+  remove,
+  clearCurrentTableState,
+  setCurrentTable
 };

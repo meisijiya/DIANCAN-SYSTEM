@@ -106,10 +106,6 @@ Page({
   },
 
   handleQuickEntryAction() {
-    if (this.data.loggedIn) {
-      this.handleLogout();
-      return;
-    }
     this.goFeedback();
   },
 
@@ -128,15 +124,16 @@ Page({
   clearCache() {
     wx.showModal({
       title: '清除缓存',
-      content: '确定要清除本地缓存吗？这将清除桌台信息和本地记录。',
+      content: '确定要清除本地缓存吗？这会清除桌台信息和本地临时记录。',
       success: (res) => {
         if (res.confirm) {
           remove(KEYS.TABLE);
-          remove(KEYS.TOKEN);
-          remove(KEYS.OPENID);
-          remove(KEYS.USER_INFO);
-          wx.showToast({ title: '缓存已清除', icon: 'none' });
-          this.setData({ loggedIn: false, userInfo: null });
+          remove(KEYS.ORDER_ID);
+          remove(KEYS.ORDERED_DISH_IDS);
+          remove(KEYS.MOCK_PAID_ORDER_IDS);
+          remove(KEYS.REVIEWED_ORDER_IDS);
+          remove(KEYS.PERSON_COUNT);
+          wx.showToast({ title: '本地缓存已清除', icon: 'none' });
         }
       }
     });

@@ -244,27 +244,6 @@
   color: #fbf8f4;
 }
 
-.identity-card__action-row {
-  display: flex;
-  gap: 16rpx;
-  margin-top: 24rpx;
-}
-
-.identity-card__action-row .identity-card__btn {
-  flex: 1;
-  margin-top: 0;
-}
-
-.identity-card__btn--ghost {
-  background: #f7f2ee;
-  color: #7c6d67;
-  border: 1rpx solid rgba(143, 31, 36, 0.08);
-}
-
-.identity-card__btn--danger {
-  background: linear-gradient(135deg, #8f1f24 0%, #6f171c 100%);
-}
-
 .promo-banner {
   margin-top: 18rpx;
 }
@@ -440,6 +419,24 @@
 
 .menu-section {
   margin-top: 24rpx;
+}
+
+.logout-section {
+  position: relative;
+  z-index: 2;
+  margin: 22rpx 24rpx 0;
+}
+
+.logout-btn {
+  height: 84rpx;
+  line-height: 84rpx;
+  border: none;
+  border-radius: 999rpx;
+  background: linear-gradient(135deg, #8f1f24 0%, #6f171c 100%);
+  color: #fff7f2;
+  font-size: 28rpx;
+  font-weight: 800;
+  box-shadow: 0 12rpx 24rpx rgba(143, 31, 36, 0.14);
 }
 
 .menu-group {

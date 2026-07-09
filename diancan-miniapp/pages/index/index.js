@@ -2,8 +2,13 @@ const bannerApi = require('../../api/banner');
 const couponApi = require('../../api/coupon');
 const dishApi = require('../../api/dish');
 const tableApi = require('../../api/table');
-const { KEYS, get, set } = require('../../utils/storage');
+const { KEYS, get, setCurrentTable } = require('../../utils/storage');
 const { isLoggedIn, wxLogin, phoneLogin } = require('../../utils/auth');
+
+function normalizeTableCode(value) {
+  if (value === null || value === undefined) return '';
+  return String(value).trim().toUpperCase();
+}
 
 function formatCouponRule(coupon) {
   if (!coupon) return '';
@@ -57,11 +62,21 @@ Page({
   onShow() {
     const loggedIn = isLoggedIn();
     const table = get(KEYS.TABLE);
+    const sceneTableCode = normalizeTableCode(this.data.tableCode);
+    const cachedTableCode = normalizeTableCode(table && table.code);
     this.setData({ loggedIn, table: table || null, showLoginPanel: false }, () => {
       this.refreshHeroState();
     });
 
-    if (this.data.tableCode && !table) {
+    if (sceneTableCode && sceneTableCode !== cachedTableCode) {
+      this.setData({ table: null, loading: true, autoRedirected: false }, () => {
+        this.refreshHeroState();
+      });
+      this.autoBind(this.data.tableCode);
+      return;
+    }
+
+    if (sceneTableCode && !table) {
       this.autoBind(this.data.tableCode);
       return;
     }
@@ -177,16 +192,24 @@ Page({
    */
   async autoBind(code) {
     if (!code) return;
+    const requestCode = normalizeTableCode(code);
     try {
       const table = await tableApi.getTableByCode(code);
-      set(KEYS.TABLE, table);
-      this.setData({ table, loading: false }, () => {
+      if (requestCode !== normalizeTableCode(this.data.tableCode)) {
+        return;
+      }
+
+      const boundTable = { ...table };
+      if (Number(boundTable.status) === 0) {
+        await tableApi.openTable(boundTable.id);
+        boundTable.status = 1;
+      }
+
+      setCurrentTable(boundTable);
+      this.setData({ table: boundTable, tableCode: boundTable.code || code, loading: false }, () => {
         this.refreshHeroState();
       });
-      if (table.status === 0) {
-        await tableApi.openTable(table.id);
-      }
-      wx.showToast({ title: `桌台 ${table.code || table.name} 已绑定`, icon: 'none', duration: 1200 });
+      wx.showToast({ title: `桌台 ${boundTable.code || boundTable.name} 已绑定`, icon: 'none', duration: 1200 });
       this.tryRedirectToMenu();
     } catch (err) {
       this.setData({ loading: false }, () => {

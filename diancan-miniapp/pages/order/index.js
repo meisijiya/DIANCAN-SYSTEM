@@ -160,15 +160,20 @@ Page({
 
   onLoad() {
     const table = get(KEYS.TABLE) || {};
-    this.setData({ tableId: Number(table.id || 0) });
+    this.resetOrderState(Number(table.id || 0));
   },
 
   onShow() {
     const table = get(KEYS.TABLE) || {};
     const tableId = Number(table.id || 0);
-    if (tableId && tableId !== Number(this.data.tableId || 0)) {
-      this.setData({ tableId });
+    if (tableId !== Number(this.data.tableId || 0)) {
+      this.resetOrderState(tableId);
     }
+    if (!tableId) {
+      this.stopPolling();
+      return;
+    }
+
     this.loadOrders();
     connectSocket();
     this.unsubscribe = addSocketListener((msg) => {
@@ -202,14 +207,31 @@ Page({
     }
   },
 
+  resetOrderState(tableId = 0) {
+    this.setData({
+      tableId: Number(tableId || 0),
+      orders: [],
+      paidOrderCount: 0,
+      unpaidOrderCount: 0,
+      completedDishCount: 0,
+      detailVisible: false,
+      currentOrderDetail: null
+    });
+  },
+
   async loadOrders() {
-    if (!this.data.tableId) return;
+    const currentTableId = Number(this.data.tableId || 0);
+    if (!currentTableId) return;
     try {
       const mockPaid = get(KEYS.MOCK_PAID_ORDER_IDS) || [];
       const mockPaidSet = new Set((Array.isArray(mockPaid) ? mockPaid : []).map((v) => String(v)));
       const reviewedSet = getReviewedSet();
 
-      const list = await orderApi.getTableOrders(this.data.tableId);
+      const list = await orderApi.getTableOrders(currentTableId);
+      if (currentTableId !== Number(this.data.tableId || 0)) {
+        return;
+      }
+
       const orders = (list || [])
         .map((o) => normalizeOrder(o, mockPaidSet, reviewedSet))
         .filter((o) => !!o.id);
