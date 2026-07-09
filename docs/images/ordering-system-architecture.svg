@@ -1,0 +1,154 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1200" viewBox="0 0 1440 1200">
+  <defs>
+    <style>
+      .bg { fill: #f8f3ed; }
+      .frame { stroke: #3a3a3a; stroke-width: 3; }
+      .label { font-family: "Microsoft YaHei", "PingFang SC", sans-serif; fill: #333; font-size: 22px; }
+      .title { font-family: "Microsoft YaHei", "PingFang SC", sans-serif; fill: #222; font-size: 28px; font-weight: 700; }
+      .subtitle { font-family: "Microsoft YaHei", "PingFang SC", sans-serif; fill: #444; font-size: 18px; font-weight: 600; }
+      .node { font-family: "Microsoft YaHei", "PingFang SC", sans-serif; fill: #222; font-size: 18px; font-weight: 600; }
+      .small { font-family: "Microsoft YaHei", "PingFang SC", sans-serif; fill: #333; font-size: 16px; }
+      .dash { stroke: #909090; stroke-width: 2; stroke-dasharray: 9 7; }
+      .app { fill: #55c2c4; }
+      .mid { fill: #ffca94; }
+      .inner { fill: #7f8ee6; }
+      .govern { fill: #ef5350; }
+      .ability { fill: #ffe357; }
+      .storage { fill: #8b88ec; }
+      .panel { fill: #fff; stroke: #d4d4d4; stroke-width: 1.5; rx: 8; ry: 8; }
+      .box { fill: #fff; stroke: #d6d6d6; stroke-width: 1.2; rx: 8; ry: 8; }
+    </style>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L6,3 z" fill="#555" />
+    </marker>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="1440" height="1200" />
+
+  <text class="label" x="60" y="82">业务应用层</text>
+  <text class="label" x="60" y="540">统一业务中台</text>
+  <text class="label" x="24" y="1112">基础设施 / 存储层</text>
+
+  <rect class="app frame" x="220" y="24" width="1160" height="100" rx="8" ry="8" />
+  <rect class="box" x="390" y="44" width="170" height="46" />
+  <rect class="box" x="630" y="44" width="170" height="46" />
+  <rect class="box" x="870" y="44" width="170" height="46" />
+  <rect class="box" x="1110" y="44" width="170" height="46" />
+  <text class="node" x="475" y="74" text-anchor="middle">顾客小程序</text>
+  <text class="node" x="715" y="74" text-anchor="middle">门店管理端</text>
+  <text class="node" x="955" y="74" text-anchor="middle">服务收银台</text>
+  <text class="node" x="1195" y="74" text-anchor="middle">报表与营销运营</text>
+
+  <line class="dash" x1="170" y1="145" x2="1390" y2="145" />
+
+  <rect class="govern frame" x="220" y="170" width="70" height="810" rx="2" ry="2" />
+  <rect class="govern frame" x="305" y="170" width="70" height="810" rx="2" ry="2" />
+  <text class="subtitle" transform="translate(263 870) rotate(-90)" text-anchor="middle">权限安全治理</text>
+  <text class="subtitle" transform="translate(348 870) rotate(-90)" text-anchor="middle">日志运营治理</text>
+
+  <rect class="mid frame" x="395" y="165" width="985" height="88" rx="8" ry="8" />
+  <text class="title" x="415" y="212">统一业务服务体系</text>
+  <rect class="box" x="585" y="184" width="160" height="42" />
+  <rect class="box" x="780" y="184" width="160" height="42" />
+  <rect class="box" x="975" y="184" width="160" height="42" />
+  <rect class="box" x="1170" y="184" width="160" height="42" />
+  <text class="node" x="665" y="210" text-anchor="middle">Spring Boot 单体</text>
+  <text class="node" x="860" y="210" text-anchor="middle">认证鉴权</text>
+  <text class="node" x="1055" y="210" text-anchor="middle">REST API</text>
+  <text class="node" x="1250" y="210" text-anchor="middle">WebSocket 推送</text>
+
+  <rect class="mid frame" x="395" y="275" width="985" height="150" rx="8" ry="8" />
+  <text class="title" x="415" y="322">核心交易服务</text>
+  <rect class="inner frame" x="417" y="338" width="941" height="78" rx="6" ry="6" />
+  <rect class="box" x="440" y="358" width="160" height="40" />
+  <rect class="box" x="622" y="358" width="160" height="40" />
+  <rect class="box" x="804" y="358" width="160" height="40" />
+  <rect class="box" x="986" y="358" width="160" height="40" />
+  <rect class="box" x="1168" y="358" width="160" height="40" />
+  <text class="node" x="520" y="384" text-anchor="middle">菜品服务</text>
+  <text class="node" x="702" y="384" text-anchor="middle">桌台服务</text>
+  <text class="node" x="884" y="384" text-anchor="middle">购物车服务</text>
+  <text class="node" x="1066" y="384" text-anchor="middle">订单服务</text>
+  <text class="node" x="1248" y="384" text-anchor="middle">支付服务</text>
+
+  <rect class="mid frame" x="395" y="445" width="985" height="150" rx="8" ry="8" />
+  <text class="title" x="415" y="492">会员营销服务</text>
+  <rect class="inner frame" x="417" y="508" width="941" height="78" rx="6" ry="6" />
+  <rect class="box" x="440" y="528" width="160" height="40" />
+  <rect class="box" x="622" y="528" width="160" height="40" />
+  <rect class="box" x="804" y="528" width="160" height="40" />
+  <rect class="box" x="986" y="528" width="160" height="40" />
+  <rect class="box" x="1168" y="528" width="160" height="40" />
+  <text class="node" x="520" y="554" text-anchor="middle">会员体系</text>
+  <text class="node" x="702" y="554" text-anchor="middle">积分成长</text>
+  <text class="node" x="884" y="554" text-anchor="middle">优惠券引擎</text>
+  <text class="node" x="1066" y="554" text-anchor="middle">轮播运营</text>
+  <text class="node" x="1248" y="554" text-anchor="middle">评价反馈</text>
+
+  <rect class="mid frame" x="395" y="615" width="985" height="150" rx="8" ry="8" />
+  <text class="title" x="415" y="662">履约运营服务</text>
+  <rect class="inner frame" x="417" y="678" width="941" height="78" rx="6" ry="6" />
+  <rect class="box" x="440" y="698" width="160" height="40" />
+  <rect class="box" x="622" y="698" width="160" height="40" />
+  <rect class="box" x="804" y="698" width="160" height="40" />
+  <rect class="box" x="986" y="698" width="160" height="40" />
+  <rect class="box" x="1168" y="698" width="160" height="40" />
+  <text class="node" x="520" y="724" text-anchor="middle">订单操作</text>
+  <text class="node" x="702" y="724" text-anchor="middle">后厨协同</text>
+  <text class="node" x="884" y="724" text-anchor="middle">打印服务</text>
+  <text class="node" x="1066" y="724" text-anchor="middle">报表统计</text>
+  <text class="node" x="1248" y="724" text-anchor="middle">审计日志</text>
+
+  <rect class="ability frame" x="395" y="790" width="475" height="190" rx="6" ry="6" />
+  <text class="title" x="415" y="835">系统治理能力</text>
+  <rect class="box" x="440" y="865" width="165" height="52" />
+  <rect class="box" x="660" y="865" width="165" height="52" />
+  <rect class="box" x="440" y="935" width="165" height="52" />
+  <rect class="box" x="660" y="935" width="165" height="52" />
+  <text class="node" x="522" y="899" text-anchor="middle">用户 / 角色</text>
+  <text class="node" x="742" y="899" text-anchor="middle">菜单 / 权限</text>
+  <text class="node" x="522" y="969" text-anchor="middle">配置 / 字典</text>
+  <text class="node" x="742" y="969" text-anchor="middle">登录 / 操作日志</text>
+
+  <rect class="ability frame" x="905" y="790" width="475" height="190" rx="6" ry="6" />
+  <text class="title" x="925" y="835">集成支撑能力</text>
+  <rect class="box" x="950" y="865" width="165" height="52" />
+  <rect class="box" x="1170" y="865" width="165" height="52" />
+  <rect class="box" x="950" y="935" width="165" height="52" />
+  <rect class="box" x="1170" y="935" width="165" height="52" />
+  <text class="node" x="1032" y="899" text-anchor="middle">RocketMQ</text>
+  <text class="node" x="1252" y="899" text-anchor="middle">MinIO 文件</text>
+  <text class="node" x="1032" y="969" text-anchor="middle">微信小程序</text>
+  <text class="node" x="1252" y="969" text-anchor="middle">微信支付</text>
+
+  <line class="dash" x1="170" y1="1010" x2="1390" y2="1010" />
+  <line x1="632" y1="980" x2="632" y2="1030" stroke="#555" stroke-width="4" marker-end="url(#arrow)" />
+  <line x1="1142" y1="980" x2="1142" y2="1030" stroke="#555" stroke-width="4" marker-end="url(#arrow)" />
+
+  <rect class="storage frame" x="220" y="1030" width="1160" height="130" rx="6" ry="6" />
+
+  <g transform="translate(390 1050)">
+    <ellipse cx="0" cy="18" rx="70" ry="20" fill="#fff" stroke="#444" stroke-width="2.5" />
+    <rect x="-70" y="18" width="140" height="62" fill="#fff" stroke="#444" stroke-width="2.5" />
+    <ellipse cx="0" cy="80" rx="70" ry="20" fill="#fff" stroke="#444" stroke-width="2.5" />
+    <text class="title" x="0" y="63" text-anchor="middle" font-size="18">MySQL</text>
+  </g>
+  <g transform="translate(650 1050)">
+    <ellipse cx="0" cy="18" rx="70" ry="20" fill="#fff" stroke="#444" stroke-width="2.5" />
+    <rect x="-70" y="18" width="140" height="62" fill="#fff" stroke="#444" stroke-width="2.5" />
+    <ellipse cx="0" cy="80" rx="70" ry="20" fill="#fff" stroke="#444" stroke-width="2.5" />
+    <text class="title" x="0" y="63" text-anchor="middle" font-size="18">Redis</text>
+  </g>
+  <g transform="translate(910 1050)">
+    <ellipse cx="0" cy="18" rx="70" ry="20" fill="#fff" stroke="#444" stroke-width="2.5" />
+    <rect x="-70" y="18" width="140" height="62" fill="#fff" stroke="#444" stroke-width="2.5" />
+    <ellipse cx="0" cy="80" rx="70" ry="20" fill="#fff" stroke="#444" stroke-width="2.5" />
+    <text class="node" x="0" y="63" text-anchor="middle">RocketMQ</text>
+  </g>
+  <g transform="translate(1170 1050)">
+    <ellipse cx="0" cy="18" rx="70" ry="20" fill="#fff" stroke="#444" stroke-width="2.5" />
+    <rect x="-70" y="18" width="140" height="62" fill="#fff" stroke="#444" stroke-width="2.5" />
+    <ellipse cx="0" cy="80" rx="70" ry="20" fill="#fff" stroke="#444" stroke-width="2.5" />
+    <text class="title" x="0" y="63" text-anchor="middle" font-size="18">MinIO</text>
+  </g>
+</svg>

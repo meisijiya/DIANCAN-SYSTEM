@@ -31,34 +31,21 @@
 
 ## 项目概览
 
-点餐系统不是单一后台 Demo，而是围绕门店堂食场景构建的三端协同业务系统。顾客通过微信小程序完成扫码入桌、点餐、支付、评价，门店员工通过管理端处理桌台、订单、后厨、收银，后端统一承载交易、会员、营销、消息与报表能力。
+点餐系统面向门店堂食场景，核心目标是把顾客自助点餐、门店履约处理、会员营销沉淀放到一套三端协同体系里完成。
 
-```mermaid
-flowchart LR
-    subgraph SYSTEM[点餐系统]
-        MINI[微信小程序]
-        ADMIN[管理端]
-        BACKEND[Spring Boot 后端]
-    end
-
-    CUSTOMER[顾客] --> MINI
-    STAFF[服务员 / 收银员 / 后厨] --> ADMIN
-    MANAGER[店长 / 运营] --> ADMIN
-
-    MINI --> BACKEND
-    ADMIN --> BACKEND
-    BACKEND --> MYSQL[(MySQL)]
-    BACKEND --> REDIS[(Redis)]
-    BACKEND --> MQ[(RocketMQ)]
-    BACKEND --> MINIO[(MinIO)]
-```
-
-| 视角 | 说明 |
+| 维度 | 概览 |
 | --- | --- |
-| 业务对象 | 顾客、服务员、收银员、后厨、店长、运营 |
-| 核心场景 | 扫码入桌、菜单浏览、购物车下单、支付结算、后厨出餐、会员运营、评价反馈 |
-| 交付形态 | `diancan-miniapp` 顾客端、`diancan-admin-web` 管理端、`diancan-admin` 后端 |
-| 架构定位 | 一个面向门店堂食业务的三端协同系统，不是单页演示项目，也不是已拆分微服务集群 |
+| 系统定位 | 一个围绕“扫码入桌 -> 点餐下单 -> 后厨履约 -> 支付结算 -> 会员沉淀 -> 评价复盘”构建的门店点餐系统 |
+| 终端组成 | `diancan-miniapp` 顾客端小程序、`diancan-admin-web` 门店管理端、`diancan-admin` 统一业务后端 |
+| 使用角色 | 顾客、服务员、收银员、后厨、店长、运营 |
+| 核心能力 | 菜品与桌台管理、购物车与订单、支付、后厨与打印、会员积分成长、优惠券营销、评价反馈、经营报表 |
+| 架构形态 | 当前仓库是真实的三端协同项目，后端采用 Spring Boot 单体应用按业务域模块化组织，而不是演示型单页项目 |
+
+| 三端协作 | 作用 |
+| --- | --- |
+| 小程序端 | 承接顾客扫码入桌、浏览菜单、加购、下单、支付、查单、会员、优惠券、评价反馈 |
+| 管理端 | 承接桌区桌台、下单台、收银台、订单处理、后厨处理、打印机、会员营销、评价报表 |
+| 后端服务 | 统一提供认证、交易、会员、营销、消息、报表和中间件集成能力 |
 
 ## 目录
 
@@ -95,9 +82,7 @@ flowchart LR
 
 ![管理端登录页](./docs/images/admin-login.png)
 
-### 管理端首页
 
-![管理端首页](./docs/images/admin-home.png)
 
 ### 桌台看板页
 
@@ -106,6 +91,104 @@ flowchart LR
 ### 管理端主题设置页
 
 ![管理端主题设置页](./docs/images/admin-theme.png)
+
+## 管理端完整菜单截图
+
+以下截图均为系统主体内容区截图，已去掉浏览器地址栏、系统侧栏与顶部菜单，只保留当前菜单对应的页面内容。
+
+### 首页
+
+![首页](./docs/images/admin-menus/35-home.png)
+
+### 菜品管理
+
+| 分类管理 | 菜品列表 |
+| --- | --- |
+| ![分类管理](./docs/images/admin-menus/01-dish_category.png) | ![菜品列表](./docs/images/admin-menus/02-dish_list.png) |
+
+### 桌台管理
+
+| 桌台列表 | 区域管理 |
+| --- | --- |
+| ![桌台列表](./docs/images/admin-menus/03-table_manage.png) | ![区域管理](./docs/images/admin-menus/04-table_area.png) |
+
+### 订单中心
+
+| 订单列表 | 支付管理 |
+| --- | --- |
+| ![订单列表](./docs/images/admin-menus/05-order_list.png) | ![支付管理](./docs/images/admin-menus/06-device_payment.png) |
+
+| 评价管理 | 反馈管理 |
+| --- | --- |
+| ![评价管理](./docs/images/admin-menus/07-device_review.png) | ![反馈管理](./docs/images/admin-menus/08-device_feedback.png) |
+
+### 数据报表
+
+| 营业额统计 | 菜品排行 | 翻台率 |
+| --- | --- | --- |
+| ![营业额统计](./docs/images/admin-menus/09-report_revenue.png) | ![菜品排行](./docs/images/admin-menus/10-report_dish-ranking.png) | ![翻台率](./docs/images/admin-menus/11-report_table-turnover.png) |
+
+### 设备与日志
+
+| 打印机管理 | 审计日志 |
+| --- | --- |
+| ![打印机管理](./docs/images/admin-menus/12-device_printer.png) | ![审计日志](./docs/images/admin-menus/13-device_audit-log.png) |
+
+### 服务收银
+
+| 桌台看板 | 服务员点单 |
+| --- | --- |
+| ![桌台看板](./docs/images/admin-menus/14-service_table-board.png) | ![服务员点单](./docs/images/admin-menus/15-service_place-order.png) |
+
+| 订单操作 | 结账 |
+| --- | --- |
+| ![订单操作](./docs/images/admin-menus/16-service_order-ops.png) | ![结账](./docs/images/admin-menus/17-service_checkout.png) |
+
+| 后厨 |
+| --- |
+| ![后厨](./docs/images/admin-menus/18-service_kitchen.png) |
+
+### 营销中心
+
+| 优惠券管理 | 轮播图管理 |
+| --- | --- |
+| ![优惠券管理](./docs/images/admin-menus/19-marketing_coupon.png) | ![轮播图管理](./docs/images/admin-menus/20-marketing_banner.png) |
+
+| 会员列表 | 会员等级 |
+| --- | --- |
+| ![会员列表](./docs/images/admin-menus/21-marketing_member.png) | ![会员等级](./docs/images/admin-menus/22-marketing_member-level.png) |
+
+| 积分流水 | 成长流水 |
+| --- | --- |
+| ![积分流水](./docs/images/admin-menus/23-marketing_member-points-record.png) | ![成长流水](./docs/images/admin-menus/24-marketing_member-growth-record.png) |
+
+### 消息监控
+
+![消息管理](./docs/images/admin-menus/25-monitor_message.png)
+
+### 系统管理
+
+| 用户管理 | 角色管理 |
+| --- | --- |
+| ![用户管理](./docs/images/admin-menus/26-manage_user.png) | ![角色管理](./docs/images/admin-menus/27-manage_role.png) |
+
+| 菜单管理 | 字典管理 |
+| --- | --- |
+| ![菜单管理](./docs/images/admin-menus/28-manage_menu.png) | ![字典管理](./docs/images/admin-menus/29-manage_dict.png) |
+
+| 配置管理 | 主题设置 |
+| --- | --- |
+| ![配置管理](./docs/images/admin-menus/30-manage_config.png) | ![主题设置](./docs/images/admin-menus/31-manage_theme.png) |
+
+| 会员用户管理 |
+| --- |
+| ![会员用户管理](./docs/images/admin-menus/32-manage_member-user.png) |
+
+### 日志管理
+
+| 登录日志 | 操作日志 |
+| --- | --- |
+| ![登录日志](./docs/images/admin-menus/33-log_login.png) | ![操作日志](./docs/images/admin-menus/34-log_operation.png) |
 
 ## 小程序页面截图
 
@@ -269,94 +352,35 @@ diancan-system
 
 ## 系统架构
 
-从当前仓库结构看，系统采用的是“`Vue 管理端 + 微信小程序 + Spring Boot 单体后端`”架构。后端并未拆成独立微服务，而是按业务域在单体应用内部做模块化组织，这也是当前代码最真实的技术形态。
+下面这张图是参考 `docs/系统架构图.png` 的层次表达方式，结合当前点餐系统的真实实现重新绘制的，不再直接套用数据中台的术语。
 
-```mermaid
-flowchart TB
-    subgraph ACCESS[接入层]
-        MINI[微信小程序]
-        ADMIN[Vue 管理端]
-    end
+![点餐系统架构图](./docs/images/ordering-system-architecture.png)
 
-    subgraph INTERACTION[交互层]
-        API[REST API]
-        WS[WebSocket / STOMP]
-    end
+图中的分层和本项目代码的对应关系如下：
 
-    subgraph APPLICATION[应用服务层：diancan-admin]
-        SYSTEM[认证 / 菜单 / 角色 / 日志]
-        STORE[菜品 / 分类 / 规格 / 桌区 / 桌台 / 轮播图]
-        TRADE[购物车 / 订单 / 支付]
-        FULFILL[后厨 / 打印 / 消息推送]
-        CRM[会员 / 积分 / 成长 / 优惠券]
-        OPS[评价 / 反馈 / 报表 / 审计]
-    end
-
-    subgraph INFRA[基础设施层]
-        MYSQL[(MySQL)]
-        REDIS[(Redis)]
-        MQ[(RocketMQ)]
-        MINIO[(MinIO)]
-        WECHAT[微信小程序 / 微信支付]
-    end
-
-    MINI --> API
-    ADMIN --> API
-    ADMIN --> WS
-
-    API --> SYSTEM
-    API --> STORE
-    API --> TRADE
-    API --> FULFILL
-    API --> CRM
-    API --> OPS
-    WS --> TRADE
-    WS --> FULFILL
-
-    SYSTEM --> MYSQL
-    STORE --> MYSQL
-    TRADE --> MYSQL
-    FULFILL --> MYSQL
-    CRM --> MYSQL
-    OPS --> MYSQL
-
-    SYSTEM --> REDIS
-    TRADE --> REDIS
-    CRM --> REDIS
-
-    FULFILL --> MQ
-    CRM --> MQ
-    STORE --> MINIO
-    TRADE --> WECHAT
-```
-
-| 层次 | 当前实现 |
+| 架构层 | 在本项目中的落地 |
 | --- | --- |
-| 前端接入 | 管理端负责门店运营与服务流程，小程序负责顾客自助点餐与会员触达 |
-| 后端形态 | `diancan-admin` 是单体应用，按 `dish`、`table`、`order`、`payment`、`member`、`coupon`、`review` 等业务域拆分 |
-| 实时与异步 | WebSocket / STOMP 负责页面实时通知，RocketMQ 负责异步消息与解耦 |
-| 数据与文件 | MySQL 存核心业务数据，Redis 承担缓存与状态能力，MinIO 承担文件存储 |
+| 业务应用层 | 顾客小程序、门店管理端、服务收银页面、经营报表与营销运营页面 |
+| 统一业务服务体系 | `diancan-admin` 作为 Spring Boot 单体后端，对外提供认证鉴权、REST API、WebSocket 推送 |
+| 核心交易服务 | `dish`、`table`、`cart`、`order`、`payment` 等交易主链路模块 |
+| 会员营销服务 | `member`、`coupon`、`banner`、`review`、`feedback` 等会员与营销相关模块 |
+| 履约运营服务 | `kitchen`、`print`、`report`、`audit` 以及订单操作相关能力 |
+| 系统治理能力 | `system` 模块下的用户、角色、菜单、字典、配置，以及登录/操作日志能力 |
+| 集成支撑能力 | RocketMQ、MinIO、微信小程序、微信支付等外部依赖与支撑组件 |
+| 基础设施 / 存储层 | MySQL、Redis、RocketMQ、MinIO 是当前仓库实际依赖的底层设施 |
 
 ## 页面与业务关系
 
-下面这张图不再按“技术分层”去画，而是按门店点餐的真实业务闭环去画。重点不是页面放在哪一层，而是哪一类页面在业务链路的哪个阶段参与协同。
+这一部分不再讲技术层次，而是把上面的系统架构落到实际业务链路里，说明顾客端页面、门店端页面、后端模块分别参与哪一段业务。
 
 ```mermaid
 flowchart LR
-    STAGE1[1. 入桌与引流] --> STAGE2[2. 点餐与交易] --> STAGE3[3. 履约与出餐] --> STAGE4[4. 评价与复盘]
-    DOMAIN[会员与营销] -.交易激励.-> STAGE2
-    DOMAIN -.复购运营.-> STAGE4
-
-    STAGE1 --- MINI1[小程序：首页 / 桌台页]
-    STAGE1 --- ADMIN1[管理端：桌区 / 桌台管理]
-    STAGE2 --- MINI2[小程序：菜单 / 购物车 / 支付]
-    STAGE2 --- ADMIN2[管理端：下单台 / 订单处理 / 收银台]
-    STAGE3 --- ADMIN3[管理端：后厨 / 桌台看板 / 打印机]
-    STAGE3 --- BACK3[后端：订单 / 厨房 / 打印 / 消息]
-    STAGE4 --- MINI4[小程序：订单 / 评价 / 反馈]
-    STAGE4 --- ADMIN4[管理端：评价 / 反馈 / 营收报表]
-    DOMAIN --- MINI5[小程序：会员 / 积分 / 成长 / 优惠券 / 我的]
-    DOMAIN --- ADMIN5[管理端：会员 / 优惠券 / 轮播图]
+    A[扫码入桌] --> B[菜单浏览 / 购物车]
+    B --> C[提交订单 / 支付结算]
+    C --> D[接单 / 后厨 / 打印 / 出餐]
+    D --> E[订单完成 / 评价反馈]
+    C -.营销激励.-> F[会员 / 积分 / 优惠券]
+    E -.数据沉淀.-> G[报表分析 / 运营复盘]
 ```
 
 | 业务阶段 | 顾客端页面 | 管理端页面 | 支撑后端模块 |
