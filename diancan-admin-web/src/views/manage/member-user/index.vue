@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { h, onMounted, ref } from 'vue';
-import { NButton, NCard, NDataTable, NForm, NFormItem, NGrid, NGi, NInput, NPopconfirm, NSelect, NSpace, NTag, useMessage } from 'naive-ui';
-import type { DataTableColumns, SelectOption } from 'naive-ui';
+import { NButton, NCard, NDataTable, NForm, NFormItem, NGrid, NGi, NInput, NPopconfirm, NSpace, NTag, useMessage } from 'naive-ui';
+import type { DataTableColumns } from 'naive-ui';
 import { fetchUserList, updateUserStatus } from '@/service/api';
 
 defineOptions({
@@ -19,30 +19,11 @@ const searchForm = ref<Api.System.UserQuery>({
   pageSize: 10
 });
 
-const userTypeOptions: SelectOption[] = [
-  { label: '全部会员用户', value: undefined },
-  { label: '小程序用户', value: 'APP' },
-  { label: '压测用户', value: 'STRESS' }
-];
-
 const data = ref<Api.System.User[]>([]);
 const total = ref(0);
 
 const columns: DataTableColumns<Api.System.User> = [
   { title: '用户名', key: 'username', width: 150 },
-  {
-    title: '用户类型',
-    key: 'userType',
-    width: 110,
-    render(row) {
-      const tagMap = {
-        APP: { type: 'success' as const, label: '小程序用户' },
-        STRESS: { type: 'warning' as const, label: '压测用户' }
-      };
-      const tag = tagMap[row.userType as 'APP' | 'STRESS'] || { type: 'default' as const, label: row.userType };
-      return h(NTag, { type: tag.type, bordered: false }, { default: () => tag.label });
-    }
-  },
   { title: '昵称', key: 'nickname', width: 130, render: row => row.nickname || '-' },
   { title: '手机号', key: 'phone', width: 140, render: row => row.phone || '-' },
   { title: 'OpenID', key: 'openid', minWidth: 220, render: row => row.openid || '-' },
@@ -131,16 +112,16 @@ onMounted(() => {
 </script>
 
 <template>
-  <NSpace vertical :size="12">
+  <NSpace vertical :size="12" class="member-account-view">
     <NCard :bordered="false" class="member-hero">
       <div class="member-hero__eyebrow">会员档案</div>
       <div class="member-hero__head">
         <div>
-          <h2 class="member-hero__title">集中查看小程序用户和压测用户，和后台员工账号彻底分开</h2>
-          <p class="member-hero__desc">这个页面只承接 C 端会员口径账号，默认汇总小程序注册用户和压测用户，方便你独立排查登录、封禁和数据分布。</p>
+          <h2 class="member-hero__title">会员用户管理</h2>
+          <p class="member-hero__desc">仅展示会员侧账号，后台员工账号请在“用户管理”中维护。</p>
         </div>
         <div class="member-hero__badge">
-          <span>当前会员用户数</span>
+          <span>当前会员账号数</span>
           <strong>{{ total }}</strong>
         </div>
       </div>
@@ -149,17 +130,12 @@ onMounted(() => {
     <NCard :bordered="false" class="member-filter-card">
       <NForm :model="searchForm" label-placement="left" label-width="80">
         <NGrid :cols="24" :x-gap="18">
-          <NGi :span="6">
+          <NGi :span="8">
             <NFormItem label="用户名">
               <NInput v-model:value="searchForm.username" placeholder="请输入用户名" clearable />
             </NFormItem>
           </NGi>
-          <NGi :span="6">
-            <NFormItem label="用户类型">
-              <NSelect v-model:value="searchForm.userType" :options="userTypeOptions" placeholder="请选择用户类型" clearable />
-            </NFormItem>
-          </NGi>
-          <NGi :span="6">
+          <NGi :span="8">
             <NSpace justify="end" class="search-actions">
               <NButton type="primary" @click="handleSearch">搜索</NButton>
               <NButton @click="handleReset">重置</NButton>
@@ -169,7 +145,7 @@ onMounted(() => {
       </NForm>
     </NCard>
 
-    <NCard :bordered="false" title="会员用户列表" class="member-list-card">
+    <NCard :bordered="false" title="会员账号列表" class="member-list-card">
       <NDataTable
         remote
         :columns="columns"
@@ -195,11 +171,12 @@ onMounted(() => {
 .member-hero {
   overflow: hidden;
   background:
-    radial-gradient(circle at top right, rgba(13, 148, 136, 0.16), transparent 26%),
-    linear-gradient(135deg, rgba(249, 255, 253, 0.98), rgba(223, 247, 242, 0.98)) !important;
-  border: 1px solid rgba(13, 148, 136, 0.16);
+    radial-gradient(circle at top right, rgba(var(--admin-accent-rgb), 0.18), transparent 24%),
+    radial-gradient(circle at left bottom, rgba(var(--admin-accent-rgb), 0.1), transparent 22%),
+    linear-gradient(135deg, rgba(252, 254, 255, 0.99), rgba(232, 241, 255, 0.96)) !important;
+  border: 1px solid rgba(var(--admin-accent-rgb), 0.14);
   box-shadow:
-    0 26px 48px rgba(13, 148, 136, 0.12),
+    0 26px 48px rgba(var(--admin-accent-rgb), 0.14),
     inset 0 1px 0 rgba(255, 255, 255, 0.82);
 }
 
@@ -208,7 +185,7 @@ onMounted(() => {
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.24em;
-  color: rgba(15, 118, 110, 0.78);
+  color: rgba(var(--admin-accent-rgb), 0.78);
 }
 
 .member-hero__head {
@@ -221,99 +198,99 @@ onMounted(() => {
 .member-hero__title {
   margin: 0;
   font-size: 28px;
-  color: #134e4a;
+  color: color-mix(in srgb, var(--admin-accent-strong) 58%, #1b2d45);
 }
 
 .member-hero__desc {
   max-width: 760px;
   margin: 10px 0 0;
   line-height: 1.75;
-  color: #466964;
+  color: color-mix(in srgb, var(--admin-accent-strong) 28%, #44556f);
 }
 
 .member-hero__badge {
   min-width: 170px;
   padding: 16px 18px;
   border-radius: 18px;
-  background: rgba(255, 255, 255, 0.82);
-  border: 1px solid rgba(13, 148, 136, 0.14);
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(var(--admin-accent-rgb), 0.12);
 }
 
 .member-hero__badge span {
   display: block;
   font-size: 12px;
-  color: rgba(15, 118, 110, 0.74);
+  color: rgba(var(--admin-accent-rgb), 0.74);
 }
 
 .member-hero__badge strong {
   display: block;
   margin-top: 8px;
   font-size: 28px;
-  color: #0f766e;
+  color: var(--admin-accent-strong);
 }
 
 .member-filter-card,
 .member-list-card {
   overflow: hidden;
-  border: 1px solid rgba(13, 148, 136, 0.1);
+  border: 1px solid rgba(var(--admin-accent-rgb), 0.1);
   background:
-    radial-gradient(circle at top left, rgba(13, 148, 136, 0.06), transparent 22%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(242, 253, 250, 0.96)) !important;
+    radial-gradient(circle at top left, rgba(var(--admin-accent-rgb), 0.06), transparent 22%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(247, 251, 255, 0.96)) !important;
   box-shadow:
-    0 20px 36px rgba(13, 148, 136, 0.08),
+    0 20px 36px rgba(var(--admin-accent-rgb), 0.08),
     inset 0 1px 0 rgba(255, 255, 255, 0.82);
 }
 
 .member-list-card :deep(.n-card-header) {
   padding-bottom: 14px;
   margin-bottom: 14px;
-  border-bottom: 1px solid rgba(13, 148, 136, 0.08);
+  border-bottom: 1px solid rgba(var(--admin-accent-rgb), 0.08);
 }
 
 .member-list-card :deep(.n-card-header__main) {
   font-size: 16px;
   font-weight: 700;
   letter-spacing: 0.01em;
-  color: #134e4a;
+  color: color-mix(in srgb, var(--admin-accent-strong) 56%, #1b2d45);
 }
 
 .member-list-card :deep(.n-data-table) {
   border-radius: 20px;
-  border: 1px solid rgba(13, 148, 136, 0.1);
+  border: 1px solid rgba(var(--admin-accent-rgb), 0.1);
   background:
-    radial-gradient(circle at top right, rgba(13, 148, 136, 0.06), transparent 20%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(244, 253, 250, 0.98));
+    radial-gradient(circle at top right, rgba(var(--admin-accent-rgb), 0.08), transparent 20%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(244, 249, 255, 0.98));
   box-shadow:
-    0 18px 34px rgba(13, 148, 136, 0.07),
+    0 18px 34px rgba(var(--admin-accent-rgb), 0.07),
     inset 0 1px 0 rgba(255, 255, 255, 0.78);
 }
 
 .member-list-card :deep(.n-data-table .n-data-table-base-table-header) {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(229, 248, 243, 0.98));
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(236, 245, 255, 0.98));
 }
 
 .member-list-card :deep(.n-data-table .n-data-table-th) {
   padding-top: 15px;
   padding-bottom: 15px;
-  color: #134e4a;
+  color: color-mix(in srgb, var(--admin-accent-strong) 64%, #20314b);
   font-size: 13px;
   font-weight: 700;
-  border-bottom-color: rgba(13, 148, 136, 0.08) !important;
+  border-bottom-color: rgba(var(--admin-accent-rgb), 0.08) !important;
 }
 
 .member-list-card :deep(.n-data-table .n-data-table-td) {
   padding-top: 14px;
   padding-bottom: 14px;
-  color: #315c58;
-  border-bottom-color: rgba(13, 148, 136, 0.06) !important;
+  color: color-mix(in srgb, var(--admin-accent-strong) 28%, #26364d);
+  border-bottom-color: rgba(var(--admin-accent-rgb), 0.06) !important;
 }
 
 .member-list-card :deep(.n-data-table .n-data-table-tr:not(.n-data-table-tr--summary):nth-child(even) td) {
-  background: rgba(240, 253, 250, 0.84);
+  background: rgba(243, 249, 255, 0.78);
 }
 
 .member-list-card :deep(.n-data-table .n-data-table-tbody .n-data-table-tr:hover td) {
-  background: rgba(13, 148, 136, 0.06) !important;
+  background: rgba(var(--admin-accent-rgb), 0.06) !important;
 }
 
 .search-actions {
@@ -322,8 +299,8 @@ onMounted(() => {
 
 html.dark .member-hero {
   background:
-    radial-gradient(circle at top right, rgba(13, 148, 136, 0.14), transparent 24%),
-    linear-gradient(135deg, rgba(4, 10, 9, 0.99), rgba(7, 16, 14, 0.99)) !important;
+    radial-gradient(circle at top right, rgba(var(--admin-accent-rgb), 0.16), transparent 24%),
+    linear-gradient(135deg, rgba(4, 6, 10, 0.99), rgba(10, 13, 19, 0.99)) !important;
   border-color: rgba(255, 255, 255, 0.06);
   box-shadow:
     0 30px 56px rgba(0, 0, 0, 0.42),
@@ -332,11 +309,11 @@ html.dark .member-hero {
 
 html.dark .member-hero__title,
 html.dark .member-list-card :deep(.n-card-header__main) {
-  color: rgba(232, 255, 248, 0.96);
+  color: rgba(241, 246, 255, 0.96);
 }
 
 html.dark .member-hero__desc {
-  color: rgba(184, 222, 214, 0.78);
+  color: rgba(184, 198, 222, 0.78);
 }
 
 html.dark .member-hero__badge {
@@ -345,19 +322,19 @@ html.dark .member-hero__badge {
 }
 
 html.dark .member-hero__badge span {
-  color: rgba(165, 216, 205, 0.72);
+  color: rgba(183, 198, 228, 0.68);
 }
 
 html.dark .member-hero__badge strong {
-  color: #d4fff6;
+  color: #dbe5ff;
 }
 
 html.dark .member-filter-card,
 html.dark .member-list-card {
   border-color: rgba(255, 255, 255, 0.06);
   background:
-    radial-gradient(circle at top left, rgba(13, 148, 136, 0.08), transparent 22%),
-    linear-gradient(180deg, rgba(5, 10, 9, 0.98), rgba(8, 14, 13, 0.98)) !important;
+    radial-gradient(circle at top left, rgba(var(--admin-accent-rgb), 0.08), transparent 22%),
+    linear-gradient(180deg, rgba(5, 7, 11, 0.98), rgba(10, 13, 19, 0.98)) !important;
   box-shadow:
     0 24px 42px rgba(0, 0, 0, 0.3),
     inset 0 1px 0 rgba(255, 255, 255, 0.04);
@@ -370,24 +347,24 @@ html.dark .member-list-card :deep(.n-card-header) {
 html.dark .member-list-card :deep(.n-data-table) {
   border-color: rgba(255, 255, 255, 0.06);
   background:
-    radial-gradient(circle at top right, rgba(13, 148, 136, 0.1), transparent 18%),
-    linear-gradient(180deg, rgba(5, 10, 9, 0.98), rgba(8, 14, 13, 0.98));
+    radial-gradient(circle at top right, rgba(var(--admin-accent-rgb), 0.1), transparent 18%),
+    linear-gradient(180deg, rgba(5, 7, 11, 0.98), rgba(10, 13, 19, 0.98));
   box-shadow:
     0 24px 40px rgba(0, 0, 0, 0.3),
     inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
 html.dark .member-list-card :deep(.n-data-table .n-data-table-base-table-header) {
-  background: linear-gradient(180deg, rgba(13, 24, 22, 0.98), rgba(8, 16, 14, 0.98));
+  background: linear-gradient(180deg, rgba(16, 21, 33, 0.98), rgba(9, 13, 21, 0.98));
 }
 
 html.dark .member-list-card :deep(.n-data-table .n-data-table-th) {
-  color: rgba(228, 255, 248, 0.92);
+  color: rgba(236, 242, 255, 0.92);
   border-bottom-color: rgba(255, 255, 255, 0.06) !important;
 }
 
 html.dark .member-list-card :deep(.n-data-table .n-data-table-td) {
-  color: rgba(208, 236, 230, 0.9);
+  color: rgba(220, 228, 242, 0.9);
   border-bottom-color: rgba(255, 255, 255, 0.05) !important;
 }
 
@@ -396,6 +373,6 @@ html.dark .member-list-card :deep(.n-data-table .n-data-table-tr:not(.n-data-tab
 }
 
 html.dark .member-list-card :deep(.n-data-table .n-data-table-tbody .n-data-table-tr:hover td) {
-  background: rgba(13, 148, 136, 0.1) !important;
+  background: rgba(var(--admin-accent-rgb), 0.08) !important;
 }
 </style>
