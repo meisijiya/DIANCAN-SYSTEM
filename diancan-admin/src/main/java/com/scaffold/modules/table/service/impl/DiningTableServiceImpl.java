@@ -120,6 +120,44 @@ public class DiningTableServiceImpl extends ServiceImpl<DiningTableMapper, Dinin
         return toVO(table);
     }
 
+    /**
+     * 预创建当前桌次编码
+     *
+     * @author Henfon
+     * @date 2026-07-10
+     * @description 为桌台即将开始的一轮点单生成稳定桌次编码，避免同桌不同批客人串单。
+     * @param id 桌台ID
+     * @return 当前桌次编码
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public String prepareCurrentSessionCode(Long id) {
+        DiningTable table = getById(id);
+        if (table == null) {
+            throw new BusinessException(ResultCode.NOT_FOUND);
+        }
+        return ensureCurrentSessionCode(table, true);
+    }
+
+    /**
+     * 获取当前活跃桌次编码
+     *
+     * @author Henfon
+     * @date 2026-07-10
+     * @description 仅在桌台处于占用、已结账、待清洁时返回当前桌次，缺失则即时补齐。
+     * @param id 桌台ID
+     * @return 当前活跃桌次编码
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public String getActiveSessionCode(Long id) {
+        DiningTable table = getById(id);
+        if (table == null) {
+            throw new BusinessException(ResultCode.NOT_FOUND);
+        }
+        return ensureCurrentSessionCode(table, false);
+    }
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void openTable(Long id) {
@@ -131,6 +169,8 @@ public class DiningTableServiceImpl extends ServiceImpl<DiningTableMapper, Dinin
         if (table.getStatus() != STATUS_FREE) {
             throw new BusinessException(ResultCode.TABLE_NOT_AVAILABLE);
         }
+        // 开台前先准备桌次，保证这一轮订单、购物车都能挂到同一批次。
+        ensureCurrentSessionCode(table, true);
         doUpdateStatus(table, STATUS_OCCUPIED);
         log.info("开台成功: id={}, code={}", id, table.getCode());
     }
@@ -172,6 +212,47 @@ public class DiningTableServiceImpl extends ServiceImpl<DiningTableMapper, Dinin
         log.info("标记清洁成功: id={}, code={}", id, table.getCode());
     }
 
+    /**
+     * 释放桌台
+     *
+     * @author Henfon
+     * @date 2026-07-09
+     * @description 管理端可将已结账或待清洁桌台直接释放为空闲，进行中桌台不允许直接释放。
+     * @param id 桌台ID
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void releaseTable(Long id) {
+        DiningTable table = getById(id);
+        if (table == null) {
+            throw new BusinessException(ResultCode.NOT_FOUND);
+        }
+
+        Integer currentStatus = table.getStatus();
+        if (currentStatus == null || currentStatus == STATUS_FREE) {
+            log.info("桌台已为空闲状态，无需释放: id={}, code={}", id, table.getCode());
+            return;
+        }
+
+        if (currentStatus == STATUS_OCCUPIED) {
+            throw new BusinessException(ResultCode.PARAM_ERROR, "当前桌台仍有进行中点单，请先完成支付或处理订单后再释放桌台");
+        }
+
+        // 已结账桌台先补齐待清洁流转，再统一回到空闲，避免状态跳变过于突兀。
+        if (currentStatus == STATUS_PAID) {
+            doUpdateStatus(table, STATUS_TO_CLEAN);
+            table.setStatus(STATUS_TO_CLEAN);
+        }
+
+        if (table.getStatus() == STATUS_TO_CLEAN) {
+            doUpdateStatus(table, STATUS_FREE);
+            log.info("释放桌台成功: id={}, code={}", id, table.getCode());
+            return;
+        }
+
+        throw new BusinessException(ResultCode.TABLE_STATUS_ERROR);
+    }
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateTableStatus(Long id, Integer status) {
@@ -198,6 +279,7 @@ public class DiningTableServiceImpl extends ServiceImpl<DiningTableMapper, Dinin
         BeanUtil.copyProperties(dto, table);
         applyAreaBinding(table, dto.getAreaId(), dto.getAreaName());
         table.setStatus(STATUS_FREE);
+        table.setCurrentSessionCode(null);
         save(table);
 
         // 缓存桌台状态到 Redis
@@ -366,6 +448,15 @@ public class DiningTableServiceImpl extends ServiceImpl<DiningTableMapper, Dinin
         LambdaUpdateWrapper<DiningTable> wrapper = new LambdaUpdateWrapper<>();
         wrapper.eq(DiningTable::getId, table.getId())
                 .set(DiningTable::getStatus, newStatus);
+
+        if (newStatus == STATUS_FREE) {
+            // 桌台回到空闲，说明这一轮点单已经彻底结束，清空当前桌次。
+            wrapper.set(DiningTable::getCurrentSessionCode, null);
+            table.setCurrentSessionCode(null);
+        } else if (StrUtil.isNotBlank(table.getCurrentSessionCode())) {
+            // 非空闲状态统一带上当前桌次，确保后续查询能锁定到同一轮。
+            wrapper.set(DiningTable::getCurrentSessionCode, table.getCurrentSessionCode());
+        }
         update(wrapper);
 
         // 缓存桌台状态到 Redis
@@ -402,9 +493,65 @@ public class DiningTableServiceImpl extends ServiceImpl<DiningTableMapper, Dinin
      * 将 DiningTable 实体转换为 DiningTableVO
      */
     private DiningTableVO toVO(DiningTable table) {
+        ensureCurrentSessionCode(table, false);
         DiningTableVO vo = BeanUtil.copyProperties(table, DiningTableVO.class);
         vo.setQrCodeUrl(minioStorageService.resolveAccessUrl(table.getQrCodeUrl()));
         return vo;
+    }
+
+    /**
+     * 确保桌台具备当前桌次编码
+     *
+     * @author Henfon
+     * @date 2026-07-10
+     * @description 仅在需要时补齐桌次编码；空闲桌默认不创建，除非显式准备新一轮点单。
+     * @param table 桌台实体
+     * @param createWhenFree 空闲桌是否允许创建桌次
+     * @return 当前桌次编码
+     */
+    private String ensureCurrentSessionCode(DiningTable table, boolean createWhenFree) {
+        if (table == null) {
+            return null;
+        }
+
+        String sessionCode = StrUtil.trimToNull(table.getCurrentSessionCode());
+        if (StrUtil.isNotBlank(sessionCode)) {
+            table.setCurrentSessionCode(sessionCode);
+            return sessionCode;
+        }
+
+        Integer status = table.getStatus();
+        if (!createWhenFree && (status == null || status == STATUS_FREE)) {
+            return null;
+        }
+
+        String nextSessionCode = generateSessionCode();
+        LambdaUpdateWrapper<DiningTable> wrapper = new LambdaUpdateWrapper<>();
+        wrapper.eq(DiningTable::getId, table.getId())
+                .and(w -> w.isNull(DiningTable::getCurrentSessionCode).or().eq(DiningTable::getCurrentSessionCode, ""))
+                .set(DiningTable::getCurrentSessionCode, nextSessionCode);
+        boolean updated = update(wrapper);
+        if (updated) {
+            table.setCurrentSessionCode(nextSessionCode);
+            return nextSessionCode;
+        }
+
+        DiningTable latestTable = getById(table.getId());
+        String latestSessionCode = latestTable == null ? null : StrUtil.trimToNull(latestTable.getCurrentSessionCode());
+        table.setCurrentSessionCode(latestSessionCode);
+        return latestSessionCode;
+    }
+
+    /**
+     * 生成桌次编码
+     *
+     * @author Henfon
+     * @date 2026-07-10
+     * @description 使用短 UUID 生成桌次编码，避免同桌多轮点单共享同一标识。
+     * @return 桌次编码
+     */
+    private String generateSessionCode() {
+        return "TS" + IdUtil.fastSimpleUUID();
     }
 
     /**

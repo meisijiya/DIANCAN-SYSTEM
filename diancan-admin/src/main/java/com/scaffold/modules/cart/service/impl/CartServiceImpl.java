@@ -10,6 +10,8 @@ import com.scaffold.modules.cart.vo.CartItemVO;
 import com.scaffold.modules.cart.vo.CartVO;
 import com.scaffold.modules.dish.entity.Dish;
 import com.scaffold.modules.dish.service.DishService;
+import com.scaffold.modules.table.service.DiningTableService;
+import cn.hutool.core.util.StrUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -24,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * 购物车服务实现
  * <p>
- * 购物车数据存储在 Redis 中，key: cart:{openid}:{tableId}，Hash 结构，TTL 2小时。
+ * 购物车数据存储在 Redis 中，key: cart:{openid}:{tableId}:{sessionCode}，Hash 结构，TTL 2小时。
  * Hash field: dishId（字符串），Hash value: CartItemVO 的 JSON。
  *
  * @author Henfon
@@ -37,6 +39,7 @@ public class CartServiceImpl implements CartService {
     private final RedisTemplate<String, Object> redisTemplate;
     private final ObjectMapper objectMapper;
     private final DishService dishService;
+    private final DiningTableService diningTableService;
 
     private static final long CART_TTL_HOURS = 2;
 
@@ -170,11 +173,9 @@ public class CartServiceImpl implements CartService {
 
     // ==================== 私有方法 ====================
 
-    /**
-     * 构建购物车 Redis key
-     */
     private String buildCartKey(String openid, Long tableId) {
-        return "cart:" + openid + ":" + tableId;
+        String sessionCode = resolveCartSessionCode(tableId);
+        return "cart:" + openid + ":" + tableId + ":" + sessionCode;
     }
 
     /**
@@ -229,5 +230,19 @@ public class CartServiceImpl implements CartService {
 
     private boolean hasText(String value) {
         return value != null && !value.trim().isEmpty();
+    }
+
+    /**
+     * 解析购物车所属桌次
+     *
+     * @author Henfon
+     * @date 2026-07-10
+     * @description 优先读取桌台当前活跃桌次，避免同桌不同批客人的购物车互相串读。
+     * @param tableId 桌台ID
+     * @return 桌次编码
+     */
+    private String resolveCartSessionCode(Long tableId) {
+        String sessionCode = diningTableService.getActiveSessionCode(tableId);
+        return StrUtil.blankToDefault(sessionCode, "default");
     }
 }

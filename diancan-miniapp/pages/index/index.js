@@ -45,7 +45,8 @@ Page({
     sceneTag: '今日主推',
     tableStatusText: '未绑定桌台',
     sceneEntry: false,
-    autoRedirected: false
+    autoRedirected: false,
+    sceneRefreshPending: false
   },
 
   onLoad(options) {
@@ -54,7 +55,7 @@ Page({
     this.loadCategories();
     const code = this.extractTableCode(options);
     if (code) {
-      this.setData({ tableCode: code, loading: true, sceneEntry: true });
+      this.setData({ tableCode: code, loading: true, sceneEntry: true, sceneRefreshPending: true });
     }
     this.refreshHeroState();
   },
@@ -68,7 +69,7 @@ Page({
       this.refreshHeroState();
     });
 
-    if (sceneTableCode && sceneTableCode !== cachedTableCode) {
+    if (sceneTableCode && this.data.sceneRefreshPending) {
       this.setData({ table: null, loading: true, autoRedirected: false }, () => {
         this.refreshHeroState();
       });
@@ -202,17 +203,18 @@ Page({
       const boundTable = { ...table };
       if (Number(boundTable.status) === 0) {
         await tableApi.openTable(boundTable.id);
-        boundTable.status = 1;
+        const openedTable = await tableApi.getTableByCode(boundTable.code || code);
+        Object.assign(boundTable, openedTable, { status: 1 });
       }
 
       setCurrentTable(boundTable);
-      this.setData({ table: boundTable, tableCode: boundTable.code || code, loading: false }, () => {
+      this.setData({ table: boundTable, tableCode: boundTable.code || code, loading: false, sceneRefreshPending: false }, () => {
         this.refreshHeroState();
       });
       wx.showToast({ title: `桌台 ${boundTable.code || boundTable.name} 已绑定`, icon: 'none', duration: 1200 });
       this.tryRedirectToMenu();
     } catch (err) {
-      this.setData({ loading: false }, () => {
+      this.setData({ loading: false, sceneRefreshPending: false }, () => {
         this.refreshHeroState();
       });
       wx.showToast({ title: err.message || '桌台不存在', icon: 'none' });

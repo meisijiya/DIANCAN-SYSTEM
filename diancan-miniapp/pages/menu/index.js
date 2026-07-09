@@ -141,13 +141,14 @@ Page({
     cartFeedbackText: '',
     showLoginPanel: false,
     agreeProtocol: false,
-    loginCallback: null
+    loginCallback: null,
+    sceneRefreshPending: false
   },
 
   onLoad(options) {
     this.initNavBar();
     const code = this.extractTableCode(options);
-    if (code) this.setData({ tableCode: code, showTableInput: false });
+    if (code) this.setData({ tableCode: code, showTableInput: false, sceneRefreshPending: true });
   },
 
   onShow() {
@@ -165,7 +166,7 @@ Page({
       tableDisplayCode: activeTable && activeTable.code ? activeTable.code : '未绑定'
     });
 
-    if (sceneTableCode && sceneTableCode !== cachedTableCode) {
+    if (sceneTableCode && this.data.sceneRefreshPending) {
       this.setData(
         {
           orderedDishIds: [],
@@ -247,7 +248,8 @@ Page({
       const boundTable = { ...table };
       if (Number(boundTable.status) === 0) {
         await tableApi.openTable(boundTable.id);
-        boundTable.status = 1;
+        const openedTable = await tableApi.getTableByCode(boundTable.code || code);
+        Object.assign(boundTable, openedTable, { status: 1 });
       }
 
       setCurrentTable(boundTable);
@@ -255,6 +257,7 @@ Page({
         table: boundTable,
         tableCode: boundTable.code || code,
         showTableInput: false,
+        sceneRefreshPending: false,
         heroStatusText: '桌台已就绪',
         menuHeroTitle: `${boundTable.name || boundTable.code || '当前桌台'} 正在点餐`,
         tableDisplayCode: boundTable.code || '未绑定'
@@ -267,6 +270,7 @@ Page({
         this.setData({ cartSummary: { totalCount: 0, totalPrice: '0.00' } });
       }
     } catch (err) {
+      this.setData({ sceneRefreshPending: false });
       wx.showToast({ title: err.message || '桌台不存在', icon: 'none' });
     } finally {
       wx.hideLoading();

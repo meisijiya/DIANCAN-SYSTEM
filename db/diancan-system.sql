@@ -157,6 +157,7 @@ CREATE TABLE `dining_table`  (
   `qr_code_url` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '二维码图片URL',
   `area_id` bigint NULL DEFAULT NULL COMMENT '区域ID',
   `area_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '区域名称（如大厅、包间）',
+  `current_session_code` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '当前桌次编码',
   `create_by` bigint NULL DEFAULT NULL COMMENT '创建人',
   `update_by` bigint NULL DEFAULT NULL COMMENT '更新人',
   `create_time` datetime NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
@@ -165,37 +166,38 @@ CREATE TABLE `dining_table`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_code`(`code` ASC) USING BTREE,
   INDEX `idx_status`(`status` ASC) USING BTREE,
-  INDEX `idx_area_id`(`area_id` ASC) USING BTREE
+  INDEX `idx_area_id`(`area_id` ASC) USING BTREE,
+  INDEX `idx_current_session_code`(`current_session_code` ASC) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '桌台表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of dining_table
 -- ----------------------------
-INSERT INTO `dining_table` VALUES (30001, 'A01', 'A1桌', 2, 0, 'table/qrcode/A01-fed19efe4ebb49c5b2a4c01fd696a3db.png', 31002, '大厅', 1, NULL, '2025-12-01 10:00:00', '2026-07-03 18:50:17', 0);
-INSERT INTO `dining_table` VALUES (30002, 'A02', 'A2桌', 2, 0, 'table/qrcode/A02-01042d5415ca46eb8ec91ccb3ebee22e.png', 31002, '大厅', 1, NULL, '2025-12-01 10:00:00', '2026-07-03 00:44:28', 0);
-INSERT INTO `dining_table` VALUES (30003, 'A03', 'A3桌', 4, 0, 'table/qrcode/A03-2d3230e48eda41b4a064f4b9b129bbcb.png', 31002, '大厅', 1, NULL, '2025-12-01 10:00:00', '2026-07-03 18:50:23', 0);
-INSERT INTO `dining_table` VALUES (30004, 'A04', 'A4桌', 4, 0, 'table/qrcode/A04-2552179a23794fbba794c24645c1e385.png', 31002, '大厅', 1, NULL, '2025-12-01 10:00:00', '2026-07-04 15:56:00', 0);
-INSERT INTO `dining_table` VALUES (30005, 'A05', 'A5桌', 4, 0, 'table/qrcode/A05-79ad6b9a6ee64152bfbcf88ed330806d.png', 31002, '大厅', 1, NULL, '2025-12-01 10:00:00', '2026-07-04 16:14:20', 0);
-INSERT INTO `dining_table` VALUES (30006, 'A06', 'A6桌', 6, 0, 'table/qrcode/A06-e2062ab56b7348edace00e0a70535926.png', 31002, '大厅', 1, NULL, '2025-12-01 10:00:00', '2026-07-03 18:50:43', 0);
-INSERT INTO `dining_table` VALUES (30007, 'A07', 'A7桌', 6, 0, 'table/qrcode/A07-62658241022646fab342003e5b12859b.png', 31002, '大厅', 1, NULL, '2025-12-01 10:00:00', '2026-07-03 18:50:55', 0);
-INSERT INTO `dining_table` VALUES (30008, 'A08', 'A8桌', 4, 0, 'table/qrcode/A08-b663ec73aac54c52bf3304ae012b6e10.png', 31002, '大厅', 1, NULL, '2025-12-01 10:00:00', '2026-07-03 00:44:31', 0);
-INSERT INTO `dining_table` VALUES (30009, 'A09', 'A9桌', 4, 0, 'table/qrcode/A09-2e3d7ef7166949a9a22be86fcdeb4fc5.png', 31002, '大厅', 1, NULL, '2025-12-01 10:00:00', '2026-07-03 18:50:32', 0);
-INSERT INTO `dining_table` VALUES (30010, 'A10', 'A10桌', 8, 0, 'table/qrcode/A10-60c45331dd8d4c9b98567d5f8a273a91.png', 31002, '大厅', 1, NULL, '2025-12-01 10:00:00', '2026-07-03 00:44:33', 0);
-INSERT INTO `dining_table` VALUES (30011, 'A11', 'A11桌', 4, 0, 'table/qrcode/A11-0f0c26f8458243bb96440d4d9723c7cb.png', 31002, '大厅', 1, NULL, '2025-12-01 10:00:00', '2026-07-03 00:44:33', 0);
-INSERT INTO `dining_table` VALUES (30012, 'A12', 'A12桌', 4, 0, 'table/qrcode/A12-741b8c426d4b4a2691982812343766d2.png', 31002, '大厅', 1, NULL, '2025-12-01 10:00:00', '2026-07-03 00:44:34', 0);
-INSERT INTO `dining_table` VALUES (30013, 'B01', '牡丹厅', 8, 0, 'table/qrcode/B01-adf64d1d43504ec4b952d070905d3068.png', 31001, '包间', 1, NULL, '2025-12-01 10:00:00', '2026-07-04 16:19:58', 0);
-INSERT INTO `dining_table` VALUES (30014, 'B02', '兰花厅', 8, 0, 'table/qrcode/B02-9baa7a50764b4aa1b2fb9b035680da6a.png', 31001, '包间', 1, NULL, '2025-12-01 10:00:00', '2026-07-04 16:29:37', 0);
-INSERT INTO `dining_table` VALUES (30015, 'B03', '梅花厅', 10, 0, 'table/qrcode/B03-dfd353f955bb4278807a1fc2b5a6ec44.png', 31001, '包间', 1, NULL, '2025-12-01 10:00:00', '2026-07-04 16:31:30', 0);
-INSERT INTO `dining_table` VALUES (30016, 'B04', '竹韵厅', 10, 0, 'table/qrcode/B04-f961500398594d11b164f3df521aec28.png', 31001, '包间', 1, NULL, '2025-12-01 10:00:00', '2026-07-03 00:44:24', 0);
-INSERT INTO `dining_table` VALUES (30017, 'B05', '荷花厅', 12, 0, 'table/qrcode/B05-ebd2964140ae4c5f99873350559da9bc.png', 31001, '包间', 1, NULL, '2025-12-01 10:00:00', '2026-07-03 18:51:24', 0);
-INSERT INTO `dining_table` VALUES (30018, 'B06', '菊花厅', 12, 0, 'table/qrcode/B06-f56be4b889a94048ab7f470045dce78d.png', 31001, '包间', 1, NULL, '2025-12-01 10:00:00', '2026-07-03 18:51:09', 0);
-INSERT INTO `dining_table` VALUES (30019, 'B07', '桂花厅', 16, 0, 'table/qrcode/B07-50134eec4a6b479c99d9fa4a59a61fea.png', 31001, '包间', 1, NULL, '2025-12-01 10:00:00', '2026-07-03 00:44:26', 0);
-INSERT INTO `dining_table` VALUES (30020, 'B08', '紫薇厅', 20, 0, 'table/qrcode/B08-8e4f968ecaf14f17897ac41ed69c7958.png', 31001, '包间', 1, NULL, '2025-12-01 10:00:00', '2026-07-03 00:44:27', 0);
-INSERT INTO `dining_table` VALUES (30021, 'C01', 'C1桌', 2, 0, 'table/qrcode/C01-a53af542944d4f18a224b5a8bc3d01b2.png', 31003, '露台', 1, NULL, '2025-12-01 10:00:00', '2026-07-03 00:44:35', 0);
-INSERT INTO `dining_table` VALUES (30022, 'C02', 'C2桌', 2, 0, 'table/qrcode/C02-b1b3f5dc1f104425aba30de46fa71dc0.png', 31003, '露台', 1, NULL, '2025-12-01 10:00:00', '2026-07-03 00:44:35', 0);
-INSERT INTO `dining_table` VALUES (30023, 'C03', 'C3桌', 4, 0, 'table/qrcode/C03-6f4bd894e9d94a61bb5fdc732fd7edf8.png', 31003, '露台', 1, NULL, '2025-12-01 10:00:00', '2026-07-03 00:44:36', 0);
-INSERT INTO `dining_table` VALUES (30024, 'C04', 'C4桌', 4, 0, 'table/qrcode/C04-7276118ac3aa49508eb9ccb1eef0feb4.png', 31003, '露台', 1, NULL, '2025-12-01 10:00:00', '2026-07-03 00:44:36', 0);
-INSERT INTO `dining_table` VALUES (30025, 'C05', 'C5桌', 6, 0, 'table/qrcode/C05-5a5cd46303394a17b39cfc47b31088eb.png', 31003, '露台', 1, NULL, '2025-12-01 10:00:00', '2026-07-03 00:44:37', 0);
+INSERT INTO `dining_table` VALUES (30001, 'A01', 'A1桌', 2, 0, 'table/qrcode/A01-fed19efe4ebb49c5b2a4c01fd696a3db.png', 31002, '大厅', NULL, 1, NULL, '2025-12-01 10:00:00', '2026-07-03 18:50:17', 0);
+INSERT INTO `dining_table` VALUES (30002, 'A02', 'A2桌', 2, 0, 'table/qrcode/A02-01042d5415ca46eb8ec91ccb3ebee22e.png', 31002, '大厅', NULL, 1, NULL, '2025-12-01 10:00:00', '2026-07-03 00:44:28', 0);
+INSERT INTO `dining_table` VALUES (30003, 'A03', 'A3桌', 4, 0, 'table/qrcode/A03-2d3230e48eda41b4a064f4b9b129bbcb.png', 31002, '大厅', NULL, 1, NULL, '2025-12-01 10:00:00', '2026-07-03 18:50:23', 0);
+INSERT INTO `dining_table` VALUES (30004, 'A04', 'A4桌', 4, 0, 'table/qrcode/A04-2552179a23794fbba794c24645c1e385.png', 31002, '大厅', NULL, 1, NULL, '2025-12-01 10:00:00', '2026-07-04 15:56:00', 0);
+INSERT INTO `dining_table` VALUES (30005, 'A05', 'A5桌', 4, 0, 'table/qrcode/A05-79ad6b9a6ee64152bfbcf88ed330806d.png', 31002, '大厅', NULL, 1, NULL, '2025-12-01 10:00:00', '2026-07-04 16:14:20', 0);
+INSERT INTO `dining_table` VALUES (30006, 'A06', 'A6桌', 6, 0, 'table/qrcode/A06-e2062ab56b7348edace00e0a70535926.png', 31002, '大厅', NULL, 1, NULL, '2025-12-01 10:00:00', '2026-07-03 18:50:43', 0);
+INSERT INTO `dining_table` VALUES (30007, 'A07', 'A7桌', 6, 0, 'table/qrcode/A07-62658241022646fab342003e5b12859b.png', 31002, '大厅', NULL, 1, NULL, '2025-12-01 10:00:00', '2026-07-03 18:50:55', 0);
+INSERT INTO `dining_table` VALUES (30008, 'A08', 'A8桌', 4, 0, 'table/qrcode/A08-b663ec73aac54c52bf3304ae012b6e10.png', 31002, '大厅', NULL, 1, NULL, '2025-12-01 10:00:00', '2026-07-03 00:44:31', 0);
+INSERT INTO `dining_table` VALUES (30009, 'A09', 'A9桌', 4, 0, 'table/qrcode/A09-2e3d7ef7166949a9a22be86fcdeb4fc5.png', 31002, '大厅', NULL, 1, NULL, '2025-12-01 10:00:00', '2026-07-03 18:50:32', 0);
+INSERT INTO `dining_table` VALUES (30010, 'A10', 'A10桌', 8, 0, 'table/qrcode/A10-60c45331dd8d4c9b98567d5f8a273a91.png', 31002, '大厅', NULL, 1, NULL, '2025-12-01 10:00:00', '2026-07-03 00:44:33', 0);
+INSERT INTO `dining_table` VALUES (30011, 'A11', 'A11桌', 4, 0, 'table/qrcode/A11-0f0c26f8458243bb96440d4d9723c7cb.png', 31002, '大厅', NULL, 1, NULL, '2025-12-01 10:00:00', '2026-07-03 00:44:33', 0);
+INSERT INTO `dining_table` VALUES (30012, 'A12', 'A12桌', 4, 0, 'table/qrcode/A12-741b8c426d4b4a2691982812343766d2.png', 31002, '大厅', NULL, 1, NULL, '2025-12-01 10:00:00', '2026-07-03 00:44:34', 0);
+INSERT INTO `dining_table` VALUES (30013, 'B01', '牡丹厅', 8, 0, 'table/qrcode/B01-adf64d1d43504ec4b952d070905d3068.png', 31001, '包间', NULL, 1, NULL, '2025-12-01 10:00:00', '2026-07-04 16:19:58', 0);
+INSERT INTO `dining_table` VALUES (30014, 'B02', '兰花厅', 8, 0, 'table/qrcode/B02-9baa7a50764b4aa1b2fb9b035680da6a.png', 31001, '包间', NULL, 1, NULL, '2025-12-01 10:00:00', '2026-07-04 16:29:37', 0);
+INSERT INTO `dining_table` VALUES (30015, 'B03', '梅花厅', 10, 0, 'table/qrcode/B03-dfd353f955bb4278807a1fc2b5a6ec44.png', 31001, '包间', NULL, 1, NULL, '2025-12-01 10:00:00', '2026-07-04 16:31:30', 0);
+INSERT INTO `dining_table` VALUES (30016, 'B04', '竹韵厅', 10, 0, 'table/qrcode/B04-f961500398594d11b164f3df521aec28.png', 31001, '包间', NULL, 1, NULL, '2025-12-01 10:00:00', '2026-07-03 00:44:24', 0);
+INSERT INTO `dining_table` VALUES (30017, 'B05', '荷花厅', 12, 0, 'table/qrcode/B05-ebd2964140ae4c5f99873350559da9bc.png', 31001, '包间', NULL, 1, NULL, '2025-12-01 10:00:00', '2026-07-03 18:51:24', 0);
+INSERT INTO `dining_table` VALUES (30018, 'B06', '菊花厅', 12, 0, 'table/qrcode/B06-f56be4b889a94048ab7f470045dce78d.png', 31001, '包间', NULL, 1, NULL, '2025-12-01 10:00:00', '2026-07-03 18:51:09', 0);
+INSERT INTO `dining_table` VALUES (30019, 'B07', '桂花厅', 16, 0, 'table/qrcode/B07-50134eec4a6b479c99d9fa4a59a61fea.png', 31001, '包间', NULL, 1, NULL, '2025-12-01 10:00:00', '2026-07-03 00:44:26', 0);
+INSERT INTO `dining_table` VALUES (30020, 'B08', '紫薇厅', 20, 0, 'table/qrcode/B08-8e4f968ecaf14f17897ac41ed69c7958.png', 31001, '包间', NULL, 1, NULL, '2025-12-01 10:00:00', '2026-07-03 00:44:27', 0);
+INSERT INTO `dining_table` VALUES (30021, 'C01', 'C1桌', 2, 0, 'table/qrcode/C01-a53af542944d4f18a224b5a8bc3d01b2.png', 31003, '露台', NULL, 1, NULL, '2025-12-01 10:00:00', '2026-07-03 00:44:35', 0);
+INSERT INTO `dining_table` VALUES (30022, 'C02', 'C2桌', 2, 0, 'table/qrcode/C02-b1b3f5dc1f104425aba30de46fa71dc0.png', 31003, '露台', NULL, 1, NULL, '2025-12-01 10:00:00', '2026-07-03 00:44:35', 0);
+INSERT INTO `dining_table` VALUES (30023, 'C03', 'C3桌', 4, 0, 'table/qrcode/C03-6f4bd894e9d94a61bb5fdc732fd7edf8.png', 31003, '露台', NULL, 1, NULL, '2025-12-01 10:00:00', '2026-07-03 00:44:36', 0);
+INSERT INTO `dining_table` VALUES (30024, 'C04', 'C4桌', 4, 0, 'table/qrcode/C04-7276118ac3aa49508eb9ccb1eef0feb4.png', 31003, '露台', NULL, 1, NULL, '2025-12-01 10:00:00', '2026-07-03 00:44:36', 0);
+INSERT INTO `dining_table` VALUES (30025, 'C05', 'C5桌', 6, 0, 'table/qrcode/C05-5a5cd46303394a17b39cfc47b31088eb.png', 31003, '露台', NULL, 1, NULL, '2025-12-01 10:00:00', '2026-07-03 00:44:37', 0);
 
 -- ----------------------------
 -- Table structure for dish
@@ -770,6 +772,7 @@ CREATE TABLE `order`  (
   `order_no` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '订单编号',
   `table_id` bigint NULL DEFAULT NULL COMMENT '关联桌台ID',
   `table_code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '桌台编号（冗余）',
+  `table_session_code` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '桌次编码（冗余）',
   `original_amount` decimal(10, 2) NOT NULL DEFAULT 0.00 COMMENT '原始总金额',
   `discount_rate` decimal(3, 2) NOT NULL DEFAULT 1.00 COMMENT '折扣比例（默认1.00）',
   `coupon_id` bigint NULL DEFAULT NULL COMMENT '优惠券ID',
@@ -795,6 +798,7 @@ CREATE TABLE `order`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_order_no`(`order_no` ASC) USING BTREE,
   INDEX `idx_table_id`(`table_id` ASC) USING BTREE,
+  INDEX `idx_table_session_status`(`table_id` ASC, `table_session_code` ASC, `status` ASC) USING BTREE,
   INDEX `idx_status`(`status` ASC) USING BTREE,
   INDEX `idx_customer_openid`(`customer_openid` ASC) USING BTREE,
   INDEX `idx_create_time`(`create_time` ASC) USING BTREE

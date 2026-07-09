@@ -58,6 +58,11 @@ public class DiningTableVO implements Serializable {
     private String areaName;
 
     /**
+     * 当前桌次编码
+     */
+    private String currentSessionCode;
+
+    /**
      * 创建时间
      */
     private LocalDateTime createTime;

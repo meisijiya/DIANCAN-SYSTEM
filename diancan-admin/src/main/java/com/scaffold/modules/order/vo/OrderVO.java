@@ -28,6 +28,11 @@ public class OrderVO implements Serializable {
     private String tableCode;
 
     /**
+     * 桌次编码
+     */
+    private String tableSessionCode;
+
+    /**
      * 桌台区域名称
      */
     private String areaName;

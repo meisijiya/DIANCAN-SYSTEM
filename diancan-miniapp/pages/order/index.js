@@ -1,7 +1,7 @@
 const orderApi = require('../../api/order');
 const reviewApi = require('../../api/review');
 const { addSocketListener, connectSocket } = require('../../utils/socket');
-const { KEYS, get, set } = require('../../utils/storage');
+const { KEYS, get, set, getTableBindingKey } = require('../../utils/storage');
 const { env } = require('../../config/env');
 
 function pickId(obj) {
@@ -149,6 +149,7 @@ function normalizeOrder(order, mockPaidSet, reviewedSet) {
 Page({
   data: {
     tableId: null,
+    tableBindingKey: '',
     orders: [],
     paidOrderCount: 0,
     unpaidOrderCount: 0,
@@ -160,14 +161,15 @@ Page({
 
   onLoad() {
     const table = get(KEYS.TABLE) || {};
-    this.resetOrderState(Number(table.id || 0));
+    this.resetOrderState(table);
   },
 
   onShow() {
     const table = get(KEYS.TABLE) || {};
     const tableId = Number(table.id || 0);
-    if (tableId !== Number(this.data.tableId || 0)) {
-      this.resetOrderState(tableId);
+    const tableBindingKey = getTableBindingKey(table);
+    if (tableBindingKey !== this.data.tableBindingKey) {
+      this.resetOrderState(table);
     }
     if (!tableId) {
       this.stopPolling();
@@ -207,9 +209,10 @@ Page({
     }
   },
 
-  resetOrderState(tableId = 0) {
+  resetOrderState(table = {}) {
     this.setData({
-      tableId: Number(tableId || 0),
+      tableId: Number(table.id || 0),
+      tableBindingKey: getTableBindingKey(table),
       orders: [],
       paidOrderCount: 0,
       unpaidOrderCount: 0,
@@ -221,6 +224,7 @@ Page({
 
   async loadOrders() {
     const currentTableId = Number(this.data.tableId || 0);
+    const currentBindingKey = this.data.tableBindingKey;
     if (!currentTableId) return;
     try {
       const mockPaid = get(KEYS.MOCK_PAID_ORDER_IDS) || [];
@@ -228,7 +232,7 @@ Page({
       const reviewedSet = getReviewedSet();
 
       const list = await orderApi.getTableOrders(currentTableId);
-      if (currentTableId !== Number(this.data.tableId || 0)) {
+      if (currentTableId !== Number(this.data.tableId || 0) || currentBindingKey !== this.data.tableBindingKey) {
         return;
       }
 

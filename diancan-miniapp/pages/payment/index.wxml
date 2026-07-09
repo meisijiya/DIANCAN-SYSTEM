@@ -45,10 +45,12 @@
       <view class="method-check">✓</view>
     </view>
 
+    <view class="pay-status" wx:if="{{paymentStatusText}}">{{paymentStatusText}}</view>
+  </view>
+
+  <view class="payment-footer safe-bottom">
     <button class="btn-primary pay-btn" bindtap="payNow" loading="{{paying}}" disabled="{{paying}}">
       {{paying ? '支付处理中...' : '立即支付'}}
     </button>
-
-    <view class="pay-status" wx:if="{{paymentStatusText}}">{{paymentStatusText}}</view>
   </view>
 </view>

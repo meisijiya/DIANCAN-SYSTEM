@@ -428,8 +428,12 @@
 }
 
 .logout-btn {
+  display: block;
+  width: 100%;
   height: 84rpx;
   line-height: 84rpx;
+  margin: 0;
+  padding: 0;
   border: none;
   border-radius: 999rpx;
   background: linear-gradient(135deg, #8f1f24 0%, #6f171c 100%);
@@ -437,6 +441,7 @@
   font-size: 28rpx;
   font-weight: 800;
   box-shadow: 0 12rpx 24rpx rgba(143, 31, 36, 0.14);
+  box-sizing: border-box;
 }
 
 .menu-group {

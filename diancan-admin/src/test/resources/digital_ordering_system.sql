@@ -84,6 +84,7 @@ CREATE TABLE `dining_table` (
     `qr_code_url` varchar(500) DEFAULT NULL COMMENT '二维码图片URL',
     `area_id` bigint DEFAULT NULL COMMENT '区域ID',
     `area_name` varchar(50) DEFAULT NULL COMMENT '区域名称（如大厅、包间）',
+    `current_session_code` varchar(64) DEFAULT NULL COMMENT '当前桌次编码',
     `create_by` bigint DEFAULT NULL COMMENT '创建人',
     `update_by` bigint DEFAULT NULL COMMENT '更新人',
     `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
@@ -92,7 +93,8 @@ CREATE TABLE `dining_table` (
     PRIMARY KEY (`id`),
     UNIQUE KEY `uk_code` (`code`),
     KEY `idx_status` (`status`),
-    KEY `idx_area_id` (`area_id`)
+    KEY `idx_area_id` (`area_id`),
+    KEY `idx_current_session_code` (`current_session_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='桌台表';
 
 -- ----------------------------
@@ -104,6 +106,7 @@ CREATE TABLE `order` (
     `order_no` varchar(32) NOT NULL COMMENT '订单编号',
     `table_id` bigint DEFAULT NULL COMMENT '关联桌台ID',
     `table_code` varchar(50) DEFAULT NULL COMMENT '桌台编号（冗余）',
+    `table_session_code` varchar(64) DEFAULT NULL COMMENT '桌次编码（冗余）',
     `original_amount` decimal(10,2) NOT NULL DEFAULT 0.00 COMMENT '原始总金额',
     `discount_rate` decimal(3,2) NOT NULL DEFAULT 1.00 COMMENT '折扣比例（默认1.00）',
     `actual_amount` decimal(10,2) NOT NULL DEFAULT 0.00 COMMENT '实付总金额',
@@ -121,6 +124,7 @@ CREATE TABLE `order` (
     PRIMARY KEY (`id`),
     UNIQUE KEY `uk_order_no` (`order_no`),
     KEY `idx_table_id` (`table_id`),
+    KEY `idx_table_session_status` (`table_id`, `table_session_code`, `status`),
     KEY `idx_status` (`status`),
     KEY `idx_customer_openid` (`customer_openid`),
     KEY `idx_create_time` (`create_time`)

@@ -55,6 +55,38 @@ public interface DiningTableService extends IService<DiningTable> {
     void markClean(Long id);
 
     /**
+     * 释放桌台（已结账/待清洁→空闲）
+     *
+     * @author Henfon
+     * @date 2026-07-09
+     * @description 为管理端提供一键释放桌台入口，进行中桌台不允许直接释放。
+     * @param id 桌台ID
+     */
+    void releaseTable(Long id);
+
+    /**
+     * 预创建当前桌次编码
+     *
+     * @author Henfon
+     * @date 2026-07-10
+     * @description 为即将开始的一轮点单准备桌次编码，供订单和购物车隔离使用。
+     * @param id 桌台ID
+     * @return 当前桌次编码
+     */
+    String prepareCurrentSessionCode(Long id);
+
+    /**
+     * 获取当前活跃桌次编码
+     *
+     * @author Henfon
+     * @date 2026-07-10
+     * @description 仅在桌台已开台或处于结账/清洁链路时返回当前桌次，缺失时自动补齐。
+     * @param id 桌台ID
+     * @return 当前活跃桌次编码
+     */
+    String getActiveSessionCode(Long id);
+
+    /**
      * 更新桌台状态（通用方法，供其他模块调用）
      *
      * @param id     桌台ID

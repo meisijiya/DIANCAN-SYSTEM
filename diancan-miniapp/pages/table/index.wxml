@@ -78,13 +78,10 @@
       </view>
     </view>
 
+    <view wx:if="{{entryHintText}}" class="entry-hint entry-hint--{{entryHintTone}}">
+      {{entryHintText}}
+    </view>
+
     <button class="btn-primary enter-btn" bindtap="enterMenu">进入点餐</button>
-
-    <view class="split"></view>
-
-    <view class="title small-title">换桌</view>
-    <view class="sub">输入目标桌号或桌台 ID，例如 A03 / 3</view>
-    <input class="input" value="{{targetTableInput}}" bindinput="onTargetInput" placeholder="目标桌号或桌台ID" />
-    <button class="btn-muted" bindtap="changeTable">提交换桌</button>
   </view>
 </view>

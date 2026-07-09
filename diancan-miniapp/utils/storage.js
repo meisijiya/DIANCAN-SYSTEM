@@ -25,9 +25,16 @@ function remove(key) {
 function normalizeTableIdentity(table) {
   if (!table || typeof table !== 'object') return '';
   const id = table.id === null || table.id === undefined ? '' : String(table.id).trim();
-  if (id) return id;
+  const sessionCode = table.currentSessionCode === null || table.currentSessionCode === undefined
+    ? ''
+    : String(table.currentSessionCode).trim();
+  if (id) return sessionCode ? `${id}#${sessionCode}` : id;
   const code = table.code === null || table.code === undefined ? '' : String(table.code).trim();
-  return code;
+  return sessionCode ? `${code}#${sessionCode}` : code;
+}
+
+function getTableBindingKey(table) {
+  return normalizeTableIdentity(table);
 }
 
 function clearCurrentTableState() {
@@ -59,5 +66,6 @@ module.exports = {
   set,
   remove,
   clearCurrentTableState,
-  setCurrentTable
+  setCurrentTable,
+  getTableBindingKey
 };

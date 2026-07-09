@@ -201,6 +201,26 @@
   padding: 14rpx 16rpx;
 }
 
+.entry-hint {
+  margin-top: 16rpx;
+  padding: 16rpx 18rpx;
+  border-radius: 14rpx;
+  font-size: 24rpx;
+  line-height: 1.6;
+}
+
+.entry-hint--success {
+  color: #166534;
+  background: #edfdf3;
+  border: 1rpx solid #b7ebc6;
+}
+
+.entry-hint--warm {
+  color: #9a5b18;
+  background: #fff5e8;
+  border: 1rpx solid #f3d4ab;
+}
+
 .meta-row {
   display: flex;
   align-items: center;
@@ -256,21 +276,6 @@
 
 .enter-btn {
   margin-top: 20rpx;
-}
-
-.small-title {
-  font-size: 30rpx;
-}
-
-.table-card .btn-muted,
-.debug-card .btn-muted {
-  margin-top: 14rpx;
-}
-
-.split {
-  height: 1rpx;
-  background: #eef2f6;
-  margin: 20rpx 0;
 }
 
 .debug-card {

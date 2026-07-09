@@ -16,8 +16,7 @@ import {
   addOrderItem,
   cashPay,
   splitBill,
-  markTableClean,
-  markTableToClean
+  releaseTable
 } from '@/service/api';
 import { connectWebSocket, subscribe } from '@/service/websocket';
 import type { WsMessage, TableStatusData } from '@/service/websocket';
@@ -146,6 +145,14 @@ function resolveActiveOrder() {
     || tableOrders.value[0]
     || null
   );
+}
+
+function filterOrdersByCurrentSession(orders: Api.Business.Order[]) {
+  const currentSessionCode = String(selectedTable.value?.currentSessionCode || '').trim();
+  if (!currentSessionCode) {
+    return orders;
+  }
+  return orders.filter(order => String(order.tableSessionCode || '').trim() === currentSessionCode);
 }
 
 /** 抽屉数据 */
@@ -336,7 +343,7 @@ async function refreshDrawerData() {
     }
     const { data, error } = await fetchOrderList({ tableId: selectedTable.value.id, pageNum: 1, pageSize: 20 });
     if (!error && data) {
-      tableOrders.value = data.list || [];
+      tableOrders.value = filterOrdersByCurrentSession(data.list || []);
       await loadCurrentOrderDetail();
     }
   } finally {
@@ -382,34 +389,16 @@ async function loadData() {
   }
 }
 
-async function handleMarkClean(table: Api.Business.DiningTable) {
-  if (table.status !== 3 || cleanLoadingTableId.value) return;
+async function handleReleaseTable(table: Api.Business.DiningTable) {
+  if ((table.status !== 2 && table.status !== 3) || cleanLoadingTableId.value) return;
   cleanLoadingTableId.value = table.id;
   try {
-    const { error } = await markTableClean(Number(table.id));
+    const { error } = await releaseTable(Number(table.id));
     if (!error) {
-      message.success(`桌台 ${table.code} 已标记清洁完成`);
+      message.success(`桌台 ${table.code} 已释放为空闲`);
       table.status = 0;
       if (selectedTable.value?.id === table.id) {
         drawerMode.value = 'order';
-        await refreshDrawerData();
-      }
-    }
-  } finally {
-    cleanLoadingTableId.value = null;
-  }
-}
-
-async function handleMarkToClean(table: Api.Business.DiningTable) {
-  if (table.status !== 2 || cleanLoadingTableId.value) return;
-  cleanLoadingTableId.value = table.id;
-  try {
-    const { error } = await markTableToClean(Number(table.id));
-    if (!error) {
-      message.success(`桌台 ${table.code} 已推进到待清洁`);
-      table.status = 3;
-      if (selectedTable.value?.id === table.id) {
-        drawerMode.value = 'overview';
         await refreshDrawerData();
       }
     }
@@ -809,29 +798,18 @@ onUnmounted(() => {
             </div>
             <div v-if="selectedTable.status === 2 || selectedTable.status === 3" class="drawer-summary__clean-actions">
               <NButton
-                v-if="selectedTable.status === 2"
                 type="warning"
-                secondary
                 :loading="cleanLoadingTableId === selectedTable.id"
-                @click="handleMarkToClean(selectedTable)"
+                @click="handleReleaseTable(selectedTable)"
               >
-                转待清洁
-              </NButton>
-              <NButton
-                v-if="selectedTable.status === 3"
-                type="success"
-                secondary
-                :loading="cleanLoadingTableId === selectedTable.id"
-                @click="handleMarkClean(selectedTable)"
-              >
-                标记清洁完成
+                释放桌台
               </NButton>
             </div>
             <div v-if="selectedTable.status === 3" class="drawer-summary__notice">
-              当前桌台处于待清洁状态，仅允许完成清洁收尾，不可继续加菜或结账。
+              当前桌台已处于待清洁状态，确认收尾完成后可直接释放为空闲。
             </div>
             <div v-else-if="selectedTable.status === 2" class="drawer-summary__notice">
-              当前桌台已结账，默认不再允许加菜和结账，可转为待清洁后继续流转。
+              当前桌台已结账，如已完成现场收尾，可直接释放桌台。
             </div>
           </div>
 

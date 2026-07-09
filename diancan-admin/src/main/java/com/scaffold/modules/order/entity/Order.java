@@ -37,6 +37,11 @@ public class Order extends BaseEntity {
     private String tableCode;
 
     /**
+     * 桌次编码（冗余）
+     */
+    private String tableSessionCode;
+
+    /**
      * 原始总金额
      */
     private BigDecimal originalAmount;

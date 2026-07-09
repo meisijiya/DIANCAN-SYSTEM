@@ -63,6 +63,11 @@ export function markTableToClean(id: number) {
   return request<void>({ url: `/admin/table/${id}/to-clean`, method: 'put' });
 }
 
+/** 一键释放桌台 */
+export function releaseTable(id: number) {
+  return request<void>({ url: `/admin/table/${id}/release`, method: 'put' });
+}
+
 /** 生成所有桌台二维码 */
 export function generateAllTableQrCodes() {
   return request<number>({ url: '/admin/table/qrcode/generate-all', method: 'post' });

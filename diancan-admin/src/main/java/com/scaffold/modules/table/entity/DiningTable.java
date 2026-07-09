@@ -54,4 +54,9 @@ public class DiningTable extends BaseEntity {
      * 区域名称（如"大厅"、"包间"）
      */
     private String areaName;
+
+    /**
+     * 当前桌次编码
+     */
+    private String currentSessionCode;
 }

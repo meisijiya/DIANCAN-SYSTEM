@@ -135,6 +135,7 @@ declare namespace Api {
       qrCodeUrl: string | null;
       areaId: number | null;
       areaName: string | null;
+      currentSessionCode?: string | null;
       createTime: string;
     }
 
@@ -209,6 +210,7 @@ declare namespace Api {
       orderNo: string;
       tableId: IdType;
       tableCode: string;
+      tableSessionCode?: string | null;
       areaName?: string | null;
       originalAmount: number;
       discountRate: number;

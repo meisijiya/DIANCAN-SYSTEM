@@ -3,7 +3,7 @@ const couponApi = require('../../api/coupon');
 const memberApi = require('../../api/member');
 const orderApi = require('../../api/order');
 const { formatPrice } = require('../../utils/format');
-const { KEYS, get, set } = require('../../utils/storage');
+const { KEYS, get, set, getTableBindingKey } = require('../../utils/storage');
 
 const WEEKDAY_LABELS = {
   1: '周一',
@@ -57,6 +57,7 @@ function normalizeDishId(value) {
 Page({
   data: {
     tableId: null,
+    tableBindingKey: '',
     availableCoupons: [],
     selectedCouponId: null,
     selectedCouponText: '暂不使用优惠券',
@@ -75,15 +76,28 @@ Page({
   },
 
   onLoad(query) {
-    const tableId = Number(query.tableId || (get(KEYS.TABLE) || {}).id);
-    this.setData({ tableId });
+    const table = get(KEYS.TABLE) || {};
+    const tableId = Number(query.tableId || table.id);
+    this.setData({ tableId, tableBindingKey: getTableBindingKey(table) });
   },
 
   onShow() {
     const table = get(KEYS.TABLE) || {};
     const tableId = Number(table.id || 0);
-    if (tableId && tableId !== Number(this.data.tableId || 0)) {
-      this.setData({ tableId });
+    const tableBindingKey = getTableBindingKey(table);
+    if (tableBindingKey && tableBindingKey !== this.data.tableBindingKey) {
+      this.setData({
+        tableId,
+        tableBindingKey,
+        selectedCouponId: null,
+        selectedCouponText: '暂不使用优惠券',
+        requestedPoints: 0,
+        actualUsedPoints: 0,
+        pointsDeductionAmount: '0.00',
+        pointsText: '暂不使用积分'
+      });
+    } else if (tableId && tableId !== Number(this.data.tableId || 0)) {
+      this.setData({ tableId, tableBindingKey });
     }
     this.loadCart();
     this.loadCoupons();

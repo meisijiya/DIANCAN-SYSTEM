@@ -160,12 +160,14 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             BigDecimal originalAmount = cart.getItems().stream()
                     .map(CartItemVO::getAmount)
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
+            String tableSessionCode = resolveTableSessionCodeForOrder(tableId);
 
             // 5. 创建订单
             Order order = new Order();
             order.setOrderNo(generateOrderNo());
             order.setTableId(tableId);
             order.setTableCode(table.getCode());
+            order.setTableSessionCode(tableSessionCode);
             order.setOriginalAmount(originalAmount);
             order.setDiscountRate(BigDecimal.ONE);
             order.setActualAmount(originalAmount);
@@ -257,11 +259,12 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             DiningTableVO table = getTableInfo(tableId);
             String tableCode = dto.getTableCode() != null ? dto.getTableCode() : table.getCode();
             boolean isPreOrder = dto.getPreOrder() != null && dto.getPreOrder();
+            String tableSessionCode = resolveTableSessionCodeForOrder(tableId);
 
             // 非预订单只允许在空闲桌台新开单，避免待清洁/已结账桌台被误用
             if (!isPreOrder) {
                 validateAdminCreateTableStatus(table, tableCode);
-                validateAdminCreateOrderConflict(tableId, tableCode);
+                validateAdminCreateOrderConflict(tableId, tableCode, tableSessionCode);
             }
 
             // 2. 校验菜品可用性并扣减库存
@@ -290,6 +293,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             order.setOrderNo(generateOrderNo());
             order.setTableId(tableId);
             order.setTableCode(tableCode);
+            order.setTableSessionCode(tableSessionCode);
             order.setOriginalAmount(originalAmount);
             order.setDiscountRate(resolveMemberDiscountRate(dto.getUserId()));
             order.setActualAmount(originalAmount);
@@ -380,10 +384,12 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
      *
      * @param tableId 桌台ID
      * @param tableCode 桌台编号
+     * @param tableSessionCode 当前桌次编码
      */
-    private void validateAdminCreateOrderConflict(Long tableId, String tableCode) {
+    private void validateAdminCreateOrderConflict(Long tableId, String tableCode, String tableSessionCode) {
         LambdaQueryWrapper<Order> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(Order::getTableId, tableId)
+                .eq(StrUtil.isNotBlank(tableSessionCode), Order::getTableSessionCode, tableSessionCode)
                 .in(Order::getStatus, 0, 1)
                 .eq(Order::getDeleted, 0)
                 .orderByDesc(Order::getCreateTime)
@@ -815,9 +821,15 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 
     @Override
     public List<OrderVO> getTableOrders(Long tableId) {
+        String activeSessionCode = diningTableService.getActiveSessionCode(tableId);
+        if (StrUtil.isBlank(activeSessionCode)) {
+            return Collections.emptyList();
+        }
+
         List<Order> orders = list(
                 new LambdaQueryWrapper<Order>()
                         .eq(Order::getTableId, tableId)
+                        .eq(Order::getTableSessionCode, activeSessionCode)
                         .in(Order::getStatus, 0, 1) // 待支付 + 已支付
                         .eq(Order::getDeleted, 0)
                         .orderByDesc(Order::getCreateTime)
@@ -964,6 +976,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
                 table.setCode(tableEntity.getCode());
                 table.setName(tableEntity.getName());
                 table.setStatus(tableEntity.getStatus());
+                table.setCurrentSessionCode(tableEntity.getCurrentSessionCode());
             }
         } catch (Exception e) {
             log.error("获取桌台信息失败: tableId={}", tableId, e);
@@ -1289,6 +1302,22 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         if (table != null) {
             orderVO.setAreaName(table.getAreaName());
         }
+    }
+
+    /**
+     * 作者：Henfon
+     * 日期：2026-07-10
+     * 描述：下单前为当前桌台准备桌次编码，保证新一轮点单不会命中上一轮遗留订单
+     *
+     * @param tableId 桌台ID
+     * @return 当前桌次编码
+     */
+    private String resolveTableSessionCodeForOrder(Long tableId) {
+        String tableSessionCode = diningTableService.prepareCurrentSessionCode(tableId);
+        if (StrUtil.isBlank(tableSessionCode)) {
+            throw new BusinessException(ResultCode.TABLE_STATUS_ERROR, "当前桌台桌次异常，请重新进入桌台后再试");
+        }
+        return tableSessionCode;
     }
 
     /**
