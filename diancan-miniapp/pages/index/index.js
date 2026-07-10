@@ -51,7 +51,6 @@ Page({
 
   onLoad(options) {
     this.initNavBar();
-    this.loadBanners();
     this.loadCategories();
     const code = this.extractTableCode(options);
     if (code) {
@@ -61,6 +60,8 @@ Page({
   },
 
   onShow() {
+    // 首页每次展示时刷新轮播，避免私有桶预签名 URL 过期后图片消失。
+    this.loadBanners();
     const loggedIn = isLoggedIn();
     const table = get(KEYS.TABLE);
     const sceneTableCode = normalizeTableCode(this.data.tableCode);
@@ -108,7 +109,10 @@ Page({
       const banners = await bannerApi.getBannerList();
       this.setData({ banners: Array.isArray(banners) ? banners : [] });
     } catch (err) {
-      this.setData({ banners: [] });
+      // 刷新失败时保留当前轮播，避免网络抖动或 URL 过期导致首页整块消失。
+      if (!Array.isArray(this.data.banners) || this.data.banners.length === 0) {
+        this.setData({ banners: [] });
+      }
     }
   },
 
