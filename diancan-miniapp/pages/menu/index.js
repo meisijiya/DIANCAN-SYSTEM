@@ -1,10 +1,10 @@
 const dishApi = require('../../api/dish');
 const cartApi = require('../../api/cart');
 const orderApi = require('../../api/order');
-const tableApi = require('../../api/table');
-const { KEYS, get, setCurrentTable } = require('../../utils/storage');
+const { KEYS, get } = require('../../utils/storage');
 const { isLoggedIn, wxLogin, phoneLogin } = require('../../utils/auth');
 const { formatPrice } = require('../../utils/format');
+const { bindTableByCode, ensureCurrentUserTableBinding, normalizeTableCode } = require('../../utils/table-binding');
 
 const SPICE_LABEL_MAP = {
   0: '不辣',
@@ -16,11 +16,6 @@ const SPICE_LABEL_MAP = {
 function normalizeId(v) {
   if (v === null || v === undefined) return '';
   return String(v);
-}
-
-function normalizeTableCode(value) {
-  if (value === null || value === undefined) return '';
-  return String(value).trim().toUpperCase();
 }
 
 function normalizeCategoryId(...values) {
@@ -240,19 +235,10 @@ Page({
     const requestCode = normalizeTableCode(code);
     wx.showLoading({ title: '加载桌台' });
     try {
-      const table = await tableApi.getTableByCode(code);
+      const { table: boundTable } = await bindTableByCode(code);
       if (requestCode !== normalizeTableCode(this.data.tableCode)) {
         return;
       }
-
-      const boundTable = { ...table };
-      if (Number(boundTable.status) === 0) {
-        await tableApi.openTable(boundTable.id);
-        const openedTable = await tableApi.getTableByCode(boundTable.code || code);
-        Object.assign(boundTable, openedTable, { status: 1 });
-      }
-
-      setCurrentTable(boundTable);
       this.setData({
         table: boundTable,
         tableCode: boundTable.code || code,
@@ -644,8 +630,20 @@ Page({
     try {
       const code = await wxLogin();
       await phoneLogin(code, e.detail.code);
-      this.setData({ loggedIn: true, showLoginPanel: false });
+      const reboundTable = await ensureCurrentUserTableBinding(this.data.table || get(KEYS.TABLE));
+      this.setData({
+        loggedIn: true,
+        showLoginPanel: false,
+        table: reboundTable || this.data.table || null
+      });
       wx.showToast({ title: '登录成功', icon: 'none' });
+      if (reboundTable) {
+        this.setData({
+          heroStatusText: '桌台已就绪',
+          menuHeroTitle: `${reboundTable.name || reboundTable.code || '当前桌台'} 正在点餐`,
+          tableDisplayCode: reboundTable.code || '未绑定'
+        });
+      }
       this.loadCart();
       const cb = this.data.loginCallback;
       if (cb) {

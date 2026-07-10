@@ -1,11 +1,6 @@
-const tableApi = require('../../api/table');
-const { KEYS, get, setCurrentTable } = require('../../utils/storage');
+const { KEYS, get } = require('../../utils/storage');
 const { isLoggedIn, wxLogin, phoneLogin } = require('../../utils/auth');
-
-function normalizeTableCode(value) {
-  if (value === null || value === undefined) return '';
-  return String(value).trim().toUpperCase();
-}
+const { bindTableByCode, ensureCurrentUserTableBinding, normalizeTableCode } = require('../../utils/table-binding');
 
 Page({
   data: {
@@ -73,7 +68,12 @@ Page({
     try {
       const code = await wxLogin();
       await phoneLogin(code, e.detail.code);
-      this.setData({ loggedIn: true });
+      const reboundTable = await ensureCurrentUserTableBinding(this.data.table || get(KEYS.TABLE));
+      this.setData({
+        loggedIn: true,
+        table: reboundTable || this.data.table || null,
+        tableCode: (reboundTable || this.data.table || {}).code || this.data.tableCode
+      });
       wx.showToast({ title: '登录成功', icon: 'none' });
     } catch (err) {
       wx.showToast({ title: err.message || '登录失败', icon: 'none' });
@@ -152,21 +152,11 @@ Page({
     this.setData({ entryHintText: '', entryHintTone: '' });
     wx.showLoading({ title: '加载中' });
     try {
-      const table = await tableApi.getTableByCode(tableCode);
+      const { table: boundTable, entryMode, originalStatus } = await bindTableByCode(tableCode);
       if (requestCode !== normalizeTableCode(this.data.tableCode)) {
         return;
       }
-
-      const originalStatus = Number(table.status);
-      const boundTable = { ...table };
-      if (originalStatus === 0) {
-        await tableApi.openTable(boundTable.id);
-        const openedTable = await tableApi.getTableByCode(boundTable.code || tableCode);
-        Object.assign(boundTable, openedTable, { status: 1 });
-      }
-
-      const entryHint = this.buildEntryHint(originalStatus);
-      setCurrentTable(boundTable);
+      const entryHint = this.buildEntryHint(originalStatus, entryMode);
       this.setData({
         table: boundTable,
         tableCode: boundTable.code || tableCode,
@@ -180,7 +170,14 @@ Page({
     }
   },
 
-  buildEntryHint(originalStatus) {
+  buildEntryHint(originalStatus, entryMode) {
+    if (entryMode === 'join') {
+      return {
+        tone: 'success',
+        text: '已进入该桌当前桌次，可与同桌一起加菜或支付。'
+      };
+    }
+
     if (originalStatus === 0) {
       return {
         tone: 'success',

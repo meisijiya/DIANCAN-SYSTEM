@@ -19,6 +19,8 @@ import com.scaffold.common.exception.BusinessException;
 import com.scaffold.common.result.ResultCode;
 import com.scaffold.framework.redis.RedisUtils;
 import com.scaffold.framework.websocket.WsService;
+import com.scaffold.modules.order.entity.Order;
+import com.scaffold.modules.order.mapper.OrderMapper;
 import com.scaffold.modules.system.service.MinioStorageService;
 import com.scaffold.modules.system.vo.FileUploadVO;
 import com.scaffold.modules.table.dto.TableCreateDTO;
@@ -36,6 +38,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -51,6 +54,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -67,6 +71,8 @@ public class DiningTableServiceImpl extends ServiceImpl<DiningTableMapper, Dinin
     private final WsService wsService;
     private final MinioStorageService minioStorageService;
     private final TableAreaMapper tableAreaMapper;
+    private final OrderMapper orderMapper;
+    private final RedisTemplate<String, Object> redisTemplate;
     private final ObjectProvider<TableQrCodeTaskService> tableQrCodeTaskServiceProvider;
 
     @Value("${wechat.miniapp.enabled:false}")
@@ -89,6 +95,8 @@ public class DiningTableServiceImpl extends ServiceImpl<DiningTableMapper, Dinin
 
     /** 桌台状态 Redis key 前缀 */
     private static final String TABLE_STATUS_KEY_PREFIX = "table:status:";
+    private static final String TABLE_USER_BINDING_KEY_PREFIX = "table:user-binding:";
+    private static final String TABLE_SESSION_MEMBERS_KEY_PREFIX = "table:session-members:";
     private static final String WECHAT_ACCESS_TOKEN_KEY = "wechat:miniapp:access-token";
     private static final String QR_TASK_KEY_PREFIX = "table:qrcode:task:";
     private static final long QR_TASK_EXPIRE_SECONDS = 24 * 60 * 60L;
@@ -98,6 +106,8 @@ public class DiningTableServiceImpl extends ServiceImpl<DiningTableMapper, Dinin
     private static final int STATUS_OCCUPIED = 1;
     private static final int STATUS_PAID = 2;
     private static final int STATUS_TO_CLEAN = 3;
+    private static final int ORDER_STATUS_PENDING = 0;
+    private static final int ORDER_STATUS_PAID = 1;
 
     @Override
     public List<DiningTableVO> listAll() {
@@ -175,6 +185,67 @@ public class DiningTableServiceImpl extends ServiceImpl<DiningTableMapper, Dinin
         log.info("开台成功: id={}, code={}", id, table.getCode());
     }
 
+    /**
+     * 绑定当前顾客到指定桌台
+     *
+     * @author Henfon
+     * @date 2026-07-11
+     * @description 维护顾客与当前桌次的一对一关系；顾客切到新桌时，仅变更绑定关系，不迁移旧订单和购物车。
+     * @param id 桌台ID
+     * @param openid 当前顾客openid
+     * @return 绑定后的桌台信息
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public DiningTableVO bindCurrentUser(Long id, String openid) {
+        if (StrUtil.isBlank(openid)) {
+            throw new BusinessException(ResultCode.UNAUTHORIZED, "请先登录后再绑定桌台");
+        }
+
+        DiningTable targetTable = getById(id);
+        if (targetTable == null) {
+            throw new BusinessException(ResultCode.NOT_FOUND);
+        }
+
+        Integer targetStatus = targetTable.getStatus();
+        if (targetStatus == null) {
+            throw new BusinessException(ResultCode.TABLE_STATUS_ERROR);
+        }
+
+        if (targetStatus == STATUS_FREE) {
+            // 空闲桌首次绑定时直接开新桌次，保证后续点单、购物车都落到同一批次。
+            ensureCurrentSessionCode(targetTable, true);
+            doUpdateStatus(targetTable, STATUS_OCCUPIED);
+        } else if (targetStatus != STATUS_OCCUPIED) {
+            throw new BusinessException(ResultCode.TABLE_NOT_AVAILABLE, "当前桌台暂不可点单，请联系服务员处理");
+        }
+
+        String targetSessionCode = ensureCurrentSessionCode(targetTable, false);
+        if (StrUtil.isBlank(targetSessionCode)) {
+            throw new BusinessException(ResultCode.TABLE_STATUS_ERROR, "目标桌当前桌次异常，请刷新后重试");
+        }
+
+        TableBindingRef currentBinding = readUserBinding(openid);
+        if (currentBinding != null && currentBinding.matches(id, targetSessionCode)) {
+            // 绑定已存在时补齐成员集合，兼容 Redis 过期或补偿场景。
+            saveUserBinding(openid, id, targetSessionCode);
+            addUserToSession(openid, id, targetSessionCode);
+            DiningTable latestTable = getById(id);
+            return latestTable == null ? toVO(targetTable) : toVO(latestTable);
+        }
+
+        if (currentBinding != null) {
+            removeUserFromSession(openid, currentBinding);
+        }
+
+        saveUserBinding(openid, id, targetSessionCode);
+        addUserToSession(openid, id, targetSessionCode);
+        log.info("顾客绑定桌台成功: openid={}, tableCode={}, sessionCode={}", openid, targetTable.getCode(), targetSessionCode);
+
+        DiningTable latestTable = getById(id);
+        return latestTable == null ? toVO(targetTable) : toVO(latestTable);
+    }
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void changeTable(Long fromId, Long toId) {
@@ -191,10 +262,24 @@ public class DiningTableServiceImpl extends ServiceImpl<DiningTableMapper, Dinin
         if (toTable.getStatus() != STATUS_FREE) {
             throw new BusinessException(ResultCode.TABLE_CHANGE_FAILED);
         }
-        // 原桌 → 空闲，目标桌 → 占用
+
+        String activeSessionCode = ensureCurrentSessionCode(fromTable, false);
+        if (!StringUtils.hasText(activeSessionCode)) {
+            throw new BusinessException(ResultCode.TABLE_STATUS_ERROR, "原桌当前桌次异常，请刷新后重试");
+        }
+
+        // 先迁移活动订单，再切换桌态，确保后续查单立即命中新桌。
+        int movedOrderCount = migrateActiveSessionOrders(fromTable, toTable, activeSessionCode);
+
+        // 目标桌沿用原桌桌次，保证同一批客人的订单与购物车继续归属于同一桌次。
+        toTable.setCurrentSessionCode(activeSessionCode);
+        int movedBindingCount = migrateSessionBindings(fromId, toId, activeSessionCode);
         doUpdateStatus(fromTable, STATUS_FREE);
         doUpdateStatus(toTable, STATUS_OCCUPIED);
-        log.info("换桌成功: from={} → to={}", fromTable.getCode(), toTable.getCode());
+
+        int movedCartCount = migrateActiveSessionCarts(fromId, toId, activeSessionCode);
+        log.info("换桌成功: from={} → to={}, sessionCode={}, movedOrders={}, movedCarts={}, movedBindings={}",
+                fromTable.getCode(), toTable.getCode(), activeSessionCode, movedOrderCount, movedCartCount, movedBindingCount);
     }
 
     @Override
@@ -317,6 +402,10 @@ public class DiningTableServiceImpl extends ServiceImpl<DiningTableMapper, Dinin
         DiningTable table = getById(id);
         if (table == null) {
             throw new BusinessException(ResultCode.NOT_FOUND);
+        }
+        String sessionCode = StrUtil.trimToNull(table.getCurrentSessionCode());
+        if (StrUtil.isNotBlank(sessionCode)) {
+            clearSessionBindings(id, sessionCode);
         }
         removeById(id);
         // 清除 Redis 缓存
@@ -445,6 +534,8 @@ public class DiningTableServiceImpl extends ServiceImpl<DiningTableMapper, Dinin
      * 执行状态更新：更新数据库 + Redis 缓存 + WebSocket 广播
      */
     private void doUpdateStatus(DiningTable table, int newStatus) {
+        Integer oldStatus = table.getStatus();
+        String previousSessionCode = StrUtil.trimToNull(table.getCurrentSessionCode());
         LambdaUpdateWrapper<DiningTable> wrapper = new LambdaUpdateWrapper<>();
         wrapper.eq(DiningTable::getId, table.getId())
                 .set(DiningTable::getStatus, newStatus);
@@ -459,6 +550,10 @@ public class DiningTableServiceImpl extends ServiceImpl<DiningTableMapper, Dinin
         }
         update(wrapper);
 
+        if (newStatus == STATUS_FREE && StrUtil.isNotBlank(previousSessionCode)) {
+            clearSessionBindings(table.getId(), previousSessionCode);
+        }
+
         // 缓存桌台状态到 Redis
         redisUtils.set(TABLE_STATUS_KEY_PREFIX + table.getId(), newStatus);
 
@@ -467,9 +562,11 @@ public class DiningTableServiceImpl extends ServiceImpl<DiningTableMapper, Dinin
         tableStatusData.put("tableId", table.getId());
         tableStatusData.put("tableCode", table.getCode());
         tableStatusData.put("tableName", table.getName());
-        tableStatusData.put("oldStatus", table.getStatus());
+        tableStatusData.put("oldStatus", oldStatus);
         tableStatusData.put("newStatus", newStatus);
         wsService.broadcast(WsEventType.TABLE_STATUS, "/topic/table-status", tableStatusData);
+
+        table.setStatus(newStatus);
     }
 
     /**
@@ -552,6 +649,315 @@ public class DiningTableServiceImpl extends ServiceImpl<DiningTableMapper, Dinin
      */
     private String generateSessionCode() {
         return "TS" + IdUtil.fastSimpleUUID();
+    }
+
+    /**
+     * 迁移当前桌次的活动订单
+     *
+     * @author Henfon
+     * @date 2026-07-10
+     * @description 将原桌未关闭的当前桌次订单改挂到目标桌，避免换桌后旧桌继续暴露上一批客人的订单。
+     * @param fromTable 原桌实体
+     * @param toTable 目标桌实体
+     * @param sessionCode 当前桌次编码
+     * @return 迁移订单数
+     */
+    private int migrateActiveSessionOrders(DiningTable fromTable, DiningTable toTable, String sessionCode) {
+        LambdaUpdateWrapper<Order> wrapper = new LambdaUpdateWrapper<>();
+        wrapper.eq(Order::getTableId, fromTable.getId())
+                .eq(Order::getTableSessionCode, sessionCode)
+                .in(Order::getStatus, ORDER_STATUS_PENDING, ORDER_STATUS_PAID)
+                .eq(Order::getDeleted, 0)
+                .set(Order::getTableId, toTable.getId())
+                .set(Order::getTableCode, toTable.getCode());
+        return orderMapper.update(null, wrapper);
+    }
+
+    /**
+     * 迁移当前桌次的购物车
+     *
+     * @author Henfon
+     * @date 2026-07-10
+     * @description 批量搬运同一桌次下所有顾客 Redis 购物车，保证换桌后未提交菜品也跟随迁移。
+     * @param fromTableId 原桌台ID
+     * @param toTableId 目标桌台ID
+     * @param sessionCode 当前桌次编码
+     * @return 迁移购物车数量
+     */
+    private int migrateActiveSessionCarts(Long fromTableId, Long toTableId, String sessionCode) {
+        String sourcePattern = "cart:*:" + fromTableId + ":" + sessionCode;
+        Set<String> sourceKeys = redisTemplate.keys(sourcePattern);
+        if (sourceKeys == null || sourceKeys.isEmpty()) {
+            return 0;
+        }
+
+        int movedCount = 0;
+        String sourceSuffix = ":" + fromTableId + ":" + sessionCode;
+        String targetSuffix = ":" + toTableId + ":" + sessionCode;
+        for (String sourceKey : sourceKeys) {
+            if (!StringUtils.hasText(sourceKey) || !sourceKey.endsWith(sourceSuffix)) {
+                continue;
+            }
+
+            String targetKey = sourceKey.substring(0, sourceKey.length() - sourceSuffix.length()) + targetSuffix;
+            Map<Object, Object> entries = redisTemplate.opsForHash().entries(sourceKey);
+            if (entries != null && !entries.isEmpty()) {
+                // 先复制购物车内容，再删除旧 key，尽量避免中途异常导致数据丢失。
+                redisTemplate.opsForHash().putAll(targetKey, entries);
+            }
+
+            Long ttlSeconds = redisTemplate.getExpire(sourceKey, TimeUnit.SECONDS);
+            if (ttlSeconds != null && ttlSeconds > 0) {
+                redisTemplate.expire(targetKey, ttlSeconds, TimeUnit.SECONDS);
+            }
+            redisTemplate.delete(sourceKey);
+            movedCount++;
+        }
+        return movedCount;
+    }
+
+    /**
+     * 迁移当前桌次的顾客绑定关系
+     *
+     * @author Henfon
+     * @date 2026-07-11
+     * @description 显式换桌时同步迁移桌次成员集合和顾客当前绑定，避免后续解绑误伤原桌。
+     * @param fromTableId 原桌台ID
+     * @param toTableId 目标桌台ID
+     * @param sessionCode 当前桌次编码
+     * @return 迁移绑定数量
+     */
+    private int migrateSessionBindings(Long fromTableId, Long toTableId, String sessionCode) {
+        String sourceKey = buildSessionMembersKey(fromTableId, sessionCode);
+        Set<Object> members = redisUtils.sMembers(sourceKey);
+        if (members == null || members.isEmpty()) {
+            return 0;
+        }
+
+        int movedCount = 0;
+        String targetKey = buildSessionMembersKey(toTableId, sessionCode);
+        for (Object member : members) {
+            String openid = StrUtil.trimToNull(member == null ? null : member.toString());
+            if (StrUtil.isBlank(openid)) {
+                continue;
+            }
+
+            redisUtils.sAdd(targetKey, openid);
+            TableBindingRef bindingRef = readUserBinding(openid);
+            if (bindingRef != null && bindingRef.matches(fromTableId, sessionCode)) {
+                saveUserBinding(openid, toTableId, sessionCode);
+            }
+            movedCount++;
+        }
+        redisUtils.delete(sourceKey);
+        return movedCount;
+    }
+
+    /**
+     * 保存顾客当前桌次绑定
+     *
+     * @author Henfon
+     * @date 2026-07-11
+     * @description 将 openid 当前所在桌次落到 Redis，便于后续重绑时从旧桌解绑。
+     * @param openid 顾客openid
+     * @param tableId 桌台ID
+     * @param sessionCode 桌次编码
+     */
+    private void saveUserBinding(String openid, Long tableId, String sessionCode) {
+        redisUtils.set(buildUserBindingKey(openid), encodeBindingValue(tableId, sessionCode));
+    }
+
+    /**
+     * 读取顾客当前桌次绑定
+     *
+     * @author Henfon
+     * @date 2026-07-11
+     * @description 从 Redis 反查顾客当前所在桌次，供换桌重绑时做旧桌解绑。
+     * @param openid 顾客openid
+     * @return 顾客桌次绑定
+     */
+    private TableBindingRef readUserBinding(String openid) {
+        if (StrUtil.isBlank(openid)) {
+            return null;
+        }
+
+        Object rawBinding = redisUtils.get(buildUserBindingKey(openid));
+        if (!(rawBinding instanceof String bindingValue) || StrUtil.isBlank(bindingValue)) {
+            return null;
+        }
+        return parseBindingValue(bindingValue);
+    }
+
+    /**
+     * 将顾客加入桌次成员集合
+     *
+     * @author Henfon
+     * @date 2026-07-11
+     * @description 同桌多人共享同一桌次时，通过集合记录当前仍在该桌的顾客。
+     * @param openid 顾客openid
+     * @param tableId 桌台ID
+     * @param sessionCode 桌次编码
+     */
+    private void addUserToSession(String openid, Long tableId, String sessionCode) {
+        redisUtils.sAdd(buildSessionMembersKey(tableId, sessionCode), openid);
+    }
+
+    /**
+     * 从旧桌次移除顾客
+     *
+     * @author Henfon
+     * @date 2026-07-11
+     * @description 顾客重绑到新桌时，从原桌次成员集合移除；若旧桌无人则自动结束旧桌当前桌次。
+     * @param openid 顾客openid
+     * @param bindingRef 旧桌次绑定
+     */
+    private void removeUserFromSession(String openid, TableBindingRef bindingRef) {
+        if (bindingRef == null || StrUtil.isBlank(openid)) {
+            return;
+        }
+
+        String sessionKey = buildSessionMembersKey(bindingRef.tableId, bindingRef.sessionCode);
+        redisTemplate.opsForSet().remove(sessionKey, openid);
+        redisUtils.delete(buildUserBindingKey(openid));
+
+        Set<Object> remainingMembers = redisUtils.sMembers(sessionKey);
+        boolean hasRemainingMembers = remainingMembers != null
+                && remainingMembers.stream()
+                .map(member -> StrUtil.trimToNull(member == null ? null : member.toString()))
+                .anyMatch(StrUtil::isNotBlank);
+        if (hasRemainingMembers) {
+            return;
+        }
+
+        redisUtils.delete(sessionKey);
+        closeSessionIfNoMember(bindingRef);
+    }
+
+    /**
+     * 结束无成员桌次
+     *
+     * @author Henfon
+     * @date 2026-07-11
+     * @description 仅当桌台仍挂着该桌次且处于占用中时，自动收掉当前桌次，避免下一批顾客继续看到旧单。
+     * @param bindingRef 空成员桌次绑定
+     */
+    private void closeSessionIfNoMember(TableBindingRef bindingRef) {
+        DiningTable table = getById(bindingRef.tableId);
+        if (table == null) {
+            return;
+        }
+
+        String currentSessionCode = StrUtil.trimToNull(table.getCurrentSessionCode());
+        if (!StrUtil.equals(currentSessionCode, bindingRef.sessionCode)) {
+            return;
+        }
+
+        if (!Integer.valueOf(STATUS_OCCUPIED).equals(table.getStatus())) {
+            log.info("桌次成员已清空，但桌台已进入收尾流程: tableCode={}, status={}, sessionCode={}",
+                    table.getCode(), table.getStatus(), bindingRef.sessionCode);
+            return;
+        }
+
+        // 最后一位顾客离开后，直接结束原桌当前桌次，避免新客扫码看到上一批订单。
+        doUpdateStatus(table, STATUS_FREE);
+        log.info("桌台最后一位顾客离桌，自动结束当前桌次: tableCode={}, sessionCode={}",
+                table.getCode(), bindingRef.sessionCode);
+    }
+
+    /**
+     * 清理桌次下的全部顾客绑定
+     *
+     * @author Henfon
+     * @date 2026-07-11
+     * @description 桌台恢复空闲时，同时回收该桌次对应的成员集合和顾客当前绑定。
+     * @param tableId 桌台ID
+     * @param sessionCode 桌次编码
+     */
+    private void clearSessionBindings(Long tableId, String sessionCode) {
+        String sessionKey = buildSessionMembersKey(tableId, sessionCode);
+        Set<Object> members = redisUtils.sMembers(sessionKey);
+        if (members != null) {
+            for (Object member : members) {
+                String openid = StrUtil.trimToNull(member == null ? null : member.toString());
+                if (StrUtil.isBlank(openid)) {
+                    continue;
+                }
+
+                TableBindingRef bindingRef = readUserBinding(openid);
+                if (bindingRef != null && bindingRef.matches(tableId, sessionCode)) {
+                    redisUtils.delete(buildUserBindingKey(openid));
+                }
+            }
+        }
+        redisUtils.delete(sessionKey);
+    }
+
+    /**
+     * 构建顾客绑定 Redis key
+     *
+     * @author Henfon
+     * @date 2026-07-11
+     * @description 使用 openid 作为单顾客维度索引，记录其当前所在桌次。
+     * @param openid 顾客openid
+     * @return Redis key
+     */
+    private String buildUserBindingKey(String openid) {
+        return TABLE_USER_BINDING_KEY_PREFIX + openid;
+    }
+
+    /**
+     * 构建桌次成员集合 Redis key
+     *
+     * @author Henfon
+     * @date 2026-07-11
+     * @description 通过桌台ID与桌次编码组合区分同一桌台的不同批顾客。
+     * @param tableId 桌台ID
+     * @param sessionCode 桌次编码
+     * @return Redis key
+     */
+    private String buildSessionMembersKey(Long tableId, String sessionCode) {
+        return TABLE_SESSION_MEMBERS_KEY_PREFIX + tableId + ":" + sessionCode;
+    }
+
+    /**
+     * 编码顾客绑定值
+     *
+     * @author Henfon
+     * @date 2026-07-11
+     * @description 采用轻量字符串格式存储桌台ID与桌次编码，减少额外序列化成本。
+     * @param tableId 桌台ID
+     * @param sessionCode 桌次编码
+     * @return 编码后的绑定值
+     */
+    private String encodeBindingValue(Long tableId, String sessionCode) {
+        return tableId + "#" + sessionCode;
+    }
+
+    /**
+     * 解析顾客绑定值
+     *
+     * @author Henfon
+     * @date 2026-07-11
+     * @description 将 Redis 中存储的桌台绑定字符串还原为结构化对象。
+     * @param bindingValue 绑定值
+     * @return 顾客桌次绑定
+     */
+    private TableBindingRef parseBindingValue(String bindingValue) {
+        if (StrUtil.isBlank(bindingValue)) {
+            return null;
+        }
+
+        String[] parts = bindingValue.split("#", 2);
+        if (parts.length < 2 || StrUtil.isBlank(parts[0]) || StrUtil.isBlank(parts[1])) {
+            return null;
+        }
+
+        try {
+            return new TableBindingRef(Long.valueOf(parts[0]), parts[1]);
+        } catch (NumberFormatException ex) {
+            log.warn("解析桌次绑定失败: value={}", bindingValue);
+            return null;
+        }
     }
 
     /**
@@ -819,6 +1225,30 @@ public class DiningTableServiceImpl extends ServiceImpl<DiningTableMapper, Dinin
             return Integer.MAX_VALUE;
         }
         return area.getSort();
+    }
+
+    /**
+     * 顾客当前桌次绑定
+     *
+     * @author Henfon
+     * @date 2026-07-11
+     * @description 保存顾客当前绑定的桌台ID与桌次编码，便于重绑时精准解绑旧桌次。
+     */
+    private static final class TableBindingRef {
+
+        private final Long tableId;
+        private final String sessionCode;
+
+        private TableBindingRef(Long tableId, String sessionCode) {
+            this.tableId = tableId;
+            this.sessionCode = sessionCode;
+        }
+
+        private boolean matches(Long targetTableId, String targetSessionCode) {
+            return tableId != null
+                    && tableId.equals(targetTableId)
+                    && StrUtil.equals(sessionCode, StrUtil.trimToNull(targetSessionCode));
+        }
     }
 
     /**

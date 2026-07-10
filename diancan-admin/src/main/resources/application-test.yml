@@ -26,38 +26,69 @@ logging:
     com.scaffold: info
     org.springframework: warn
 
+# 发券 MQ 配置（测试环境）
+coupon:
+  grant:
+    mq:
+      # 是否启用发券 MQ；需要联调发券链路时保持开启
+      enabled: true
+
 # MinIO 文件上传配置（测试环境）
 storage:
   minio:
+    # 是否启用 MinIO 文件存储
     enabled: ${MINIO_ENABLED:false}
+    # MinIO 服务访问地址；私有桶模式下返回给前端的预签名 URL 会基于这里生成
     endpoint: ${MINIO_ENDPOINT:http://127.0.0.1:9000}
+    # MinIO Access Key
     access-key: ${MINIO_ACCESS_KEY:minioadmin}
+    # MinIO Secret Key
     secret-key: ${MINIO_SECRET_KEY:minioadmin}
+    # 存储桶名称
     bucket: ${MINIO_BUCKET:dish-images}
+    # 公网访问基地址；公共桶或直链回退时使用
     public-url: ${MINIO_PUBLIC_URL:http://127.0.0.1:9000}
+    # 桶不存在时是否自动创建
     auto-create-bucket: ${MINIO_AUTO_CREATE_BUCKET:true}
+    # 上传文件大小上限，单位 MB
     max-file-size-mb: ${MINIO_MAX_FILE_SIZE_MB:5}
+    # 是否按私有桶处理；true 返回预签名地址，false 返回直链
     private-bucket: ${MINIO_PRIVATE_BUCKET:true}
+    # 预签名地址有效期，单位秒
     presign-expire-seconds: ${MINIO_PRESIGN_EXPIRE_SECONDS:3600}
 
-# 微信小程序码配置（测试环境）
+# 微信小程序配置（测试环境）
 wechat:
   miniapp:
+    # 是否启用微信小程序相关能力
     enabled: ${WECHAT_MINIAPP_ENABLED:false}
+    # 小程序 AppID
     app-id: ${WECHAT_MINIAPP_APP_ID:}
+    # 小程序 AppSecret
     app-secret: ${WECHAT_MINIAPP_APP_SECRET:}
+    # 生成小程序码时默认打开的页面
     page: ${WECHAT_MINIAPP_PAGE:pages/index/index}
+    # 小程序码环境版本：develop/trial/release
     env-version: ${WECHAT_MINIAPP_ENV_VERSION:trial}
+    # 小程序码宽度，单位 px
     width: ${WECHAT_MINIAPP_WIDTH:430}
 
 # 微信支付配置（测试环境）
 wx:
   pay:
+    # 是否启用微信支付
     enabled: ${WX_PAY_ENABLED:false}
+    # 微信支付应用 AppID
     app-id: ${WX_PAY_APP_ID:}
+    # 微信商户号
     mch-id: ${WX_PAY_MCH_ID:}
+    # 商户平台 APIv3 密钥
     api-v3-key: ${WX_PAY_API_V3_KEY:}
+    # 商户证书序列号
     merchant-serial-no: ${WX_PAY_MERCHANT_SERIAL_NO:}
+    # 商户 API 证书私钥文件路径
     private-key-path: ${WX_PAY_PRIVATE_KEY_PATH:}
+    # 微信支付平台公钥文件路径
     public-key-path: ${WX_PAY_PUBLIC_KEY_PATH:}
+    # 支付结果异步通知地址
     notify-url: ${WX_PAY_NOTIFY_URL:http://localhost:8080/api/wx/pay/notify}

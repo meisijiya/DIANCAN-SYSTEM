@@ -258,4 +258,117 @@ class DineInFlowIntegrationTest {
         assertNotEquals(first.getId(), second.getId(), "当前管理端预订单重复提交应生成独立订单");
         assertNotEquals(first.getOrderNo(), second.getOrderNo(), "当前管理端预订单会生成新的订单编号");
     }
+
+    @Test
+    void bindCurrentUser_shouldKeepSharedSessionUntilLastMemberLeaves() {
+        final String suffix = String.valueOf(System.currentTimeMillis());
+        final String firstOpenid = "bind-openid-a-" + suffix;
+        final String secondOpenid = "bind-openid-b-" + suffix;
+        final String nextOpenid = "bind-openid-c-" + suffix;
+
+        DishCategoryCreateDTO categoryDTO = new DishCategoryCreateDTO();
+        categoryDTO.setName("绑定桌次分类-" + suffix);
+        dishCategoryService.createCategory(categoryDTO);
+        DishCategory category = dishCategoryService.list().stream()
+                .filter(c -> ("绑定桌次分类-" + suffix).equals(c.getName()))
+                .findFirst()
+                .orElseThrow();
+
+        DishCreateDTO dishDTO = new DishCreateDTO();
+        dishDTO.setCategoryId(category.getId());
+        dishDTO.setName("绑定桌次菜品-" + suffix);
+        dishDTO.setPrice(new BigDecimal("12.00"));
+        dishDTO.setImage("/test/bind-i.jpg");
+        dishDTO.setThumbnail("/test/bind-t.jpg");
+        dishDTO.setStock(-1);
+        dishService.createDish(dishDTO);
+        Dish dish = dishService.list().stream()
+                .filter(d -> ("绑定桌次菜品-" + suffix).equals(d.getName()))
+                .findFirst()
+                .orElseThrow();
+
+        TableCreateDTO fromTableDTO = new TableCreateDTO();
+        fromTableDTO.setCode("BF" + suffix.substring(Math.max(0, suffix.length() - 5)));
+        fromTableDTO.setName("绑定原桌-" + suffix);
+        fromTableDTO.setCapacity(4);
+        diningTableService.createTable(fromTableDTO);
+
+        TableCreateDTO toTableDTO = new TableCreateDTO();
+        toTableDTO.setCode("BT" + suffix.substring(Math.max(0, suffix.length() - 5)));
+        toTableDTO.setName("绑定目标桌-" + suffix);
+        toTableDTO.setCapacity(4);
+        diningTableService.createTable(toTableDTO);
+
+        TableCreateDTO anotherTableDTO = new TableCreateDTO();
+        anotherTableDTO.setCode("BU" + suffix.substring(Math.max(0, suffix.length() - 5)));
+        anotherTableDTO.setName("绑定后续桌-" + suffix);
+        anotherTableDTO.setCapacity(4);
+        diningTableService.createTable(anotherTableDTO);
+
+        DiningTable fromTable = diningTableService.list().stream()
+                .filter(t -> ("绑定原桌-" + suffix).equals(t.getName()))
+                .findFirst()
+                .orElseThrow();
+        DiningTable toTable = diningTableService.list().stream()
+                .filter(t -> ("绑定目标桌-" + suffix).equals(t.getName()))
+                .findFirst()
+                .orElseThrow();
+        DiningTable anotherTable = diningTableService.list().stream()
+                .filter(t -> ("绑定后续桌-" + suffix).equals(t.getName()))
+                .findFirst()
+                .orElseThrow();
+
+        DiningTableVO firstBind = diningTableService.bindCurrentUser(fromTable.getId(), firstOpenid);
+        DiningTableVO secondBind = diningTableService.bindCurrentUser(fromTable.getId(), secondOpenid);
+        String originalSessionCode = firstBind.getCurrentSessionCode();
+        assertNotNull(originalSessionCode, "首次绑定后应生成桌次编码");
+        assertEquals(originalSessionCode, secondBind.getCurrentSessionCode(), "同桌第二位顾客应加入同一桌次");
+
+        CartItemDTO firstCartItem = new CartItemDTO();
+        firstCartItem.setDishId(dish.getId());
+        firstCartItem.setQuantity(1);
+        cartService.addItem(firstOpenid, fromTable.getId(), firstCartItem);
+
+        OrderCreateDTO orderCreateDTO = new OrderCreateDTO();
+        orderCreateDTO.setTableId(fromTable.getId());
+        orderCreateDTO.setPaymentMode(1);
+        orderCreateDTO.setOrderType(0);
+        OrderVO originalOrder = orderService.createOrder(firstOpenid, orderCreateDTO);
+        assertEquals(fromTable.getId(), originalOrder.getTableId());
+        assertEquals(originalSessionCode, originalOrder.getTableSessionCode());
+
+        CartItemDTO secondCartItem = new CartItemDTO();
+        secondCartItem.setDishId(dish.getId());
+        secondCartItem.setQuantity(2);
+        secondCartItem.setRemark("原桌未提交菜品");
+        cartService.addItem(firstOpenid, fromTable.getId(), secondCartItem);
+
+        DiningTableVO firstRebind = diningTableService.bindCurrentUser(toTable.getId(), firstOpenid);
+        DiningTable afterFirstLeave = diningTableService.getById(fromTable.getId());
+        assertEquals(1, afterFirstLeave.getStatus(), "原桌仍有同桌顾客时，不应提前释放");
+        assertEquals(originalSessionCode, afterFirstLeave.getCurrentSessionCode(), "仍有人在桌时应保留原桌次");
+        assertEquals(1, orderService.getTableOrders(fromTable.getId()).size(), "仍有人在桌时原桌应继续返回当前桌次订单");
+
+        OrderVO storedOrder = orderService.getOrderDetail(originalOrder.getId());
+        assertEquals(fromTable.getId(), storedOrder.getTableId(), "顾客换到新桌后，旧订单不应迁移到新桌");
+        assertEquals(originalSessionCode, storedOrder.getTableSessionCode(), "旧订单应继续保留在原桌次");
+        assertNotEquals(originalSessionCode, firstRebind.getCurrentSessionCode(), "新桌应开启独立桌次");
+
+        CartVO newTableCart = cartService.getCart(firstOpenid, toTable.getId());
+        assertEquals(0, newTableCart.getTotalCount(), "新桌购物车应从空开始，不继承原桌未提交菜品");
+
+        diningTableService.bindCurrentUser(anotherTable.getId(), secondOpenid);
+
+        DiningTable releasedFromTable = diningTableService.getById(fromTable.getId());
+        assertEquals(0, releasedFromTable.getStatus(), "最后一位顾客离开后，原桌应恢复空闲");
+        assertNull(releasedFromTable.getCurrentSessionCode(), "最后一位顾客离开后，原桌桌次应清空");
+        assertTrue(orderService.getTableOrders(fromTable.getId()).isEmpty(), "原桌空出后，新客不应再看到上一批客人的订单");
+
+        DiningTableVO reopenedFromTable = diningTableService.bindCurrentUser(fromTable.getId(), nextOpenid);
+        assertNotNull(reopenedFromTable.getCurrentSessionCode(), "新客重新入桌时应生成新的桌次编码");
+        assertNotEquals(originalSessionCode, reopenedFromTable.getCurrentSessionCode(), "新一批客人应拿到新的桌次编码");
+
+        CartVO nextCustomerCart = cartService.getCart(nextOpenid, fromTable.getId());
+        assertEquals(0, nextCustomerCart.getTotalCount(), "新客人的购物车应为空");
+    }
 }

@@ -40,7 +40,19 @@ public interface DiningTableService extends IService<DiningTable> {
     void openTable(Long id);
 
     /**
-     * 换桌（原桌→空闲，目标桌→占用）
+     * 绑定当前顾客到指定桌台
+     *
+     * @author Henfon
+     * @date 2026-07-11
+     * @description 维护顾客与当前桌次的一对一关系，同桌多位顾客可共享同一桌次。
+     * @param id 桌台ID
+     * @param openid 当前顾客openid
+     * @return 绑定后的桌台信息
+     */
+    DiningTableVO bindCurrentUser(Long id, String openid);
+
+    /**
+     * 换桌（迁移原桌当前桌次到目标桌）
      *
      * @param fromId 原桌台ID
      * @param toId   目标桌台ID
