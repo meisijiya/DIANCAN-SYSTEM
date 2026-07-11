@@ -70,25 +70,16 @@
 
 .profile-hero {
   margin-top: 12rpx;
-  padding: 8rpx;
-  border-radius: 28rpx;
-  background:
-    linear-gradient(90deg, rgba(145, 22, 28, 0.98) 0%, rgba(148, 21, 29, 0.98) 54%, rgba(126, 18, 24, 0.98) 100%);
+  margin-left: 0;
+  margin-right: 0;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
   overflow: hidden;
 }
 
 .profile-hero::after {
-  content: '';
-  position: absolute;
-  right: 26rpx;
-  top: 10rpx;
-  width: 210rpx;
-  height: 210rpx;
-  border-radius: 28rpx;
-  background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.01));
-  opacity: 0.5;
-  transform: skew(-8deg);
+  content: none;
 }
 
 .profile-hero__banner-stage {
@@ -97,16 +88,16 @@
 }
 
 .profile-hero__banner-swiper {
-  height: 240rpx;
+  height: 256rpx;
 }
 
 .profile-hero__banner-card {
   position: relative;
-  height: 240rpx;
+  height: 256rpx;
   overflow: hidden;
-  border-radius: 24rpx;
+  border-radius: 0 0 32rpx 32rpx;
   background: rgba(255, 255, 255, 0.16);
-  box-shadow: 0 18rpx 32rpx rgba(77, 18, 17, 0.18);
+  box-shadow: 0 22rpx 36rpx rgba(77, 18, 17, 0.16);
 }
 
 .profile-hero__banner-image {
