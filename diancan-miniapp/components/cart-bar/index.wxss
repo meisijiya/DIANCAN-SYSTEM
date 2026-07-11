@@ -64,17 +64,20 @@
   flex-shrink: 0;
   width: 200rpx;
   height: 72rpx;
-  border-radius: 36rpx;
+  border-radius: 24rpx;
   font-size: 28rpx;
-  font-weight: 600;
-  background: #ddd;
-  color: #999;
+  font-weight: 700;
+  background: #f1ece8;
+  color: #b2a39d;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: none;
+  border: 1rpx solid rgba(189, 175, 169, 0.4);
+  box-sizing: border-box;
 }
 .cart-submit.active {
-  background: var(--primary);
-  color: #fff;
+  background: linear-gradient(180deg, #fff8f5 0%, #f8ecec 100%);
+  color: #8f1f24;
+  border-color: rgba(143, 31, 36, 0.16);
+  box-shadow: 0 8rpx 18rpx rgba(111, 23, 28, 0.06);
 }

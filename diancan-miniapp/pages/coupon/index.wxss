@@ -3,7 +3,7 @@
   position: relative;
   padding: 18rpx;
   background:
-    radial-gradient(circle at top right, rgba(119, 150, 106, 0.16), transparent 24%),
+    radial-gradient(circle at top right, rgba(143, 31, 36, 0.12), transparent 24%),
     radial-gradient(circle at bottom left, rgba(236, 219, 191, 0.22), transparent 30%),
     linear-gradient(180deg, #f8f5ee 0%, #f2eee5 48%, #ece7dc 100%);
 }
@@ -20,7 +20,7 @@
   right: -88rpx;
   width: 250rpx;
   height: 250rpx;
-  background: rgba(120, 155, 102, 0.18);
+  background: rgba(143, 31, 36, 0.14);
 }
 
 .page-glow-b {
@@ -36,8 +36,8 @@
   z-index: 2;
   padding: 22rpx;
   border-radius: 30rpx;
-  background: linear-gradient(145deg, #314a2d 0%, #5f7f52 55%, #7da06d 100%);
-  box-shadow: 0 24rpx 50rpx rgba(46, 66, 42, 0.18);
+  background: linear-gradient(145deg, #6f171c 0%, #8f1f24 55%, #a63339 100%);
+  box-shadow: 0 24rpx 50rpx rgba(111, 23, 28, 0.20);
 }
 
 .hero-chip {
@@ -105,14 +105,14 @@
   padding: 14rpx 24rpx;
   border-radius: 999rpx;
   background: rgba(255, 252, 247, 0.92);
-  color: #6d766c;
+  color: #7f6e69;
   font-size: 24rpx;
   font-weight: 700;
-  box-shadow: 0 12rpx 22rpx rgba(67, 72, 57, 0.05);
+  box-shadow: 0 12rpx 22rpx rgba(111, 23, 28, 0.06);
 }
 
 .tab-item.is-active {
-  background: linear-gradient(135deg, #5f7f52 0%, #48643f 100%);
+  background: linear-gradient(135deg, #8f1f24 0%, #6f171c 100%);
   color: #fff;
 }
 
@@ -131,8 +131,8 @@
   height: 88rpx;
   margin: 0 auto;
   border-radius: 28rpx;
-  background: #edf4e7;
-  color: #4c6842;
+  background: #f8ecec;
+  color: #8f1f24;
   font-size: 32rpx;
   font-weight: 800;
   display: flex;
@@ -142,7 +142,7 @@
 
 .empty-title {
   margin-top: 18rpx;
-  color: #22301f;
+  color: #231516;
   font-size: 34rpx;
   font-weight: 800;
 }
@@ -150,7 +150,7 @@
 .empty-desc {
   margin-top: 10rpx;
   font-size: 24rpx;
-  color: #788373;
+  color: #8f7f73;
 }
 
 .list {
@@ -180,14 +180,14 @@
 }
 
 .coupon-name {
-  color: #22301f;
+  color: #231516;
   font-size: 32rpx;
   font-weight: 800;
 }
 
 .coupon-rule {
   margin-top: 10rpx;
-  color: #4c6842;
+  color: #8f1f24;
   font-size: 26rpx;
 }
 
@@ -204,7 +204,7 @@
 }
 
 .coupon-value {
-  color: #628056;
+  color: #8f1f24;
   font-size: 36rpx;
   font-weight: 800;
 }

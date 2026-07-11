@@ -60,7 +60,7 @@
 
       <view class="order-card__foot">
         <view class="order-card__action ghost" bindtap="openOrderDetail" data-order-id="{{order.id}}">查看详情</view>
-        <button class="order-card__action primary" wx:if="{{order.status === 0}}" data-order-id="{{order.id}}" catchtap="goPayment">去支付</button>
+        <button class="order-card__action primary pay-action" wx:if="{{order.status === 0}}" data-order-id="{{order.id}}" catchtap="goPayment">去支付</button>
         <button class="order-card__action primary" wx:if="{{order.status === 1 && !order.reviewed}}" data-order-id="{{order.id}}" data-status="{{order.status}}" catchtap="goReview">去评价</button>
         <view class="order-card__done" wx:if="{{order.reviewed}}">已评价</view>
       </view>
@@ -129,7 +129,7 @@
 
         <view class="detail-actions">
           <button class="detail-actions__btn ghost" bindtap="closeOrderDetail">我知道了</button>
-          <button class="detail-actions__btn primary" wx:if="{{currentOrderDetail.status === 0}}" data-order-id="{{currentOrderDetail.id}}" catchtap="goPayment">去支付</button>
+          <button class="detail-actions__btn primary pay-action" wx:if="{{currentOrderDetail.status === 0}}" data-order-id="{{currentOrderDetail.id}}" catchtap="goPayment">去支付</button>
           <button class="detail-actions__btn primary" wx:if="{{currentOrderDetail.status === 1 && !currentOrderDetail.reviewed}}" data-order-id="{{currentOrderDetail.id}}" data-status="{{currentOrderDetail.status}}" catchtap="goReview">去评价</button>
         </view>
       </view>

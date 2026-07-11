@@ -22,9 +22,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 
 /**
- * 首页轮播图服务实现
+ * 小程序轮播图服务实现
  *
  * @author Henfon
  */
@@ -33,14 +34,21 @@ import java.util.List;
 @RequiredArgsConstructor
 public class HomeBannerServiceImpl implements HomeBannerService {
 
+    private static final String SCENE_HOME = "HOME";
+    private static final String SCENE_MENU_HERO = "MENU_HERO";
+    private static final String SCENE_PROFILE_HERO = "PROFILE_HERO";
+    private static final Set<String> SUPPORTED_SCENES = Set.of(SCENE_HOME, SCENE_MENU_HERO, SCENE_PROFILE_HERO);
+
     private final HomeBannerMapper homeBannerMapper;
     private final MinioStorageService minioStorageService;
 
     @Override
     public PageResult<HomeBannerVO> pageList(HomeBannerQueryDTO dto) {
         Page<HomeBanner> page = new Page<>(dto.getPageNum(), dto.getPageSize());
+        String queryScene = StrUtil.isNotBlank(dto.getScene()) ? normalizeScene(dto.getScene(), false) : null;
         LambdaQueryWrapper<HomeBanner> wrapper = new LambdaQueryWrapper<>();
         wrapper.like(StrUtil.isNotBlank(dto.getTitle()), HomeBanner::getTitle, dto.getTitle())
+                .eq(StrUtil.isNotBlank(queryScene), HomeBanner::getScene, queryScene)
                 .eq(dto.getStatus() != null, HomeBanner::getStatus, dto.getStatus())
                 .orderByAsc(HomeBanner::getSort)
                 .orderByDesc(HomeBanner::getCreateTime);
@@ -51,9 +59,11 @@ public class HomeBannerServiceImpl implements HomeBannerService {
     }
 
     @Override
-    public List<HomeBannerVO> listEnabled() {
+    public List<HomeBannerVO> listEnabled(String scene) {
+        String normalizedScene = normalizeScene(scene, true);
         LambdaQueryWrapper<HomeBanner> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(HomeBanner::getStatus, 1)
+                .eq(HomeBanner::getScene, normalizedScene)
                 .orderByAsc(HomeBanner::getSort)
                 .orderByDesc(HomeBanner::getCreateTime);
         return homeBannerMapper.selectList(wrapper).stream().map(this::toVO).toList();
@@ -67,8 +77,9 @@ public class HomeBannerServiceImpl implements HomeBannerService {
         HomeBanner banner = new HomeBanner();
         BeanUtil.copyProperties(dto, banner);
         banner.setImageUrl(minioStorageService.normalizeObjectKey(dto.getImageUrl()));
+        banner.setScene(normalizeScene(dto.getScene(), false));
         homeBannerMapper.insert(banner);
-        log.info("首页轮播图创建成功: id={}, title={}", banner.getId(), banner.getTitle());
+        log.info("轮播图创建成功: id={}, title={}, scene={}", banner.getId(), banner.getTitle(), banner.getScene());
     }
 
     @Override
@@ -82,10 +93,11 @@ public class HomeBannerServiceImpl implements HomeBannerService {
         exist.setImageUrl(minioStorageService.normalizeObjectKey(dto.getImageUrl()));
         exist.setActionType(dto.getActionType());
         exist.setTargetPath(dto.getTargetPath());
+        exist.setScene(normalizeScene(dto.getScene(), false));
         exist.setSort(dto.getSort());
         exist.setStatus(dto.getStatus());
         homeBannerMapper.updateById(exist);
-        log.info("首页轮播图更新成功: id={}", dto.getId());
+        log.info("轮播图更新成功: id={}, scene={}", dto.getId(), exist.getScene());
     }
 
     @Override
@@ -131,6 +143,32 @@ public class HomeBannerServiceImpl implements HomeBannerService {
         if (dto.getActionType() != null && dto.getActionType() != 0 && StrUtil.isBlank(dto.getTargetPath())) {
             throw new BusinessException(ResultCode.PARAM_ERROR, "配置跳转动作时必须填写跳转路径");
         }
+        normalizeScene(dto.getScene(), false);
+    }
+
+    /**
+     * 规范化投放位置
+     *
+     * @author Henfon
+     * @date 2026-07-11
+     * @description 统一校验并标准化轮播图投放位置；小程序查询未传时默认回落到首页位置。
+     * @param scene 原始投放位置
+     * @param useDefaultWhenBlank 空值时是否回落默认首页位置
+     * @return 规范化后的投放位置
+     */
+    private String normalizeScene(String scene, boolean useDefaultWhenBlank) {
+        String normalizedScene = StrUtil.trimToEmpty(scene).toUpperCase();
+        if (StrUtil.isBlank(normalizedScene)) {
+            if (useDefaultWhenBlank) {
+                return SCENE_HOME;
+            }
+            throw new BusinessException(ResultCode.PARAM_ERROR, "投放位置不能为空");
+        }
+
+        if (!SUPPORTED_SCENES.contains(normalizedScene)) {
+            throw new BusinessException(ResultCode.PARAM_ERROR, "投放位置不正确");
+        }
+        return normalizedScene;
     }
 
     /**

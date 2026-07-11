@@ -467,6 +467,7 @@ CREATE TABLE `home_banner`  (
   `image_url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '图片地址或对象键',
   `action_type` tinyint NOT NULL DEFAULT 0 COMMENT '操作类型（0无动作 1页面跳转 2切换Tab）',
   `target_path` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '跳转路径',
+  `scene` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'HOME' COMMENT '投放位置（HOME首页 MENU_HERO点餐页头图 PROFILE_HERO我的页头图）',
   `sort` int NOT NULL DEFAULT 0 COMMENT '排序',
   `status` tinyint NOT NULL DEFAULT 1 COMMENT '状态（0停用 1启用）',
   `create_by` bigint NULL DEFAULT NULL,
@@ -475,16 +476,16 @@ CREATE TABLE `home_banner`  (
   `update_time` datetime NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `deleted` tinyint NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`) USING BTREE,
-  INDEX `idx_home_banner_status_sort`(`status` ASC, `sort` ASC) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '首页轮播图表' ROW_FORMAT = Dynamic;
+  INDEX `idx_home_banner_scene_status_sort`(`scene` ASC, `status` ASC, `sort` ASC) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '小程序轮播图表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of home_banner
 -- ----------------------------
-INSERT INTO `home_banner` VALUES (2070529130667544578, '今日招牌推荐', '现点现做，人气主菜正在热卖', 'dish/a8200af054cf44b7a7c9f19006cfaccf.jpg', 0, '', 1, 1, 1, 1, '2026-06-26 23:26:28', '2026-06-26 23:30:47', 0);
-INSERT INTO `home_banner` VALUES (2070529230752026625, '热销必点清单', '经典热菜、凉菜搭配更省心', 'dish/b447369fc0ba476f84a5ed5397a81b6c.jpg', 0, '', 2, 1, 1, 1, '2026-06-26 23:26:52', '2026-06-26 23:30:47', 0);
-INSERT INTO `home_banner` VALUES (2070529297214967809, '到店福利专区', '新客优惠券、限时活动到首页就能看', 'dish/2005a32637824a52bcae014d59a9b72a.jpg', 0, '', 3, 1, 1, 1, '2026-06-26 23:27:08', '2026-06-26 23:30:47', 0);
-INSERT INTO `home_banner` VALUES (2070529366148354049, '饮品甜点上新', '正餐之后，再来一杯更舒服', 'dish/b4767478159745f5841aced71cb6a56a.jpg', 0, '', 4, 1, 1, 1, '2026-06-26 23:27:24', '2026-06-26 23:30:47', 0);
+INSERT INTO `home_banner` VALUES (2070529130667544578, '今日招牌推荐', '现点现做，人气主菜正在热卖', 'dish/a8200af054cf44b7a7c9f19006cfaccf.jpg', 0, '', 'HOME', 1, 1, 1, 1, '2026-06-26 23:26:28', '2026-06-26 23:30:47', 0);
+INSERT INTO `home_banner` VALUES (2070529230752026625, '热销必点清单', '经典热菜、凉菜搭配更省心', 'dish/b447369fc0ba476f84a5ed5397a81b6c.jpg', 0, '', 'HOME', 2, 1, 1, 1, '2026-06-26 23:26:52', '2026-06-26 23:30:47', 0);
+INSERT INTO `home_banner` VALUES (2070529297214967809, '到店福利专区', '新客优惠券、限时活动到首页就能看', 'dish/2005a32637824a52bcae014d59a9b72a.jpg', 0, '', 'HOME', 3, 1, 1, 1, '2026-06-26 23:27:08', '2026-06-26 23:30:47', 0);
+INSERT INTO `home_banner` VALUES (2070529366148354049, '饮品甜点上新', '正餐之后，再来一杯更舒服', 'dish/b4767478159745f5841aced71cb6a56a.jpg', 0, '', 'HOME', 4, 1, 1, 1, '2026-06-26 23:27:24', '2026-06-26 23:30:47', 0);
 
 -- ----------------------------
 -- Table structure for member_benefit_grant_log

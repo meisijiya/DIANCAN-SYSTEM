@@ -1,3 +1,4 @@
+const bannerApi = require('../../api/banner');
 const { isLoggedIn, wxLogin, phoneLogin } = require('../../utils/auth');
 const { KEYS, get, remove } = require('../../utils/storage');
 
@@ -7,7 +8,8 @@ Page({
     navBarHeight: 44,
     loggedIn: false,
     userInfo: null,
-    agreeProtocol: false
+    agreeProtocol: false,
+    banners: []
   },
 
   onLoad() {
@@ -15,9 +17,21 @@ Page({
   },
 
   onShow() {
+    this.loadBanners();
     const loggedIn = isLoggedIn();
     const userInfo = get(KEYS.USER_INFO) || null;
     this.setData({ loggedIn, userInfo });
+  },
+
+  async loadBanners() {
+    try {
+      const banners = await bannerApi.getBannerList('PROFILE_HERO');
+      this.setData({ banners: Array.isArray(banners) ? banners : [] });
+    } catch (err) {
+      if (!Array.isArray(this.data.banners) || this.data.banners.length === 0) {
+        this.setData({ banners: [] });
+      }
+    }
   },
 
   initNavBar() {
@@ -119,6 +133,21 @@ Page({
       content: '云点餐 — 智能堂食点单系统\n版本 1.0.0\n\n致力于为餐厅提供便捷的扫码点餐体验',
       showCancel: false
     });
+  },
+
+  openBanner(e) {
+    const banner = e.currentTarget.dataset.banner || {};
+    const targetPath = banner.targetPath || '';
+    const actionType = Number(banner.actionType || 0);
+
+    if (!targetPath || actionType === 0) return;
+
+    if (actionType === 2) {
+      wx.switchTab({ url: targetPath });
+      return;
+    }
+
+    wx.navigateTo({ url: targetPath });
   },
 
   clearCache() {

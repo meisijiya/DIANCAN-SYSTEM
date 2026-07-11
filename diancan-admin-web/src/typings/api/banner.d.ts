@@ -7,6 +7,7 @@ declare namespace Api {
       imageUrl: string;
       actionType: number;
       targetPath: string | null;
+      scene: string;
       sort: number;
       status: number;
       createTime: string;
@@ -15,6 +16,7 @@ declare namespace Api {
     interface HomeBannerQuery {
       title?: string;
       status?: number;
+      scene?: string;
       pageNum?: number;
       pageSize?: number;
     }
@@ -25,6 +27,7 @@ declare namespace Api {
       imageUrl: string;
       actionType: number;
       targetPath?: string;
+      scene: string;
       sort: number;
       status: number;
     }

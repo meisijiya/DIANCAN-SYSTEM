@@ -8,22 +8,33 @@
     </view>
   </view>
 
-  <view class="profile-hero">
-    <view class="profile-hero__content">
-      <view class="profile-hero__avatar-shell">
-        <view class="profile-hero__avatar-ring">
-          <view class="profile-hero__avatar">👤</view>
-        </view>
-      </view>
-      <view class="profile-hero__meta">
-        <view class="profile-hero__name">{{loggedIn ? (userInfo.phone || userInfo.mobile || '已登录用户') : '亲爱的用户'}}</view>
-        <view class="profile-hero__desc">{{loggedIn ? '已登录，可查看订单、优惠券和会员服务' : '登录后查看订单、优惠券与会员专属权益'}}</view>
-      </view>
+  <view class="profile-hero" wx:if="{{banners.length > 0}}">
+    <view class="profile-hero__banner-stage" wx:if="{{banners.length > 0}}">
+      <swiper
+        class="profile-hero__banner-swiper"
+        circular
+        autoplay
+        interval="4200"
+        duration="450"
+        indicator-dots
+        indicator-color="rgba(255, 243, 236, 0.24)"
+        indicator-active-color="#fff7f2"
+      >
+        <swiper-item wx:for="{{banners}}" wx:key="id">
+          <view class="profile-hero__banner-card" bindtap="openBanner" data-banner="{{item}}">
+            <image class="profile-hero__banner-image" src="{{item.imageUrl}}" mode="aspectFill" lazy-load />
+            <view class="profile-hero__banner-overlay"></view>
+            <view class="profile-hero__banner-copy">
+              <view class="profile-hero__banner-title">{{item.title}}</view>
+              <view class="profile-hero__banner-subtitle" wx:if="{{item.subtitle}}">{{item.subtitle}}</view>
+            </view>
+          </view>
+        </swiper-item>
+      </swiper>
     </view>
-    <view class="profile-hero__mark">我的</view>
   </view>
 
-  <view class="identity-card">
+  <view class="identity-card {{banners.length > 0 ? 'identity-card--overlap' : ''}}">
     <block wx:if="{{!loggedIn}}">
       <view class="identity-card__title">注册/登录</view>
       <view class="identity-card__desc">注册会员享受更多专属特权</view>
@@ -38,14 +49,6 @@
           <text class="agreement-link" catchtap="openPrivacyPolicy">《隐私政策》</text>
         </view>
       </view>
-      <button
-        class="identity-card__btn {{!agreeProtocol ? 'identity-card__btn--disabled' : ''}}"
-        disabled="{{!agreeProtocol}}"
-        open-type="getPhoneNumber"
-        bindgetphonenumber="handlePhoneLogin"
-      >
-        手机号快捷登录
-      </button>
     </block>
     <block wx:else>
       <view class="identity-card__title">会员已登录</view>
@@ -53,7 +56,18 @@
     </block>
   </view>
 
-  <view class="promo-banner">
+  <view class="login-section" wx:if="{{!loggedIn}}">
+    <button
+      class="identity-card__btn {{!agreeProtocol ? 'identity-card__btn--disabled' : ''}}"
+      disabled="{{!agreeProtocol}}"
+      open-type="getPhoneNumber"
+      bindgetphonenumber="handlePhoneLogin"
+    >
+      手机号快捷登录
+    </button>
+  </view>
+
+  <view class="promo-banner" wx:if="{{banners.length === 0}}">
     <view class="promo-banner__frame">
       <view class="promo-banner__copy">
         <view class="promo-banner__eyebrow">会员服务</view>

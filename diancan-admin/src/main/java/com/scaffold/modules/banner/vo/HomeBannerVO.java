@@ -23,6 +23,7 @@ public class HomeBannerVO implements Serializable {
     private String imageUrl;
     private Integer actionType;
     private String targetPath;
+    private String scene;
     private Integer sort;
     private Integer status;
     private LocalDateTime createTime;

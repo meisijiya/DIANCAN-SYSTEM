@@ -8,7 +8,7 @@ import lombok.EqualsAndHashCode;
 import java.io.Serial;
 
 /**
- * 首页轮播图实体
+ * 小程序轮播图实体
  *
  * @author Henfon
  */
@@ -44,6 +44,11 @@ public class HomeBanner extends BaseEntity {
      * 跳转路径
      */
     private String targetPath;
+
+    /**
+     * 投放位置（HOME首页 MENU_HERO点餐页头图 PROFILE_HERO我的页头图）
+     */
+    private String scene;
 
     /**
      * 排序

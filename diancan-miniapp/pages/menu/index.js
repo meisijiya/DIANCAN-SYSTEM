@@ -1,3 +1,4 @@
+const bannerApi = require('../../api/banner');
 const dishApi = require('../../api/dish');
 const cartApi = require('../../api/cart');
 const orderApi = require('../../api/order');
@@ -105,6 +106,7 @@ Page({
     loggedIn: false,
     tableCode: '',
     table: null,
+    banners: [],
     showTableInput: false,
     categories: [],
     categoryScrollIntoView: 'category-all',
@@ -147,6 +149,7 @@ Page({
   },
 
   onShow() {
+    this.loadBanners();
     const loggedIn = isLoggedIn();
     const table = get(KEYS.TABLE);
     const sceneTableCode = normalizeTableCode(this.data.tableCode);
@@ -260,6 +263,17 @@ Page({
       wx.showToast({ title: err.message || '桌台不存在', icon: 'none' });
     } finally {
       wx.hideLoading();
+    }
+  },
+
+  async loadBanners() {
+    try {
+      const banners = await bannerApi.getBannerList('MENU_HERO');
+      this.setData({ banners: Array.isArray(banners) ? banners : [] });
+    } catch (err) {
+      if (!Array.isArray(this.data.banners) || this.data.banners.length === 0) {
+        this.setData({ banners: [] });
+      }
     }
   },
 
@@ -733,6 +747,21 @@ Page({
       return;
     }
     wx.navigateTo({ url: '/pages/cart/index' });
+  },
+
+  openBanner(e) {
+    const banner = e.currentTarget.dataset.banner || {};
+    const targetPath = banner.targetPath || '';
+    const actionType = Number(banner.actionType || 0);
+
+    if (!targetPath || actionType === 0) return;
+
+    if (actionType === 2) {
+      wx.switchTab({ url: targetPath });
+      return;
+    }
+
+    wx.navigateTo({ url: targetPath });
   },
 
   noop() {},

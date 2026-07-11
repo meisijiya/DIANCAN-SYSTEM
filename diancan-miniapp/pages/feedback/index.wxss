@@ -53,6 +53,17 @@
 
 .submit-btn {
   margin-top: 22rpx;
+  background: linear-gradient(180deg, #fff8f5 0%, #f8ecec 100%) !important;
+  color: #8f1f24 !important;
+  border: 1rpx solid rgba(143, 31, 36, 0.16) !important;
+  box-shadow: 0 8rpx 18rpx rgba(111, 23, 28, 0.06) !important;
+}
+
+.submit-btn[disabled] {
+  background: #f1ece8 !important;
+  color: #b2a39d !important;
+  border-color: rgba(189, 175, 169, 0.4) !important;
+  box-shadow: none !important;
 }
 
 .history-head {
@@ -116,8 +127,8 @@
 }
 
 .item-status.is-done {
-  background: #e7ece8;
-  color: #5e6a65;
+  background: #f4e7e6;
+  color: #8b4a3f;
 }
 
 .item-time {

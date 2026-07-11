@@ -9,7 +9,7 @@ import com.scaffold.modules.banner.vo.HomeBannerVO;
 import java.util.List;
 
 /**
- * 首页轮播图服务
+ * 小程序轮播图服务
  *
  * @author Henfon
  */
@@ -32,9 +32,9 @@ public interface HomeBannerService {
      * @return 轮播图列表
      * @author Henfon
      * @date 2026-06-26
-     * @description 小程序首页查询启用状态的轮播图
+     * @description 按投放位置查询启用状态的轮播图，首页、点餐页和我的页各自独立配置。
      */
-    List<HomeBannerVO> listEnabled();
+    List<HomeBannerVO> listEnabled(String scene);
 
     /**
      * 创建轮播图

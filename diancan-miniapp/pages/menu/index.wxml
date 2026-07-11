@@ -2,15 +2,31 @@
   <view class="page-glow page-glow-a"></view>
   <view class="page-glow page-glow-b"></view>
   <view class="top-card">
-    <view class="menu-hero" style="padding-top: {{statusBarHeight + navBarHeight + 8}}px;">
-      <view class="menu-hero__topline">
-        <view class="menu-hero__title">{{tableDisplayCode}} · 点餐中</view>
-        <view class="hero-badge-row">
-          <view class="hero-badge">{{heroStatusText}}</view>
-        </view>
-        <view class="hero-count">{{cartSummary.totalCount}} 件已选</view>
+    <view class="menu-hero" style="padding-top: {{statusBarHeight + 6}}px;">
+      <view class="hero-banner-stage" wx:if="{{banners.length > 0}}">
+        <swiper
+          class="hero-banner-swiper"
+          circular
+          autoplay
+          interval="4200"
+          duration="450"
+          indicator-dots
+          indicator-color="rgba(255, 245, 240, 0.24)"
+          indicator-active-color="#fff7f2"
+        >
+          <swiper-item wx:for="{{banners}}" wx:key="id">
+            <view class="hero-banner-card" bindtap="openBanner" data-banner="{{item}}">
+              <image class="hero-banner-image" src="{{item.imageUrl}}" mode="aspectFill" lazy-load />
+              <view class="hero-banner-overlay"></view>
+              <view class="hero-banner-copy">
+                <view class="hero-banner-title">{{item.title}}</view>
+                <view class="hero-banner-subtitle" wx:if="{{item.subtitle}}">{{item.subtitle}}</view>
+              </view>
+            </view>
+          </swiper-item>
+        </swiper>
       </view>
-      <view class="menu-hero__desc">{{menuHeroTitle}}</view>
+
       <view class="hero-chip-row">
         <view class="hero-chip">今日可点 {{totalDishCount}} 道</view>
         <view class="hero-chip">点过 {{orderedDishCount}} 道</view>

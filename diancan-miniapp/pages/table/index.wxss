@@ -143,12 +143,15 @@
 }
 
 .login-btn {
+  width: 100%;
   margin-top: 22rpx;
 }
 
 .login-btn--disabled {
-  background: #d6d8dd !important;
-  color: #f8fafc !important;
+  background: #e6dad4 !important;
+  color: #887872 !important;
+  border-color: rgba(136, 120, 114, 0.28) !important;
+  box-shadow: none !important;
 }
 
 .input-box {

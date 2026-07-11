@@ -259,9 +259,18 @@
   height: 92rpx;
   border-radius: 28rpx;
   font-size: 32rpx;
-  background: linear-gradient(135deg, #07c160 0%, #06ad56 100%);
+  background: linear-gradient(180deg, #f4fcf7 0%, #e8f8ee 100%);
+  border: 1rpx solid rgba(7, 193, 96, 0.24);
+  color: #07c160;
   box-sizing: border-box;
-  box-shadow: 0 18rpx 36rpx rgba(7, 193, 96, 0.20);
+  box-shadow: 0 10rpx 22rpx rgba(7, 193, 96, 0.10);
+}
+
+.pay-btn[disabled] {
+  background: #eef4ef !important;
+  border-color: rgba(145, 173, 154, 0.4) !important;
+  color: #91ad9a !important;
+  box-shadow: none !important;
 }
 
 .pay-status {

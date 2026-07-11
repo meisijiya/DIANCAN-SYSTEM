@@ -51,6 +51,12 @@ public class HomeBannerCreateDTO implements Serializable {
     private String targetPath;
 
     /**
+     * 投放位置
+     */
+    @NotBlank(message = "投放位置不能为空")
+    private String scene;
+
+    /**
      * 排序
      */
     @NotNull(message = "排序不能为空")

@@ -101,7 +101,7 @@ Page({
 
   async loadBanners() {
     try {
-      const banners = await bannerApi.getBannerList();
+      const banners = await bannerApi.getBannerList('HOME');
       this.setData({ banners: Array.isArray(banners) ? banners : [] });
     } catch (err) {
       // 刷新失败时保留当前轮播，避免网络抖动或 URL 过期导致首页整块消失。

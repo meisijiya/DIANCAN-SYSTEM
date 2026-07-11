@@ -54,22 +54,25 @@
   width: 48rpx;
   height: 48rpx;
   border-radius: 50%;
-  background: var(--primary);
-  color: #fff;
+  background: linear-gradient(180deg, #fff8f5 0%, #f8ecec 100%);
+  color: #8f1f24;
+  border: 1rpx solid rgba(143, 31, 36, 0.16);
   font-size: 32rpx;
-  font-weight: 600;
+  font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
   line-height: 1;
   flex-shrink: 0;
+  box-sizing: border-box;
 }
 .add-btn:active {
-  background: var(--primary-dark);
+  background: linear-gradient(180deg, #fff4f0 0%, #f4e3e2 100%);
 }
 .add-btn.disabled {
-  background: #ccefd3;
-  color: #8cba94;
+  background: #f1ece8;
+  color: #b2a39d;
+  border-color: rgba(189, 175, 169, 0.4);
   font-size: 20rpx;
   width: auto;
   padding: 0 12rpx;

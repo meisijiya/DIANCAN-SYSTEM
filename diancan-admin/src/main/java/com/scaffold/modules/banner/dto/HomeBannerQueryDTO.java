@@ -27,6 +27,11 @@ public class HomeBannerQueryDTO implements Serializable {
     private Integer status;
 
     /**
+     * 投放位置
+     */
+    private String scene;
+
+    /**
      * 页码
      */
     private Long pageNum = 1L;

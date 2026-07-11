@@ -38,6 +38,7 @@ const previewImageUrl = ref('');
 const searchForm = ref<Api.Banner.HomeBannerQuery>({
   title: '',
   status: undefined,
+  scene: undefined,
   pageNum: 1,
   pageSize: 10
 });
@@ -48,12 +49,18 @@ const formModel = ref<Api.Banner.HomeBannerSubmit & { id?: number }>({
   imageUrl: '',
   actionType: 0,
   targetPath: '',
+  scene: 'HOME',
   sort: 0,
   status: 1
 });
 
-const statusOptions: SelectOption[] = [
+const searchStatusOptions: SelectOption[] = [
   { label: '全部', value: undefined },
+  { label: '启用', value: 1 },
+  { label: '停用', value: 0 }
+];
+
+const formStatusOptions: SelectOption[] = [
   { label: '启用', value: 1 },
   { label: '停用', value: 0 }
 ];
@@ -64,7 +71,34 @@ const actionOptions: SelectOption[] = [
   { label: '切换Tab', value: 2 }
 ];
 
+const searchSceneOptions: SelectOption[] = [
+  { label: '全部位置', value: undefined },
+  { label: '首页轮播', value: 'HOME' },
+  { label: '点餐页 HERO', value: 'MENU_HERO' },
+  { label: '我的页 HERO', value: 'PROFILE_HERO' }
+];
+
+const formSceneOptions: SelectOption[] = [
+  { label: '首页轮播', value: 'HOME' },
+  { label: '点餐页 HERO', value: 'MENU_HERO' },
+  { label: '我的页 HERO', value: 'PROFILE_HERO' }
+];
+
+const sceneLabelMap: Record<string, string> = {
+  HOME: '首页轮播',
+  MENU_HERO: '点餐页 HERO',
+  PROFILE_HERO: '我的页 HERO'
+};
+
 const columns: DataTableColumns<Api.Banner.HomeBanner> = [
+  {
+    title: '投放位置',
+    key: 'scene',
+    width: 130,
+    render(row) {
+      return sceneLabelMap[row.scene] || row.scene;
+    }
+  },
   { title: '标题', key: 'title', width: 170 },
   { title: '副标题', key: 'subtitle', width: 220 },
   {
@@ -135,16 +169,31 @@ async function loadData() {
   }
 }
 
-function resetForm() {
-  formModel.value = {
+function createDefaultFormModel(): Api.Banner.HomeBannerSubmit & { id?: number } {
+  return {
     title: '',
     subtitle: '',
     imageUrl: '',
     actionType: 0,
     targetPath: '',
+    scene: 'HOME',
     sort: 0,
     status: 1
   };
+}
+
+function normalizeNumberValue(value: unknown, fallback: number) {
+  const numericValue = Number(value);
+  return Number.isFinite(numericValue) ? numericValue : fallback;
+}
+
+function normalizeSceneValue(value: unknown) {
+  const normalizedValue = String(value || '').trim().toUpperCase();
+  return formSceneOptions.some(option => option.value === normalizedValue) ? normalizedValue : 'HOME';
+}
+
+function resetForm() {
+  formModel.value = createDefaultFormModel();
   previewImageUrl.value = '';
 }
 
@@ -161,10 +210,11 @@ function handleEdit(row: Api.Banner.HomeBanner) {
     title: row.title,
     subtitle: row.subtitle || '',
     imageUrl: row.imageUrl,
-    actionType: row.actionType,
+    actionType: normalizeNumberValue(row.actionType, 0),
     targetPath: row.targetPath || '',
-    sort: row.sort,
-    status: row.status
+    scene: normalizeSceneValue(row.scene),
+    sort: normalizeNumberValue(row.sort, 0),
+    status: normalizeNumberValue(row.status, 1)
   };
   previewImageUrl.value = row.imageUrl;
   showModal.value = true;
@@ -211,6 +261,7 @@ function handleReset() {
   searchForm.value = {
     title: '',
     status: undefined,
+    scene: undefined,
     pageNum: 1,
     pageSize: 10
   };
@@ -254,8 +305,8 @@ onMounted(() => {
       <div class="banner-hero__eyebrow">BANNER STUDIO</div>
       <div class="banner-hero__head">
         <div>
-          <h2 class="banner-hero__title">把首页轮播图做成一块可运营的内容陈列位</h2>
-          <p class="banner-hero__desc">适合管理主推活动、跳转入口和展示顺序，让首页内容发布和状态控制更直观。</p>
+          <h2 class="banner-hero__title">把小程序顶部轮播图做成可分位置运营的内容陈列位</h2>
+          <p class="banner-hero__desc">首页、点餐页 HERO、我的页 HERO 各自独立配置，活动投放和入口管理不会再互相串用。</p>
         </div>
         <div class="banner-hero__badge">
           <span>当前轮播数</span>
@@ -267,14 +318,19 @@ onMounted(() => {
     <NCard :bordered="false" class="banner-filter-card">
       <NForm :model="searchForm" label-placement="left" label-width="80">
         <NGrid :cols="24" :x-gap="18">
-          <NGi :span="8">
+          <NGi :span="6">
             <NFormItem label="标题">
               <NInput v-model:value="searchForm.title" placeholder="请输入标题关键词" clearable />
             </NFormItem>
           </NGi>
           <NGi :span="4">
             <NFormItem label="状态">
-              <NSelect v-model:value="searchForm.status" :options="statusOptions" clearable />
+              <NSelect v-model:value="searchForm.status" :options="searchStatusOptions" clearable />
+            </NFormItem>
+          </NGi>
+          <NGi :span="6">
+            <NFormItem label="位置">
+              <NSelect v-model:value="searchForm.scene" :options="searchSceneOptions" clearable />
             </NFormItem>
           </NGi>
           <NGi :span="8">
@@ -287,7 +343,7 @@ onMounted(() => {
       </NForm>
     </NCard>
 
-    <NCard :bordered="false" title="首页轮播图" class="banner-list-card">
+    <NCard :bordered="false" title="小程序轮播图" class="banner-list-card">
       <template #header-extra>
         <NButton type="primary" @click="handleAdd">新增轮播图</NButton>
       </template>
@@ -309,7 +365,12 @@ onMounted(() => {
       />
     </NCard>
 
-    <NModal v-model:show="showModal" preset="card" :title="isEdit ? '编辑轮播图' : '新增轮播图'" style="width: 680px">
+    <NModal
+      v-model:show="showModal"
+      preset="card"
+      :title="isEdit ? '编辑轮播图' : '新增轮播图'"
+      style="width: 760px; max-width: calc(100vw - 32px);"
+    >
       <NForm :model="formModel" label-placement="left" label-width="100">
         <NFormItem label="主标题">
           <NInput v-model:value="formModel.title" placeholder="例如：本周主推 / 新客到店礼" />
@@ -332,20 +393,25 @@ onMounted(() => {
             />
           </NSpace>
         </NFormItem>
-        <NGrid :cols="24" :x-gap="16">
-          <NGi :span="8">
+        <NGrid :cols="24" :x-gap="16" :y-gap="8">
+          <NGi :span="12">
+            <NFormItem label="投放位置">
+              <NSelect v-model:value="formModel.scene" :options="formSceneOptions" placeholder="请选择投放位置" />
+            </NFormItem>
+          </NGi>
+          <NGi :span="12">
             <NFormItem label="动作">
-              <NSelect v-model:value="formModel.actionType" :options="actionOptions" />
+              <NSelect v-model:value="formModel.actionType" :options="actionOptions" placeholder="请选择动作" />
             </NFormItem>
           </NGi>
-          <NGi :span="8">
+          <NGi :span="12">
             <NFormItem label="排序">
-              <NInputNumber v-model:value="formModel.sort" :min="0" style="width: 100%;" />
+              <NInputNumber v-model:value="formModel.sort" :min="0" placeholder="请输入排序值" style="width: 100%;" />
             </NFormItem>
           </NGi>
-          <NGi :span="8">
+          <NGi :span="12">
             <NFormItem label="状态">
-              <NSelect v-model:value="formModel.status" :options="statusOptions.filter(item => item.value !== undefined)" />
+              <NSelect v-model:value="formModel.status" :options="formStatusOptions" placeholder="请选择状态" />
             </NFormItem>
           </NGi>
         </NGrid>
@@ -465,4 +531,3 @@ html.dark .banner-list-card {
     inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 </style>
-
