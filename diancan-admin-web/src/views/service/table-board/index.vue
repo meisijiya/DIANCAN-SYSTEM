@@ -193,8 +193,8 @@ interface DrawerCartItem {
   remark: string;
 }
 
-const quickOrderForm = ref({ dishId: null as Api.Business.IdType | null, quantity: 1, remark: '' });
-const quickAddForm = ref({ dishId: null as Api.Business.IdType | null, quantity: 1, remark: '' });
+const quickOrderForm = ref({ dishId: null as Api.Business.IdType | null });
+const quickAddForm = ref({ dishId: null as Api.Business.IdType | null });
 const quickOrderCart = ref<DrawerCartItem[]>([]);
 const quickAddCart = ref<DrawerCartItem[]>([]);
 const receivedAmount = ref<number | null>(null);
@@ -238,8 +238,8 @@ const splitTotal = computed(() =>
 );
 
 function resetQuickForms() {
-  quickOrderForm.value = { dishId: null, quantity: 1, remark: '' };
-  quickAddForm.value = { dishId: null, quantity: 1, remark: '' };
+  quickOrderForm.value = { dishId: null };
+  quickAddForm.value = { dishId: null };
   drawerDishKeyword.value = '';
   activeDishCategoryId.value = null;
 }
@@ -269,24 +269,22 @@ function pushDishToCart(
   });
 }
 
-function addQuickOrderDish() {
-  if (!selectedQuickOrderDish.value || !quickOrderForm.value.dishId) {
-    message.warning('请选择菜品');
-    return;
-  }
-  pushDishToCart(quickOrderCart.value, selectedQuickOrderDish.value, quickOrderForm.value.quantity, quickOrderForm.value.remark.trim());
-  message.success(`已加入点单清单：${selectedQuickOrderDish.value.name} × ${quickOrderForm.value.quantity}`);
-  quickOrderForm.value = { dishId: null, quantity: 1, remark: '' };
-}
+function addDrawerDishToCart(mode: 'order' | 'add', dish: Api.Business.Dish) {
+  const isQuickOrder = mode === 'order';
+  const cart = isQuickOrder ? quickOrderCart.value : quickAddCart.value;
+  const quantity = 1;
+  const remark = '';
 
-function addQuickAddDishToCart() {
-  if (!selectedQuickAddDish.value || !quickAddForm.value.dishId) {
-    message.warning('请选择菜品');
+  pushDishToCart(cart, dish, quantity, remark);
+  message.success(`已加入${isQuickOrder ? '点单' : '加菜'}清单：${dish.name} × ${quantity}`);
+
+  // 保留当前菜品高亮，方便继续加同款。
+  if (isQuickOrder) {
+    quickOrderForm.value = { dishId: dish.id };
     return;
   }
-  pushDishToCart(quickAddCart.value, selectedQuickAddDish.value, quickAddForm.value.quantity, quickAddForm.value.remark.trim());
-  message.success(`已加入加菜清单：${selectedQuickAddDish.value.name} × ${quickAddForm.value.quantity}`);
-  quickAddForm.value = { dishId: null, quantity: 1, remark: '' };
+
+  quickAddForm.value = { dishId: dish.id };
 }
 
 function removeCartItem(cart: typeof quickOrderCart.value, index: number) {
@@ -312,9 +310,11 @@ async function loadDrawerDishes() {
 function selectDrawerDish(dish: Api.Business.Dish) {
   if (selectedTable.value?.status === 0) {
     quickOrderForm.value.dishId = dish.id;
+    addDrawerDishToCart('order', dish);
     return;
   }
   quickAddForm.value.dishId = dish.id;
+  addDrawerDishToCart('add', dish);
 }
 
 async function loadCurrentOrderDetail() {
@@ -883,7 +883,7 @@ onUnmounted(() => {
             <template v-else-if="drawerMode === 'order'">
               <div class="drawer-panel">
                 <div class="drawer-panel__title">{{ selectedTable?.status === 0 ? '快捷点单' : '快捷加菜' }}</div>
-                <div class="drawer-panel__desc">先筛分类、再搜菜名，直接点菜卡加入清单，适合高峰期快速补单。</div>
+                <div class="drawer-panel__desc">先筛分类、再搜菜名，直接点菜卡即可加入清单；数量统一在下方清单里调整。</div>
 
                 <div class="drawer-dish-browser">
                   <NInput
@@ -936,7 +936,7 @@ onUnmounted(() => {
                         v-else-if="String((selectedTable?.status === 0 ? quickOrderForm.dishId : quickAddForm.dishId)) === String(dish.id)"
                         class="drawer-dish-card__feedback"
                       >
-                        已选中，可在底部直接加入清单
+                        当前菜品，可继续点卡快速加入
                       </div>
                     </button>
                   </div>
@@ -953,18 +953,6 @@ onUnmounted(() => {
                       {{ (selectedTable?.status === 0 ? selectedQuickOrderDish : selectedQuickAddDish)?.categoryName }}
                     </NTag>
                   </div>
-
-                  <NSpace v-if="selectedTable?.status === 0" vertical :size="12" class="drawer-quick-compose__form">
-                    <NInputNumber v-model:value="quickOrderForm.quantity" :min="1" style="width: 100%;" />
-                    <NInput v-model:value="quickOrderForm.remark" placeholder="备注（可选）" />
-                    <NButton secondary type="primary" block class="drawer-quick-compose__button" @click="addQuickOrderDish">加入点单清单</NButton>
-                  </NSpace>
-
-                  <NSpace v-else vertical :size="12" class="drawer-quick-compose__form">
-                    <NInputNumber v-model:value="quickAddForm.quantity" :min="1" style="width: 100%;" />
-                    <NInput v-model:value="quickAddForm.remark" placeholder="备注（可选）" />
-                    <NButton secondary type="primary" block class="drawer-quick-compose__button" @click="addQuickAddDishToCart">加入加菜清单</NButton>
-                  </NSpace>
                 </div>
 
                 <div class="drawer-cart" v-if="selectedTable?.status === 0 ? quickOrderCart.length > 0 : quickAddCart.length > 0">
@@ -2194,17 +2182,6 @@ onUnmounted(() => {
   backdrop-filter: blur(8px);
 }
 
-.drawer-quick-compose__form {
-  margin-top: 12px;
-  padding: 14px;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.82);
-  border: 1px solid rgba(15, 111, 255, 0.1);
-  box-shadow:
-    0 14px 26px rgba(15, 57, 119, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.86);
-}
-
 .drawer-quick-compose__button {
   width: 100%;
 }
@@ -2659,14 +2636,6 @@ html.dark .drawer-order-items__item span {
 html.dark .drawer-quick-compose {
   background:
     linear-gradient(180deg, rgba(9, 13, 21, 0) 0%, rgba(9, 13, 21, 0.92) 16%, rgba(9, 13, 21, 0.98) 100%);
-}
-
-html.dark .drawer-quick-compose__form {
-  background: rgba(255, 255, 255, 0.04);
-  border-color: rgba(255, 255, 255, 0.08);
-  box-shadow:
-    0 16px 28px rgba(0, 0, 0, 0.24),
-    inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
 html.dark .drawer-dish-card--in-cart {

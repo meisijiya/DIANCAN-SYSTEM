@@ -1,5 +1,6 @@
 import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client/dist/sockjs';
+import { getServiceBaseURL } from '@/utils/service';
 
 /** WebSocket 消息结构（与后端 WsMessage 对应） */
 export interface WsMessage<T = any> {
@@ -25,8 +26,18 @@ const stompSubscriptions = new Map<string, { unsubscribe: () => void }>();
 
 /** 获取 WebSocket 连接地址 */
 function getWsUrl() {
-  // 直连后端 WebSocket 端点，不走 Vite proxy（SockJS 需要完整的 HTTP 握手）
-  return 'http://localhost:8080/api/ws';
+  const isHttpProxy = import.meta.env.DEV && import.meta.env.VITE_HTTP_PROXY === 'Y';
+  const { baseURL } = getServiceBaseURL(import.meta.env, isHttpProxy);
+
+  // 复用现有接口基地址规则，保证开发代理和部署环境都连接到同一后端。
+  const normalizedBaseURL = baseURL.replace(/\/+$/, '');
+  const wsPath = `${normalizedBaseURL}/ws`;
+
+  if (/^https?:\/\//i.test(wsPath)) {
+    return wsPath;
+  }
+
+  return new URL(wsPath.startsWith('/') ? wsPath : `/${wsPath}`, window.location.origin).toString();
 }
 
 /** 初始化 WebSocket 连接 */
@@ -60,6 +71,14 @@ export function connectWebSocket() {
 
   client.onStompError = (frame) => {
     console.error('[WS] STOMP 错误:', frame.headers.message);
+  };
+
+  client.onWebSocketError = (event) => {
+    console.error('[WS] 底层连接异常:', event);
+  };
+
+  client.onWebSocketClose = (event) => {
+    console.warn('[WS] 连接关闭:', event.code, event.reason || '无原因');
   };
 
   client.activate();

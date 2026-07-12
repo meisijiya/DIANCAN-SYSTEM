@@ -446,7 +446,8 @@ pnpm dev
 ### 5. 启动小程序端
 
 - 使用微信开发者工具导入 `diancan-miniapp`
-- 修改 `config/env.js` 为你本机的局域网地址
+- 开发者工具调试默认走 `http://127.0.0.1:8080`
+- 真机联调时，将 `diancan-miniapp/config/env.js` 中的 `REAL_DEVICE_API_HOST` 改成你本机的局域网地址
 - 编译运行
 
 ### 6. 验证访问
@@ -629,17 +630,19 @@ diancan-miniapp
 - `app.json`
 - `config/env.js`
 
-当前 `config/env.js` 中已经写了一个局域网地址示例，实际本地联调时需要改成你自己电脑可被手机访问的 IP。
+当前 `config/env.js` 默认对微信开发者工具使用 `127.0.0.1`，避免仓库里写死某一台电脑的内网 IP。
 
 例如：
 
 ```js
-apiHost: 'http://192.168.x.x:8080'
+const REAL_DEVICE_API_HOST = 'http://192.168.x.x:8080';
 ```
 
 注意：
 
-- 小程序联调**不要使用** `localhost`
+- 微信开发者工具可直接使用 `localhost / 127.0.0.1`
+- 真机联调**不要使用** `localhost`
+- 临时切换接口地址时，也可以在开发者工具 Console 执行 `wx.setStorageSync('diancan.devApiHost', 'http://192.168.x.x:8080')`，重启小程序后生效
 - 小程序登录接口依赖微信 `code` 和 `phoneCode`
 - 小程序支付能力依赖真实微信环境
 
@@ -795,7 +798,7 @@ http://localhost:9527
 
 1. 打开微信开发者工具
 2. 导入 `diancan-miniapp`
-3. 修改 `config/env.js`
+3. 如需真机联调，修改 `config/env.js` 中的 `REAL_DEVICE_API_HOST`
 4. 编译运行
 
 ## 开发环境访问地址
@@ -805,7 +808,7 @@ http://localhost:9527
 | 后端接口根地址 | `http://localhost:8080/api` |
 | 后端接口文档 | `http://localhost:8080/api/swagger-ui.html` |
 | 管理端 | `http://localhost:9527` |
-| 小程序接口前缀 | `http://<局域网IP>:8080/api/app` |
+| 小程序接口前缀 | `http://127.0.0.1:8080/api/app`（开发者工具） / `http://<局域网IP>:8080/api/app`（真机） |
 
 ## 推荐启动路径
 
@@ -822,7 +825,7 @@ http://localhost:9527
 1. 准备 MySQL、Redis、RocketMQ、MinIO
 2. 启动后端
 3. 启动管理端
-4. 修改小程序 `config/env.js`
+4. 如需真机联调，修改小程序 `config/env.js`
 5. 使用微信开发者工具运行小程序
 
 ## 当前仓库特点
@@ -939,8 +942,8 @@ README 不提供演示地址说明，因为当前仓库中没有现成的在线�
 
 优先检查：
 
-- `config/env.js` 是否写成了 `localhost`
-- 是否改成了你电脑局域网 IP
+- 微信开发者工具是否连到了 `127.0.0.1:8080`
+- 真机调试时 `REAL_DEVICE_API_HOST` 是否改成了你电脑局域网 IP
 - 手机和电脑是否在同一网络
 
 ### 5. 与支付、手机号登录相关的功能跑不通

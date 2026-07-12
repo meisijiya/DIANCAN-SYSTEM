@@ -1,6 +1,9 @@
 const { getBaseURL } = require('../config/env');
 const { KEYS, get } = require('./storage');
 
+const REQUEST_TIMEOUT = 10000;
+const NETWORK_ERROR_MESSAGE = '接口连接失败，请检查后端服务和小程序服务地址配置';
+
 function serializeQuery(params) {
   if (!params) return '';
   const query = Object.keys(params)
@@ -12,10 +15,20 @@ function serializeQuery(params) {
 
 function normalizeError(err) {
   if (typeof err === 'string') return new Error(err);
-  if (err instanceof Error) return err;
+  if (err instanceof Error) {
+    if (/timeout|timed out|connection|request:fail/i.test(err.message || '')) {
+      return new Error(NETWORK_ERROR_MESSAGE);
+    }
+    return err;
+  }
   if (err && typeof err === 'object') {
     const errMsg = err.errMsg || err.message || '';
-    if (errMsg) return new Error(String(errMsg));
+    if (errMsg) {
+      if (/timeout|timed out|connection|request:fail/i.test(errMsg)) {
+        return new Error(NETWORK_ERROR_MESSAGE);
+      }
+      return new Error(String(errMsg));
+    }
   }
   return new Error('请求失败');
 }
@@ -35,6 +48,7 @@ function requestRaw({ url, method = 'GET', data, params, header = {}, withPrefix
         ...(token ? { Authorization: token } : {}),
         ...header
       },
+      timeout: REQUEST_TIMEOUT,
       success: (res) => {
         const payload = res.data || {};
         if (res.statusCode < 200 || res.statusCode >= 300) {
@@ -47,7 +61,10 @@ function requestRaw({ url, method = 'GET', data, params, header = {}, withPrefix
         }
         resolve(payload);
       },
-      fail: (err) => reject(normalizeError(err))
+      fail: (err) => {
+        console.error('小程序请求失败', { url: fullUrl, err });
+        reject(normalizeError(err));
+      }
     });
   });
 }
