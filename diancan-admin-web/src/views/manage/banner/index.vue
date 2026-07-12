@@ -99,8 +99,22 @@ const columns: DataTableColumns<Api.Banner.HomeBanner> = [
       return sceneLabelMap[row.scene] || row.scene;
     }
   },
-  { title: '标题', key: 'title', width: 170 },
-  { title: '副标题', key: 'subtitle', width: 220 },
+  {
+    title: '标题',
+    key: 'title',
+    width: 170,
+    render(row) {
+      return row.title || '-';
+    }
+  },
+  {
+    title: '副标题',
+    key: 'subtitle',
+    width: 220,
+    render(row) {
+      return row.subtitle || '-';
+    }
+  },
   {
     title: '图片',
     key: 'imageUrl',
@@ -220,10 +234,22 @@ function handleEdit(row: Api.Banner.HomeBanner) {
   showModal.value = true;
 }
 
+function handleSceneChange(value: string) {
+  formModel.value.scene = value;
+  if (value === 'PROFILE_HERO') {
+    formModel.value.title = '';
+    formModel.value.subtitle = '';
+  }
+}
+
 async function handleSubmit() {
   const payload = { ...formModel.value };
   if (payload.actionType === 0) {
     payload.targetPath = '';
+  }
+  if (payload.scene === 'PROFILE_HERO') {
+    payload.title = '';
+    payload.subtitle = '';
   }
 
   if (isEdit.value && formModel.value.id) {
@@ -372,12 +398,17 @@ onMounted(() => {
       style="width: 760px; max-width: calc(100vw - 32px);"
     >
       <NForm :model="formModel" label-placement="left" label-width="100">
-        <NFormItem label="主标题">
-          <NInput v-model:value="formModel.title" placeholder="例如：本周主推 / 新客到店礼" />
-        </NFormItem>
-        <NFormItem label="副标题">
-          <NInput v-model:value="formModel.subtitle" placeholder="例如：堂食人气菜、限时赠饮、下午茶时段" />
-        </NFormItem>
+        <template v-if="formModel.scene !== 'PROFILE_HERO'">
+          <NFormItem label="主标题">
+            <NInput v-model:value="formModel.title" placeholder="例如：本周主推 / 新客到店礼" />
+          </NFormItem>
+          <NFormItem label="副标题">
+            <NInput v-model:value="formModel.subtitle" placeholder="例如：堂食人气菜、限时赠饮、下午茶时段" />
+          </NFormItem>
+        </template>
+        <div v-else class="banner-scene-tip">
+          我的页 HERO 当前按纯图片展示，标题和副标题不会在小程序里显示。
+        </div>
         <NFormItem label="图片">
           <NSpace vertical :size="8" style="width: 100%;">
             <NUpload :show-file-list="false" :custom-request="handleUploadImage">
@@ -396,7 +427,12 @@ onMounted(() => {
         <NGrid :cols="24" :x-gap="16" :y-gap="8">
           <NGi :span="12">
             <NFormItem label="投放位置">
-              <NSelect v-model:value="formModel.scene" :options="formSceneOptions" placeholder="请选择投放位置" />
+              <NSelect
+                v-model:value="formModel.scene"
+                :options="formSceneOptions"
+                placeholder="请选择投放位置"
+                @update:value="handleSceneChange"
+              />
             </NFormItem>
           </NGi>
           <NGi :span="12">
@@ -510,6 +546,15 @@ onMounted(() => {
   width: 100%;
 }
 
+.banner-scene-tip {
+  margin-bottom: 18px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  color: color-mix(in srgb, var(--admin-accent-strong) 36%, #4c5c74);
+  background: rgba(var(--admin-accent-rgb), 0.08);
+  border: 1px dashed rgba(var(--admin-accent-rgb), 0.18);
+}
+
 html.dark .banner-hero {
   background:
     radial-gradient(circle at top right, rgba(var(--admin-accent-rgb), 0.16), transparent 24%),
@@ -529,5 +574,11 @@ html.dark .banner-list-card {
   box-shadow:
     0 24px 42px rgba(0, 0, 0, 0.3),
     inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+html.dark .banner-scene-tip {
+  color: rgba(214, 224, 244, 0.78);
+  background: rgba(var(--admin-accent-rgb), 0.12);
+  border-color: rgba(var(--admin-accent-rgb), 0.22);
 }
 </style>

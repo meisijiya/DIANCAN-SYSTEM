@@ -439,8 +439,8 @@ onUnmounted(() => {
         </NSpace>
       </NCard>
 
-      <NCard :bordered="false" class="table-selection-surface">
-        <div v-if="selectedTable && selectedTableStatusMeta" class="table-selection-card" :data-tone="selectedTableStatusMeta.tone">
+      <NCard v-if="selectedTable && selectedTableStatusMeta" :bordered="false" class="table-selection-surface">
+        <div class="table-selection-card" :data-tone="selectedTableStatusMeta.tone">
           <div class="table-selection-card__main">
             <div class="table-selection-card__eyebrow">ACTIVE TABLE</div>
             <div class="table-selection-card__title">
@@ -458,14 +458,6 @@ onUnmounted(() => {
           </div>
           <div v-if="selectedTableNoticeList.length" class="table-selection-card__alerts">
             <span v-for="notice in selectedTableNoticeList" :key="notice">{{ notice }}</span>
-          </div>
-        </div>
-        <div v-else class="table-selection-card table-selection-card--empty">
-          <div class="table-selection-card__eyebrow">ACTIVE TABLE</div>
-          <div class="table-selection-card__title">先选择桌台，再开始点单</div>
-          <div class="table-selection-card__meta">
-            <span>支持按区域、桌名和编号搜索</span>
-            <span>选中后会展示当前桌态和接待限制</span>
           </div>
         </div>
       </NCard>
@@ -704,10 +696,6 @@ onUnmounted(() => {
 
 .table-selection-card[data-tone='cleaning'] {
   --table-card-accent: var(--table-status-cleaning-accent);
-}
-
-.table-selection-card--empty {
-  grid-template-columns: 1fr;
 }
 
 .table-selection-card__main {

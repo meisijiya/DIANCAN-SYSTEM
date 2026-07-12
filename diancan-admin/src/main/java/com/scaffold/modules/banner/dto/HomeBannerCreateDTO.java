@@ -21,9 +21,8 @@ public class HomeBannerCreateDTO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 主标题
+     * 主标题（PROFILE_HERO 场景允许为空）
      */
-    @NotBlank(message = "主标题不能为空")
     private String title;
 
     /**

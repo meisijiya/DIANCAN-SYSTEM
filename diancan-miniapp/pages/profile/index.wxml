@@ -24,10 +24,6 @@
           <view class="profile-hero__banner-card" bindtap="openBanner" data-banner="{{item}}">
             <image class="profile-hero__banner-image" src="{{item.imageUrl}}" mode="aspectFill" lazy-load />
             <view class="profile-hero__banner-overlay"></view>
-            <view class="profile-hero__banner-copy">
-              <view class="profile-hero__banner-title">{{item.title}}</view>
-              <view class="profile-hero__banner-subtitle" wx:if="{{item.subtitle}}">{{item.subtitle}}</view>
-            </view>
           </view>
         </swiper-item>
       </swiper>

@@ -180,8 +180,12 @@ onMounted(() => {
     inset 0 1px 0 rgba(255, 255, 255, 0.82);
 }
 
+.member-hero :deep(.n-card__content) {
+  padding: 14px 22px;
+}
+
 .member-hero__eyebrow {
-  margin-bottom: 10px;
+  margin-bottom: 8px;
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.24em;
@@ -192,7 +196,7 @@ onMounted(() => {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  gap: 18px;
+  gap: 16px;
 }
 
 .member-hero__title {
@@ -203,14 +207,14 @@ onMounted(() => {
 
 .member-hero__desc {
   max-width: 760px;
-  margin: 10px 0 0;
-  line-height: 1.75;
+  margin: 8px 0 0;
+  line-height: 1.7;
   color: color-mix(in srgb, var(--admin-accent-strong) 28%, #44556f);
 }
 
 .member-hero__badge {
   min-width: 170px;
-  padding: 16px 18px;
+  padding: 12px 16px;
   border-radius: 18px;
   background: rgba(255, 255, 255, 0.78);
   border: 1px solid rgba(var(--admin-accent-rgb), 0.12);
@@ -224,7 +228,7 @@ onMounted(() => {
 
 .member-hero__badge strong {
   display: block;
-  margin-top: 8px;
+  margin-top: 6px;
   font-size: 28px;
   color: var(--admin-accent-strong);
 }
@@ -295,6 +299,22 @@ onMounted(() => {
 
 .search-actions {
   width: 100%;
+}
+
+@media (max-width: 960px) {
+  .member-hero :deep(.n-card__content) {
+    padding: 12px 18px;
+  }
+
+  .member-hero__head {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .member-hero__badge {
+    min-width: 0;
+    width: 100%;
+  }
 }
 
 html.dark .member-hero {

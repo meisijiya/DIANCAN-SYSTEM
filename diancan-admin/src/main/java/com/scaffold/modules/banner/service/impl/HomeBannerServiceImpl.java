@@ -76,6 +76,8 @@ public class HomeBannerServiceImpl implements HomeBannerService {
 
         HomeBanner banner = new HomeBanner();
         BeanUtil.copyProperties(dto, banner);
+        // 我的页 HERO 按纯图片投放时允许空标题，统一落库为空字符串以兼容表结构约束。
+        banner.setTitle(StrUtil.blankToDefault(dto.getTitle(), ""));
         banner.setImageUrl(minioStorageService.normalizeObjectKey(dto.getImageUrl()));
         banner.setScene(normalizeScene(dto.getScene(), false));
         homeBannerMapper.insert(banner);
@@ -88,7 +90,8 @@ public class HomeBannerServiceImpl implements HomeBannerService {
         HomeBanner exist = getBannerOrThrow(dto.getId());
         validateBanner(dto);
 
-        exist.setTitle(dto.getTitle());
+        // 我的页 HERO 按纯图片投放时允许空标题，统一落库为空字符串以兼容表结构约束。
+        exist.setTitle(StrUtil.blankToDefault(dto.getTitle(), ""));
         exist.setSubtitle(dto.getSubtitle());
         exist.setImageUrl(minioStorageService.normalizeObjectKey(dto.getImageUrl()));
         exist.setActionType(dto.getActionType());
@@ -134,16 +137,19 @@ public class HomeBannerServiceImpl implements HomeBannerService {
      * @param dto 轮播图参数
      * @author Henfon
      * @date 2026-06-26
-     * @description 校验跳转配置和排序字段，避免保存无效轮播图
+     * @description 校验轮播图场景、标题和跳转配置，避免保存无效轮播图
      */
     private void validateBanner(HomeBannerCreateDTO dto) {
+        String normalizedScene = normalizeScene(dto.getScene(), false);
         if (dto.getSort() == null || dto.getSort() < 0) {
             throw new BusinessException(ResultCode.PARAM_ERROR, "排序不能小于0");
+        }
+        if (!SCENE_PROFILE_HERO.equals(normalizedScene) && StrUtil.isBlank(dto.getTitle())) {
+            throw new BusinessException(ResultCode.PARAM_ERROR, "主标题不能为空");
         }
         if (dto.getActionType() != null && dto.getActionType() != 0 && StrUtil.isBlank(dto.getTargetPath())) {
             throw new BusinessException(ResultCode.PARAM_ERROR, "配置跳转动作时必须填写跳转路径");
         }
-        normalizeScene(dto.getScene(), false);
     }
 
     /**

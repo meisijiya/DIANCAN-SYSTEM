@@ -228,6 +228,21 @@ onUnmounted(() => {
 <template>
   <NSpin :show="loading">
     <NSpace vertical :size="12">
+      <NCard :bordered="false" class="kitchen-hero">
+        <div class="kitchen-hero__eyebrow">KITCHEN FLOW</div>
+        <div class="kitchen-hero__head">
+          <div>
+            <h2 class="kitchen-hero__title">把后厨任务、接单节奏和催单提醒放在一条制作流水线上</h2>
+            <p class="kitchen-hero__desc">适合后厨在忙时快速判断积压情况、自动接单状态和异常催单，不用额外切换任务视角。</p>
+          </div>
+          <div class="kitchen-hero__stats">
+            <div class="kitchen-hero__stat"><span>待制作</span><strong>{{ pendingCount }}</strong></div>
+            <div class="kitchen-hero__stat"><span>制作中</span><strong>{{ cookingCount }}</strong></div>
+            <div class="kitchen-hero__stat"><span>超时</span><strong>{{ overtimeCount }}</strong></div>
+          </div>
+        </div>
+      </NCard>
+
       <NCard :bordered="false">
         <NSpace align="center" justify="space-between" :wrap="true">
           <NSpace :size="20">
@@ -265,28 +280,6 @@ onUnmounted(() => {
           </NSpace>
         </NSpace>
       </NCard>
-
-      <NCard :bordered="false" class="kitchen-hero">
-        <div class="kitchen-hero__eyebrow">KITCHEN FLOW</div>
-        <div class="kitchen-hero__head">
-          <div>
-            <h2 class="kitchen-hero__title">把后厨任务、接单节奏和催单提醒放在一条制作流水线上</h2>
-            <p class="kitchen-hero__desc">适合后厨在忙时快速判断积压情况、自动接单状态和异常催单，不用额外切换任务视角。</p>
-          </div>
-          <div class="kitchen-hero__stats">
-            <div class="kitchen-hero__stat"><span>待制作</span><strong>{{ pendingCount }}</strong></div>
-            <div class="kitchen-hero__stat"><span>制作中</span><strong>{{ cookingCount }}</strong></div>
-            <div class="kitchen-hero__stat"><span>超时</span><strong>{{ overtimeCount }}</strong></div>
-          </div>
-        </div>
-      </NCard>
-
-      <div :class="['auto-accept-banner', autoAcceptEnabled ? 'is-on' : 'is-off']">
-        <div class="auto-accept-banner__dot" />
-        <div class="auto-accept-banner__text">
-          {{ autoAcceptEnabled ? '新堂食订单将自动进入制作中，无需手动接单。' : '当前需要后厨手动接单，新订单不会自动流转。' }}
-        </div>
-      </div>
 
       <NEmpty v-if="visibleTasks.length === 0" description="暂无后厨任务" />
 
@@ -377,45 +370,6 @@ onUnmounted(() => {
   background: #e9f2ff;
 }
 
-.auto-accept-banner {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 14px;
-  border-radius: 12px;
-  font-size: 13px;
-  border: 1px solid transparent;
-}
-
-.auto-accept-banner.is-on {
-  color: #2f8f6b;
-  background: linear-gradient(90deg, #edf7f1 0%, #f3faf5 100%);
-  border-color: #b7e1cc;
-}
-
-.auto-accept-banner.is-off {
-  color: #0f6fff;
-  background: linear-gradient(90deg, #e9f2ff 0%, #eef7ff 100%);
-  border-color: #bfd8ff;
-}
-
-.auto-accept-banner__dot {
-  width: 8px;
-  height: 8px;
-  flex-shrink: 0;
-  border-radius: 50%;
-  background: currentColor;
-  box-shadow: 0 0 10px currentColor;
-}
-
-.auto-accept-banner.is-on .auto-accept-banner__dot {
-  animation: auto-accept-pulse 1.8s ease-in-out infinite;
-}
-
-.auto-accept-banner__text {
-  line-height: 1.5;
-}
-
 @keyframes auto-accept-breathe {
   0%,
   100% {
@@ -426,19 +380,6 @@ onUnmounted(() => {
   50% {
     box-shadow: 0 0 0 6px rgba(34, 197, 94, 0.14);
     transform: translateY(-1px);
-  }
-}
-
-@keyframes auto-accept-pulse {
-  0%,
-  100% {
-    opacity: 0.75;
-    transform: scale(1);
-  }
-
-  50% {
-    opacity: 1;
-    transform: scale(1.18);
   }
 }
 
@@ -548,18 +489,6 @@ onUnmounted(() => {
 .kitchen-task-card__remark {
   margin-top: 4px;
   color: #c24141;
-}
-
-html.dark .auto-accept-banner.is-on {
-  color: #77d8a8;
-  background: linear-gradient(90deg, rgba(34, 197, 94, 0.16) 0%, rgba(34, 197, 94, 0.08) 100%);
-  border-color: rgba(34, 197, 94, 0.24);
-}
-
-html.dark .auto-accept-banner.is-off {
-  color: #dbe5ff;
-  background: linear-gradient(90deg, rgba(var(--admin-accent-rgb), 0.16) 0%, rgba(var(--admin-accent-rgb), 0.08) 100%);
-  border-color: rgba(var(--admin-accent-rgb), 0.24);
 }
 
 html.dark .kitchen-hero {
