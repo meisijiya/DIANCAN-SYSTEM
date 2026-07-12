@@ -3,7 +3,7 @@
   position: relative;
   padding: 18rpx;
   background:
-    radial-gradient(circle at top right, rgba(143, 31, 36, 0.12), transparent 24%),
+    radial-gradient(circle at top right, rgba(7, 193, 96, 0.12), transparent 24%),
     radial-gradient(circle at bottom left, rgba(236, 219, 191, 0.22), transparent 30%),
     linear-gradient(180deg, #f8f5ee 0%, #f2eee5 48%, #ece7dc 100%);
 }
@@ -20,7 +20,7 @@
   right: -88rpx;
   width: 250rpx;
   height: 250rpx;
-  background: rgba(143, 31, 36, 0.14);
+  background: rgba(7, 193, 96, 0.14);
 }
 
 .page-glow-b {
@@ -36,8 +36,8 @@
   z-index: 2;
   padding: 22rpx;
   border-radius: 30rpx;
-  background: linear-gradient(145deg, #6f171c 0%, #8f1f24 55%, #a63339 100%);
-  box-shadow: 0 24rpx 50rpx rgba(111, 23, 28, 0.20);
+  background: linear-gradient(145deg, #057a3d 0%, #07c160 55%, #18d071 100%);
+  box-shadow: 0 24rpx 50rpx rgba(5, 122, 61, 0.20);
 }
 
 .hero-chip {
@@ -108,11 +108,11 @@
   color: #7f6e69;
   font-size: 24rpx;
   font-weight: 700;
-  box-shadow: 0 12rpx 22rpx rgba(111, 23, 28, 0.06);
+  box-shadow: 0 12rpx 22rpx rgba(5, 122, 61, 0.06);
 }
 
 .tab-item.is-active {
-  background: linear-gradient(135deg, #8f1f24 0%, #6f171c 100%);
+  background: linear-gradient(135deg, #07c160 0%, #057a3d 100%);
   color: #fff;
 }
 
@@ -131,8 +131,8 @@
   height: 88rpx;
   margin: 0 auto;
   border-radius: 28rpx;
-  background: #f8ecec;
-  color: #8f1f24;
+  background: #e8f8ee;
+  color: #07c160;
   font-size: 32rpx;
   font-weight: 800;
   display: flex;
@@ -187,7 +187,7 @@
 
 .coupon-rule {
   margin-top: 10rpx;
-  color: #8f1f24;
+  color: #07c160;
   font-size: 26rpx;
 }
 
@@ -204,7 +204,7 @@
 }
 
 .coupon-value {
-  color: #8f1f24;
+  color: #07c160;
   font-size: 36rpx;
   font-weight: 800;
 }

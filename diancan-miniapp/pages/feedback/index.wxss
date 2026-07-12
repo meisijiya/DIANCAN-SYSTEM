@@ -53,10 +53,10 @@
 
 .submit-btn {
   margin-top: 22rpx;
-  background: linear-gradient(180deg, #fff8f5 0%, #f8ecec 100%) !important;
-  color: #8f1f24 !important;
-  border: 1rpx solid rgba(143, 31, 36, 0.16) !important;
-  box-shadow: 0 8rpx 18rpx rgba(111, 23, 28, 0.06) !important;
+  background: linear-gradient(180deg, #f5fcf8 0%, #e8f8ee 100%) !important;
+  color: #07c160 !important;
+  border: 1rpx solid rgba(7, 193, 96, 0.16) !important;
+  box-shadow: 0 8rpx 18rpx rgba(5, 122, 61, 0.06) !important;
 }
 
 .submit-btn[disabled] {

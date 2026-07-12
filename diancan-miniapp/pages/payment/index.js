@@ -86,6 +86,20 @@ Page({
         paySign: payData.paySign,
         success: resolve,
         fail: (err) => {
+          console.error('微信支付拉起失败', {
+            errMsg: err && err.errMsg,
+            errno: err && err.errno,
+            errCode: err && err.errCode,
+            raw: err,
+            payParams: {
+              appId: payData.appId,
+              timeStamp: String(payData.timeStamp),
+              nonceStr: payData.nonceStr,
+              packageValue: payData.packageValue,
+              signType: payData.signType || 'RSA',
+              paySignLength: payData.paySign ? String(payData.paySign).length : 0
+            }
+          });
           if (err && err.errMsg && err.errMsg.includes('cancel')) {
             reject(new Error('已取消支付'));
             return;

@@ -17,7 +17,7 @@
         interval="4200"
         duration="450"
         indicator-dots
-        indicator-color="rgba(255, 243, 236, 0.24)"
+        indicator-color="rgba(237, 249, 242, 0.24)"
         indicator-active-color="#fff7f2"
       >
         <swiper-item wx:for="{{banners}}" wx:key="id">

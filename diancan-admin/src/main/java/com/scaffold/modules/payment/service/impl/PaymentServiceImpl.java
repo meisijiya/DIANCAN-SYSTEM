@@ -842,7 +842,8 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentRecordMapper, Payment
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
             if (response.statusCode() < 200 || response.statusCode() >= 300) {
                 log.error("微信支付接口调用失败: status={}, body={}", response.statusCode(), response.body());
-                throw new BusinessException(ResultCode.PAYMENT_INIT_FAILED, "微信支付调用失败: HTTP " + response.statusCode());
+                throw new BusinessException(ResultCode.PAYMENT_INIT_FAILED,
+                        "微信支付调用失败: HTTP " + response.statusCode() + "，" + summarizeWechatError(response.body()));
             }
             return response.body();
         } catch (InterruptedException e) {
@@ -851,6 +852,34 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentRecordMapper, Payment
         } catch (IOException e) {
             throw new BusinessException(ResultCode.PAYMENT_INIT_FAILED, "微信支付请求失败: " + e.getMessage());
         }
+    }
+
+    /**
+     * 提取微信支付错误响应摘要
+     *
+     * @author Henfon
+     * @date 2026-07-12
+     * @description 从微信支付错误响应中提取 code/message，方便小程序和日志直接展示真实失败原因。
+     * @param responseBody 微信支付响应体
+     * @return 错误摘要
+     */
+    private String summarizeWechatError(String responseBody) {
+        if (isBlank(responseBody)) {
+            return "微信未返回错误详情";
+        }
+
+        try {
+            JsonNode node = OBJECT_MAPPER.readTree(responseBody);
+            String code = textOrNull(node, "code");
+            String message = textOrNull(node, "message");
+            if (!isBlank(code) || !isBlank(message)) {
+                return firstNonBlank(code, "UNKNOWN") + ": " + firstNonBlank(message, "微信未返回错误详情");
+            }
+        } catch (Exception e) {
+            log.warn("微信支付错误响应解析失败: {}", e.getMessage());
+        }
+
+        return responseBody.length() > 180 ? responseBody.substring(0, 180) + "..." : responseBody;
     }
 
     /**

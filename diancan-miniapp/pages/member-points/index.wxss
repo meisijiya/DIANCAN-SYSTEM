@@ -1,7 +1,9 @@
 .page {
   min-height: 100vh;
   padding: 24rpx;
-  background: linear-gradient(180deg, #f8f0e8 0%, #f1e7de 100%);
+  background:
+    radial-gradient(circle at top right, rgba(7, 193, 96, 0.10), transparent 24%),
+    linear-gradient(180deg, #f6fbf7 0%, #edf5ec 100%);
 }
 
 .record-list {
@@ -13,8 +15,8 @@
 .record-card {
   padding: 26rpx 24rpx;
   border-radius: 24rpx;
-  background: #fffaf6;
-  box-shadow: 0 14rpx 30rpx rgba(47, 31, 26, 0.06);
+  background: #fbfffb;
+  box-shadow: 0 14rpx 30rpx rgba(35, 67, 42, 0.06);
 }
 
 .record-head,

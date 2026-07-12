@@ -1,13 +1,13 @@
 .page {
-  --result-red: #8f1f24;
-  --result-red-deep: #6f171c;
+  --result-red: #07c160;
+  --result-red-deep: #057a3d;
   min-height: 100vh;
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   background:
-    radial-gradient(circle at top right, rgba(143, 31, 36, 0.10), transparent 24%),
+    radial-gradient(circle at top right, rgba(7, 193, 96, 0.10), transparent 24%),
     radial-gradient(circle at bottom left, rgba(236, 219, 191, 0.16), transparent 30%),
     linear-gradient(180deg, #fbf8f4 0%, #f2ede6 48%, #ece3db 100%);
   padding: 28rpx;
@@ -26,7 +26,7 @@
   right: -88rpx;
   width: 250rpx;
   height: 250rpx;
-  background: rgba(143, 31, 36, 0.14);
+  background: rgba(7, 193, 96, 0.14);
 }
 
 .page-glow-b {
@@ -62,7 +62,7 @@
 }
 
 .result-icon.success {
-  background: #f8ecec;
+  background: #e8f8ee;
   color: var(--result-red);
 }
 
@@ -188,7 +188,7 @@
   align-items: center;
   justify-content: center;
   border-radius: 24rpx;
-  background: #f8ecec;
+  background: #e8f8ee;
   color: var(--result-red);
   font-size: 26rpx;
   font-weight: 700;

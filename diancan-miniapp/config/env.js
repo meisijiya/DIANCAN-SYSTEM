@@ -1,5 +1,5 @@
 const DEVTOOLS_API_HOST = 'http://127.0.0.1:8080';
-const REAL_DEVICE_API_HOST = '';
+const REAL_DEVICE_API_HOST = 'https://2ee227a1.r22.cpolar.top';
 const DEV_API_HOST_STORAGE_KEY = 'diancan.devApiHost';
 
 const staticEnv = {

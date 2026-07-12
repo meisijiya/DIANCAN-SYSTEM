@@ -1,16 +1,16 @@
 .order-page {
-  --order-red: #8f1f24;
-  --order-red-deep: #6f171c;
+  --order-red: #07c160;
+  --order-red-deep: #057a3d;
   --order-cream: #f7f3ee;
   --order-card: #fffdfb;
-  --order-line: rgba(143, 31, 36, 0.08);
+  --order-line: rgba(7, 193, 96, 0.08);
   --order-text: #251819;
   --order-subtext: #8d7e78;
 
   min-height: 100vh;
   position: relative;
   background:
-    radial-gradient(circle at top right, rgba(143, 31, 36, 0.08), transparent 28%),
+    radial-gradient(circle at top right, rgba(7, 193, 96, 0.08), transparent 28%),
     linear-gradient(180deg, #fcfaf7 0%, var(--order-cream) 42%, #efe7df 100%);
   padding: 22rpx 22rpx 180rpx;
   box-sizing: border-box;
@@ -28,7 +28,7 @@
   right: -100rpx;
   width: 260rpx;
   height: 260rpx;
-  background: rgba(143, 31, 36, 0.12);
+  background: rgba(7, 193, 96, 0.12);
 }
 
 .order-page__glow-b {
@@ -62,13 +62,13 @@
   flex-shrink: 0;
   padding: 10rpx 18rpx;
   border-radius: 999rpx;
-  border: 1rpx solid rgba(143, 31, 36, 0.1);
+  border: 1rpx solid rgba(7, 193, 96, 0.1);
   background: rgba(255, 255, 255, 0.8);
-  color: #8f1f24;
+  color: #07c160;
   font-size: 20rpx;
   line-height: 1;
   text-align: center;
-  box-shadow: 0 8rpx 18rpx rgba(78, 43, 35, 0.04);
+  box-shadow: 0 8rpx 18rpx rgba(55, 84, 48, 0.04);
 }
 
 .order-stats {
@@ -82,7 +82,7 @@
   padding: 18rpx 14rpx;
   border-radius: 22rpx;
   background: rgba(255, 255, 255, 0.88);
-  box-shadow: 0 14rpx 28rpx rgba(78, 43, 35, 0.06);
+  box-shadow: 0 14rpx 28rpx rgba(55, 84, 48, 0.06);
   text-align: center;
 }
 
@@ -111,7 +111,7 @@
   padding: 22rpx;
   border-radius: 28rpx;
   background: var(--order-card);
-  box-shadow: 0 16rpx 30rpx rgba(78, 43, 35, 0.06);
+  box-shadow: 0 16rpx 30rpx rgba(55, 84, 48, 0.06);
 }
 
 .order-card__head,
@@ -187,7 +187,7 @@
   width: 94rpx;
   height: 94rpx;
   border-radius: 20rpx;
-  background: #efe6db;
+  background: #e6eee1;
   flex-shrink: 0;
 }
 
@@ -262,26 +262,26 @@
 
 .order-card__action.ghost,
 .detail-actions__btn.ghost {
-  color: var(--order-red);
-  background: linear-gradient(180deg, #fff8f5 0%, #f8ecec 100%);
-  border: 1rpx solid rgba(143, 31, 36, 0.14);
+  color: #07a857;
+  background: linear-gradient(180deg, #f5fcf8 0%, #e8f8ee 100%);
+  border: 1rpx solid rgba(7, 193, 96, 0.18);
 }
 
 .order-card__action.primary,
 .detail-actions__btn.primary,
 .order-empty__btn {
   color: var(--order-red);
-  background: linear-gradient(180deg, #fff8f5 0%, #f8ecec 100%);
-  border: 1rpx solid rgba(143, 31, 36, 0.16);
-  box-shadow: 0 8rpx 18rpx rgba(111, 23, 28, 0.06);
+  background: linear-gradient(180deg, #f5fcf8 0%, #e8f8ee 100%);
+  border: 1rpx solid rgba(7, 193, 96, 0.16);
+  box-shadow: 0 8rpx 18rpx rgba(5, 122, 61, 0.06);
 }
 
 .order-card__action.primary.pay-action,
 .detail-actions__btn.primary.pay-action {
-  color: #07c160;
-  background: linear-gradient(180deg, #f4fcf7 0%, #e8f8ee 100%);
-  border: 1rpx solid rgba(7, 193, 96, 0.24);
-  box-shadow: 0 8rpx 18rpx rgba(7, 193, 96, 0.10);
+  color: #ffffff;
+  background: linear-gradient(135deg, #07c160 0%, #06ad56 100%);
+  border: 1rpx solid rgba(7, 193, 96, 0.28);
+  box-shadow: 0 12rpx 26rpx rgba(7, 193, 96, 0.18);
 }
 
 .order-card__done {
@@ -342,14 +342,14 @@
   padding: 22rpx 24rpx;
   border-radius: 24rpx;
   background: rgba(255, 255, 255, 0.92);
-  box-shadow: 0 14rpx 24rpx rgba(78, 43, 35, 0.06);
+  box-shadow: 0 14rpx 24rpx rgba(55, 84, 48, 0.06);
   color: var(--order-text);
   font-size: 25rpx;
   font-weight: 700;
 }
 
 .order-bottom__entry--accent {
-  background: linear-gradient(180deg, rgba(143, 31, 36, 0.96) 0%, rgba(111, 23, 28, 0.96) 100%);
+  background: linear-gradient(180deg, rgba(7, 193, 96, 0.96) 0%, rgba(5, 122, 61, 0.96) 100%);
   color: #fff8f3;
 }
 
@@ -361,7 +361,7 @@
   position: fixed;
   inset: 0;
   z-index: 100;
-  background: rgba(25, 15, 16, 0.52);
+  background: rgba(13, 31, 20, 0.52);
 }
 
 .detail-sheet {
@@ -394,7 +394,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f7efec;
+  background: #eef7ed;
   color: var(--order-red);
   font-size: 30rpx;
 }
@@ -405,7 +405,7 @@
   margin-top: 18rpx;
   padding: 20rpx;
   border-radius: 24rpx;
-  background: #fbf7f4;
+  background: #f7fbf4;
 }
 
 .detail-banner__status {

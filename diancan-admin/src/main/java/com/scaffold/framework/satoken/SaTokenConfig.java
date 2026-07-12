@@ -1,9 +1,10 @@
 package com.scaffold.framework.satoken;
 
+import cn.dev33.satoken.context.SaHolder;
 import cn.dev33.satoken.interceptor.SaInterceptor;
-import cn.dev33.satoken.router.SaRouter;
 import cn.dev33.satoken.stp.StpUtil;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -21,6 +22,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  */
 @Configuration
 public class SaTokenConfig implements WebMvcConfigurer {
+
+    private static final AntPathMatcher PATH_MATCHER = new AntPathMatcher();
 
     /**
      * 公开访问路径（无需任何鉴权）
@@ -58,27 +61,47 @@ public class SaTokenConfig implements WebMvcConfigurer {
 
     /**
      * 注册 Sa-Token 拦截器
+     *
+     * @author Henfon
+     * @date 2026-07-12
+     * @description 使用统一的公开路径匹配逻辑处理鉴权，确保扫码桌台等匿名接口按预期放行。
      */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new SaInterceptor(handle -> {
-            // 1. /admin/** 管理端路径：后台登录鉴权
-            SaRouter.match("/admin/**")
-                    .notMatch(PUBLIC_PATHS)
-                    .check(r -> StpUtil.checkLogin());
+            final String requestPath = SaHolder.getRequest().getRequestPath();
 
-            // 2. /app/** 小程序端路径：小程序登录鉴权
-            //    当前阶段使用 StpUtil.checkLogin()，后续小程序登录模块会通过 openid 创建 Sa-Token session
-            SaRouter.match("/app/**")
-                    .notMatch(PUBLIC_PATHS)
-                    .check(r -> StpUtil.checkLogin());
+            // 公开接口直接放行，避免通配符路径在不同请求下出现误判。
+            if (isPublicPath(requestPath)) {
+                return;
+            }
 
-            // 3. 其他未匹配 /admin/ 或 /app/ 的路径：仍需登录校验
-            SaRouter.match("/**")
-                    .notMatch(PUBLIC_PATHS)
-                    .notMatch("/admin/**")
-                    .notMatch("/app/**")
-                    .check(r -> StpUtil.checkLogin());
+            // 其余接口沿用统一登录校验，保持管理端与小程序端现有行为不变。
+            StpUtil.checkLogin();
         })).addPathPatterns("/**");
+    }
+
+    /**
+     * 判断当前请求是否为公开路径
+     *
+     * @author Henfon
+     * @date 2026-07-12
+     * @description 使用 Ant 风格路径匹配公开接口，兼容桌台扫码等带路径变量的匿名访问场景。
+     * @param requestPath 当前请求路径
+     * @return true-公开访问；false-需要登录
+     */
+    private boolean isPublicPath(String requestPath) {
+        if (requestPath == null || requestPath.isBlank()) {
+            return false;
+        }
+
+        // 逐个匹配公开路径，保证 /app/table/*、/swagger-ui/** 等规则都能稳定命中。
+        for (String publicPath : PUBLIC_PATHS) {
+            if (PATH_MATCHER.match(publicPath, requestPath)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
