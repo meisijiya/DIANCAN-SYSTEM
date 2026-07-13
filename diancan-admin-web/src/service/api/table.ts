@@ -58,6 +58,11 @@ export function markTableClean(id: number) {
   return request<void>({ url: `/admin/table/${id}/clean`, method: 'put' });
 }
 
+/** 当前桌次全部结清后确认结台（占用 -> 待清洁） */
+export function checkoutTable(id: number) {
+  return request<void>({ url: `/admin/table/${id}/checkout`, method: 'put' });
+}
+
 /** 已结账推进为待清洁 */
 export function markTableToClean(id: number) {
   return request<void>({ url: `/admin/table/${id}/to-clean`, method: 'put' });

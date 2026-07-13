@@ -1,7 +1,9 @@
 package com.scaffold.modules.table.controller;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
+import com.scaffold.common.exception.BusinessException;
 import com.scaffold.common.result.Result;
+import com.scaffold.common.result.ResultCode;
 import com.scaffold.modules.table.dto.TableCreateDTO;
 import com.scaffold.modules.table.dto.TableUpdateDTO;
 import com.scaffold.modules.table.service.DiningTableService;
@@ -70,6 +72,24 @@ public class AdminTableController {
     @PutMapping("/{id}/clean")
     public Result<Void> markClean(@Parameter(description = "桌台ID") @PathVariable Long id) {
         diningTableService.markClean(id);
+        return Result.success();
+    }
+
+    /**
+     * 管理端确认结台
+     *
+     * @author Henfon
+     * @date 2026-07-13
+     * @description 校验当前桌次所有订单均已支付，再将桌台推进到待清洁状态。
+     * @param id 桌台ID
+     * @return 处理结果
+     */
+    @Operation(summary = "确认结台（占用→待清洁）")
+    @PutMapping("/{id}/checkout")
+    public Result<Void> checkout(@Parameter(description = "桌台ID") @PathVariable Long id) {
+        if (!diningTableService.checkoutTableIfSettled(id)) {
+            throw new BusinessException(ResultCode.ORDER_STATUS_ERROR, "当前桌次仍有待支付订单，请完成收款后再结台");
+        }
         return Result.success();
     }
 

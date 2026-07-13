@@ -46,14 +46,14 @@
   align-items: flex-end;
   justify-content: space-between;
   gap: 16rpx;
-  padding: 6rpx 4rpx 2rpx;
+  padding: 8rpx 4rpx 4rpx;
 }
 
 .order-topbar__title {
   color: var(--order-text);
   font-size: 42rpx;
   font-weight: 800;
-  line-height: 1.15;
+  line-height: 1.32;
   text-align: left;
   letter-spacing: 0.02em;
 }

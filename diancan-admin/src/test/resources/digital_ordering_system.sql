@@ -25,6 +25,24 @@ CREATE TABLE `dish_category` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='菜品分类表';
 
 -- ----------------------------
+-- 菜品分类默认规格关联表
+-- ----------------------------
+DROP TABLE IF EXISTS `dish_category_spec`;
+CREATE TABLE `dish_category_spec` (
+    `id` bigint NOT NULL COMMENT '关联ID',
+    `category_id` bigint NOT NULL COMMENT '分类ID',
+    `spec_group_id` bigint NOT NULL COMMENT '规格组ID',
+    `create_by` bigint DEFAULT NULL COMMENT '创建人',
+    `update_by` bigint DEFAULT NULL COMMENT '更新人',
+    `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `deleted` tinyint NOT NULL DEFAULT 0 COMMENT '删除标志（0未删除 1已删除）',
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uk_dish_category_spec` (`category_id`, `spec_group_id`),
+    KEY `idx_dish_category_spec_group_id` (`spec_group_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='分类默认规格关联表';
+
+-- ----------------------------
 -- 菜品表
 -- ----------------------------
 DROP TABLE IF EXISTS `dish`;
@@ -36,6 +54,7 @@ CREATE TABLE `dish` (
     `image` varchar(500) DEFAULT NULL COMMENT '图片URL',
     `thumbnail` varchar(500) DEFAULT NULL COMMENT '缩略图URL',
     `spice_level` tinyint NOT NULL DEFAULT 0 COMMENT '辣度标记（0不辣 1微辣 2中辣 3重辣）',
+    `spec_values` varchar(1000) DEFAULT NULL COMMENT '扩展规格值（JSON）',
     `ingredients` varchar(500) DEFAULT NULL COMMENT '配料列表（JSON数组）',
     `description` varchar(500) DEFAULT NULL COMMENT '简介',
     `status` tinyint NOT NULL DEFAULT 1 COMMENT '状态（0下架 1上架）',
@@ -51,6 +70,25 @@ CREATE TABLE `dish` (
     KEY `idx_category_id` (`category_id`),
     KEY `idx_status` (`status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='菜品表';
+
+-- ----------------------------
+-- 菜品规格映射表
+-- ----------------------------
+DROP TABLE IF EXISTS `dish_spec_mapping`;
+CREATE TABLE `dish_spec_mapping` (
+    `id` bigint NOT NULL COMMENT '映射ID',
+    `dish_id` bigint NOT NULL COMMENT '菜品ID',
+    `spec_group_id` bigint NOT NULL COMMENT '规格组ID',
+    `option_ids` varchar(500) NOT NULL COMMENT '规格值ID列表，逗号分隔',
+    `create_by` bigint DEFAULT NULL COMMENT '创建人',
+    `update_by` bigint DEFAULT NULL COMMENT '更新人',
+    `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `deleted` tinyint NOT NULL DEFAULT 0 COMMENT '删除标志（0未删除 1已删除）',
+    PRIMARY KEY (`id`),
+    KEY `idx_dish_spec_mapping_dish_id` (`dish_id`),
+    KEY `idx_dish_spec_mapping_group_id` (`spec_group_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='菜品规格映射表';
 
 -- ----------------------------
 -- 桌台区域表
@@ -109,7 +147,15 @@ CREATE TABLE `order` (
     `table_session_code` varchar(64) DEFAULT NULL COMMENT '桌次编码（冗余）',
     `original_amount` decimal(10,2) NOT NULL DEFAULT 0.00 COMMENT '原始总金额',
     `discount_rate` decimal(3,2) NOT NULL DEFAULT 1.00 COMMENT '折扣比例（默认1.00）',
+    `coupon_id` bigint DEFAULT NULL COMMENT '优惠券ID',
+    `coupon_name` varchar(100) DEFAULT NULL COMMENT '优惠券名称',
+    `coupon_type` tinyint DEFAULT NULL COMMENT '优惠券类型（1满减 2折扣）',
+    `coupon_threshold_amount` decimal(10,2) DEFAULT NULL COMMENT '优惠券门槛金额',
+    `coupon_discount_amount` decimal(10,2) DEFAULT NULL COMMENT '优惠券减免金额',
+    `coupon_discount_rate` decimal(4,2) DEFAULT NULL COMMENT '优惠券折扣比例',
     `actual_amount` decimal(10,2) NOT NULL DEFAULT 0.00 COMMENT '实付总金额',
+    `points_used` int NOT NULL DEFAULT 0 COMMENT '使用积分',
+    `points_discount_amount` decimal(10,2) NOT NULL DEFAULT 0.00 COMMENT '积分抵现金额',
     `paid_amount` decimal(10,2) NOT NULL DEFAULT 0.00 COMMENT '已支付金额（AA场景）',
     `status` tinyint NOT NULL DEFAULT 0 COMMENT '状态（0待支付 1已支付 2已取消）',
     `payment_mode` tinyint NOT NULL DEFAULT 1 COMMENT '支付模式（0餐前付 1餐后付）',
@@ -258,6 +304,25 @@ CREATE TABLE `printer_category_mapping` (
     UNIQUE KEY `uk_printer_category` (`printer_id`, `category_id`),
     KEY `idx_category_id` (`category_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='打印机-分类映射表';
+
+-- ----------------------------
+-- 系统配置表
+-- ----------------------------
+DROP TABLE IF EXISTS `sys_config`;
+CREATE TABLE `sys_config` (
+    `id` bigint NOT NULL COMMENT '配置ID',
+    `name` varchar(100) NOT NULL COMMENT '配置名称',
+    `config_key` varchar(100) NOT NULL COMMENT '配置键',
+    `config_value` varchar(500) DEFAULT NULL COMMENT '配置值',
+    `remark` varchar(255) DEFAULT NULL COMMENT '备注',
+    `create_by` bigint DEFAULT NULL COMMENT '创建人',
+    `update_by` bigint DEFAULT NULL COMMENT '更新人',
+    `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `deleted` tinyint NOT NULL DEFAULT 0 COMMENT '删除标志（0未删除 1已删除）',
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uk_config_key` (`config_key`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='系统配置表';
 
 -- ----------------------------
 -- 订单操作日志表

@@ -16,6 +16,7 @@ import {
   addOrderItem,
   cashPay,
   splitBill,
+  checkoutTable,
   releaseTable
 } from '@/service/api';
 import { connectWebSocket, subscribe } from '@/service/websocket';
@@ -236,6 +237,15 @@ const splitTotal = computed(() =>
     .filter(item => splitCheckedItemIds.value.includes(item.id))
     .reduce((sum, item) => sum + item.amount, 0)
 );
+const currentOrderRemainingAmount = computed(() => {
+  const actualAmount = currentOrderDetail.value?.actualAmount || 0;
+  const paidAmount = currentOrderDetail.value?.paidAmount || 0;
+  return Math.max(actualAmount - paidAmount, 0);
+});
+
+function isSameId(left: Api.Business.IdType | null | undefined, right: Api.Business.IdType | null | undefined) {
+  return String(left ?? '') === String(right ?? '');
+}
 
 function resetQuickForms() {
   quickOrderForm.value = { dishId: null };
@@ -326,7 +336,7 @@ async function loadCurrentOrderDetail() {
   const { data, error } = await fetchOrderDetail(targetOrder.id);
   if (!error && data) {
     currentOrderDetail.value = data;
-    receivedAmount.value = data.actualAmount;
+    receivedAmount.value = Math.max((data.actualAmount || 0) - (data.paidAmount || 0), 0);
     splitCheckedItemIds.value = [];
   }
 }
@@ -341,7 +351,7 @@ async function refreshDrawerData() {
       receivedAmount.value = null;
       return;
     }
-    const { data, error } = await fetchOrderList({ tableId: selectedTable.value.id, pageNum: 1, pageSize: 20 });
+    const { data, error } = await fetchOrderList({ tableId: selectedTable.value.id, pageNum: 1, pageSize: 200 });
     if (!error && data) {
       tableOrders.value = filterOrdersByCurrentSession(data.list || []);
       await loadCurrentOrderDetail();
@@ -354,7 +364,7 @@ async function refreshDrawerData() {
 async function syncSelectedTableStatus() {
   if (!selectedTable.value) return;
   await loadData();
-  const nextTable = tables.value.find(t => t.id === selectedTable.value?.id) || null;
+  const nextTable = tables.value.find(t => isSameId(t.id, selectedTable.value?.id)) || null;
   selectedTable.value = nextTable;
 }
 
@@ -375,8 +385,8 @@ async function handleTableClick(table: Api.Business.DiningTable) {
   await Promise.all([loadDrawerDishes(), refreshDrawerData()]);
 }
 
-async function loadData() {
-  loading.value = true;
+async function loadData(showLoading = true) {
+  if (showLoading) loading.value = true;
   try {
     const [{ data: tableData, error: tableError }, { data: areaData, error: areaError }] = await Promise.all([
       fetchTableList(),
@@ -385,7 +395,7 @@ async function loadData() {
     if (!tableError && tableData) tables.value = tableData;
     if (!areaError && areaData) areaList.value = areaData;
   } finally {
-    loading.value = false;
+    if (showLoading) loading.value = false;
   }
 }
 
@@ -397,7 +407,7 @@ async function handleReleaseTable(table: Api.Business.DiningTable) {
     if (!error) {
       message.success(`桌台 ${table.code} 已释放为空闲`);
       table.status = 0;
-      if (selectedTable.value?.id === table.id) {
+      if (isSameId(selectedTable.value?.id, table.id)) {
         drawerMode.value = 'order';
         await refreshDrawerData();
       }
@@ -501,11 +511,29 @@ async function handleQuickAddDish() {
 }
 
 async function handleQuickCheckout() {
-  if (!currentOrderDetail.value) {
+  if (!selectedTable.value || !currentOrderDetail.value) {
     message.warning('暂无可结账订单');
     return;
   }
-  if ((receivedAmount.value || 0) < currentOrderDetail.value.actualAmount) {
+
+  // 小程序已付清本桌全部订单时，管理端只需要确认结台，不再重复收款。
+  if (currentOrderDetail.value.status !== 0 || currentOrderRemainingAmount.value <= 0) {
+    actionLoading.value = true;
+    try {
+      const { error } = await checkoutTable(Number(selectedTable.value.id));
+      if (!error) {
+        message.success('结台成功，桌台已进入待清洁');
+        await syncSelectedTableStatus();
+        await refreshDrawerData();
+        drawerMode.value = 'overview';
+      }
+    } finally {
+      actionLoading.value = false;
+    }
+    return;
+  }
+
+  if ((receivedAmount.value || 0) < currentOrderRemainingAmount.value) {
     message.warning('收款金额不足');
     return;
   }
@@ -513,12 +541,16 @@ async function handleQuickCheckout() {
   try {
     const { error } = await cashPay({
       orderId: currentOrderDetail.value.id,
-      receivedAmount: receivedAmount.value || currentOrderDetail.value.actualAmount
+      receivedAmount: receivedAmount.value || currentOrderRemainingAmount.value
     });
     if (!error) {
-      message.success('结账成功');
       await syncSelectedTableStatus();
       await refreshDrawerData();
+      if (selectedTable.value?.status === 3) {
+        message.success('结账成功，桌台已进入待清洁');
+      } else {
+        message.success('本单收款成功，请继续处理本桌其他待支付订单');
+      }
       drawerMode.value = 'overview';
     }
   } finally {
@@ -567,11 +599,12 @@ async function handleQuickSplitCheckout() {
 /** WebSocket 桌台状态实时更新 */
 function handleTableStatus(msg: WsMessage<TableStatusData>) {
   const { tableId, newStatus } = msg.data;
-  const table = tables.value.find(t => t.id === tableId);
+  const table = tables.value.find(t => isSameId(t.id, tableId));
   if (table) table.status = newStatus;
-  if (selectedTable.value?.id === tableId) {
+  if (isSameId(selectedTable.value?.id, tableId)) {
     selectedTable.value.status = newStatus;
   }
+  void loadData(false);
 }
 
 let unsubscribe: (() => void) | null = null;
@@ -997,9 +1030,13 @@ onUnmounted(() => {
             <template v-else>
               <div class="drawer-panel" v-if="currentOrderDetail">
                 <div class="drawer-panel__title">快捷结账</div>
-                <div class="drawer-panel__desc">支持整单结账，也支持先勾选部分菜品做分单结账。</div>
+                <div class="drawer-panel__desc">
+                  {{ currentOrderDetail.status === 0
+                    ? '支持整单结账，也支持先勾选部分菜品做分单结账。'
+                    : '本桌当前桌次订单均已支付，确认结台后桌台将进入待清洁。' }}
+                </div>
 
-                <div class="drawer-mode-switch drawer-mode-switch--checkout" style="margin-top: 16px;">
+                <div v-if="currentOrderDetail.status === 0" class="drawer-mode-switch drawer-mode-switch--checkout" style="margin-top: 16px;">
                   <button class="drawer-mode-switch__item" :class="{ 'drawer-mode-switch__item--active': checkoutMode === 'full' }" @click="checkoutMode = 'full'">
                     整单结账
                   </button>
@@ -1013,13 +1050,22 @@ onUnmounted(() => {
                     <NDescriptionsItem label="订单号">{{ currentOrderDetail.orderNo }}</NDescriptionsItem>
                     <NDescriptionsItem label="订单状态">{{ orderStatusMap[currentOrderDetail.status] || '未知' }}</NDescriptionsItem>
                     <NDescriptionsItem label="原价">¥{{ currentOrderDetail.originalAmount?.toFixed(2) }}</NDescriptionsItem>
-                    <NDescriptionsItem :label="checkoutMode === 'full' ? '应付' : '已选小计'">
-                      ¥{{ (checkoutMode === 'full' ? currentOrderDetail.actualAmount : splitTotal).toFixed(2) }}
+                    <NDescriptionsItem :label="currentOrderDetail.status === 0 ? (checkoutMode === 'full' ? '待收' : '已选小计') : '支付状态'">
+                      <template v-if="currentOrderDetail.status === 0">
+                        ¥{{ (checkoutMode === 'full' ? currentOrderRemainingAmount : splitTotal).toFixed(2) }}
+                      </template>
+                      <NTag v-else type="success" size="small">已付清</NTag>
                     </NDescriptionsItem>
                   </NDescriptions>
                 </NCard>
 
-                <div v-if="checkoutMode === 'full'">
+                <div v-if="currentOrderDetail.status !== 0">
+                  <NButton type="warning" block style="margin-top: 16px;" @click="handleQuickCheckout">
+                    确认结台
+                  </NButton>
+                </div>
+
+                <div v-else-if="checkoutMode === 'full'">
                   <div class="checkout-amount">
                     <span>收款金额</span>
                     <NInputNumber v-model:value="receivedAmount" :min="0" :precision="2" style="width: 100%;">

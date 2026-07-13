@@ -40,6 +40,17 @@ public interface DiningTableService extends IService<DiningTable> {
     void openTable(Long id);
 
     /**
+     * 管理端结台
+     *
+     * @author Henfon
+     * @date 2026-07-13
+     * @description 当前桌次不存在待支付订单时，将桌台从占用态推进到待清洁态。
+     * @param id 桌台ID
+     * @return true 表示结台完成，false 表示当前桌次仍有待支付订单
+     */
+    boolean checkoutTableIfSettled(Long id);
+
+    /**
      * 绑定当前顾客到指定桌台
      *
      * @author Henfon

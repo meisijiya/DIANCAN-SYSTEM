@@ -239,6 +239,7 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentRecordMapper, Payment
             markRemainingOrderItemsPaid(order.getId());
             // 订单已全部支付后再执行会员结算，避免部分支付时重复累计。
             memberSettlementService.settleAfterOrderPaid(order.getId());
+            tryFinishTableAfterAdminCheckout(order, "CASH");
         }
 
         CashPayVO vo = new CashPayVO();
@@ -429,6 +430,7 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentRecordMapper, Payment
                     markRemainingOrderItemsPaid(order.getId());
                     // 分单场景下，最后一笔付清后再累计积分和成长值。
                     memberSettlementService.settleAfterOrderPaid(order.getId());
+                    tryFinishTableAfterAdminCheckout(order, "SPLIT_CASH");
                 }
             } else {
                 logOperation(order.getId(), "SPLIT_BILL", null,
@@ -1304,7 +1306,6 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentRecordMapper, Payment
 
             if (fullyPaid) {
                 couponService.markCouponUsed(latest.getId());
-                updateTableStatusAfterPaid(latest.getTableId());
             }
             return OrderPaymentApplyResult.applied(newPaid, actualAmount.subtract(newPaid), fullyPaid);
         }
@@ -1313,30 +1314,32 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentRecordMapper, Payment
     }
 
     /**
-     * 支付后更新桌台状态。
+     * 管理端收款完成后尝试结台。
      *
      * @author Henfon
-     * @date 2026-06-25
-     * @description 将堂食桌台从占用态推进到待清洁态。
+     * @date 2026-07-13
+     * @description 仅管理端结账场景触发；同桌次仍有待支付订单时保留占用状态，供继续收款或加菜。
+     * @param order 本次完成收款的订单
+     * @param paymentScene 管理端收款场景
      */
-    private void updateTableStatusAfterPaid(Long tableId) {
-        if (tableId == null) {
+    private void tryFinishTableAfterAdminCheckout(Order order, String paymentScene) {
+        if (order == null || order.getTableId() == null) {
             return;
         }
 
-        DiningTable table = diningTableService.getById(tableId);
-        if (table == null || table.getStatus() == null) {
-            return;
-        }
-
-        Integer status = table.getStatus();
-        if (status == 1) {
-            diningTableService.updateTableStatus(tableId, 2);
-            diningTableService.updateTableStatus(tableId, 3);
-        } else if (status == 2) {
-            diningTableService.updateTableStatus(tableId, 3);
-        } else if (status != 3) {
-            log.warn("支付后桌台状态无需流转: tableId={}, status={}", tableId, status);
+        try {
+            boolean settled = diningTableService.checkoutTableIfSettled(order.getTableId());
+            if (settled) {
+                log.info("管理端收款后结台完成: tableId={}, orderId={}, scene={}",
+                        order.getTableId(), order.getId(), paymentScene);
+                return;
+            }
+            log.info("管理端收款完成但当前桌次仍有待支付订单，桌台保持占用: tableId={}, orderId={}, scene={}",
+                    order.getTableId(), order.getId(), paymentScene);
+        } catch (Exception e) {
+            // 桌台收尾异常不能回滚已经成功的收款，保留桌态供管理端人工处理。
+            log.warn("管理端收款成功但自动结台失败: tableId={}, orderId={}, scene={}, msg={}",
+                    order.getTableId(), order.getId(), paymentScene, e.getMessage());
         }
     }
 
@@ -1413,7 +1416,24 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentRecordMapper, Payment
             markRemainingOrderItemsPaid(record.getOrderId());
             // 回调场景与现金/分单保持一致，只有整单付清后才做会员结算。
             memberSettlementService.settleAfterOrderPaid(record.getOrderId());
+            if (isAdminCheckoutPayment(record)) {
+                Order paidOrder = orderService.getById(record.getOrderId());
+                tryFinishTableAfterAdminCheckout(paidOrder, "NATIVE_QR");
+            }
         }
+    }
+
+    /**
+     * 判断微信支付是否来自管理端收款码。
+     *
+     * @author Henfon
+     * @date 2026-07-13
+     * @description 管理端 Native 支付记录不携带付款人 openid；小程序 JSAPI 支付记录始终携带 openid。
+     * @param record 支付记录
+     * @return true 表示管理端收款码支付，false 表示小程序订单支付
+     */
+    private boolean isAdminCheckoutPayment(PaymentRecord record) {
+        return record != null && isBlank(record.getPayerOpenid());
     }
 
     /**

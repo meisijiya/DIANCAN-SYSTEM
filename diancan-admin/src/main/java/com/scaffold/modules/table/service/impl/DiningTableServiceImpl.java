@@ -186,6 +186,59 @@ public class DiningTableServiceImpl extends ServiceImpl<DiningTableMapper, Dinin
     }
 
     /**
+     * 管理端结台
+     *
+     * @author Henfon
+     * @date 2026-07-13
+     * @description 以当前桌次为边界检查所有订单，全部结清后才将桌台推进到待清洁状态。
+     * @param id 桌台ID
+     * @return true 表示结台完成，false 表示当前桌次仍有待支付订单
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean checkoutTableIfSettled(Long id) {
+        DiningTable table = getById(id);
+        if (table == null) {
+            throw new BusinessException(ResultCode.NOT_FOUND);
+        }
+
+        Integer status = table.getStatus();
+        if (status == null || status == STATUS_FREE) {
+            throw new BusinessException(ResultCode.TABLE_STATUS_ERROR, "当前桌台未开台，无法结台");
+        }
+        if (status == STATUS_TO_CLEAN) {
+            return true;
+        }
+
+        String sessionCode = StrUtil.trimToNull(table.getCurrentSessionCode());
+        if (StrUtil.isBlank(sessionCode)) {
+            throw new BusinessException(ResultCode.TABLE_STATUS_ERROR, "当前桌台桌次异常，请刷新后重试");
+        }
+
+        // 结台检查覆盖同一桌次下所有顾客创建的订单，不能只判断本次收款的单笔订单。
+        Long pendingOrderCount = orderMapper.selectCount(new LambdaQueryWrapper<Order>()
+                .eq(Order::getTableId, id)
+                .eq(Order::getTableSessionCode, sessionCode)
+                .eq(Order::getStatus, ORDER_STATUS_PENDING)
+                .eq(Order::getDeleted, 0));
+        if (pendingOrderCount != null && pendingOrderCount > 0) {
+            return false;
+        }
+
+        if (status == STATUS_OCCUPIED) {
+            doUpdateStatus(table, STATUS_PAID);
+            table.setStatus(STATUS_PAID);
+        }
+        if (table.getStatus() == STATUS_PAID) {
+            doUpdateStatus(table, STATUS_TO_CLEAN);
+            log.info("管理端结台成功: id={}, code={}, sessionCode={}", id, table.getCode(), sessionCode);
+            return true;
+        }
+
+        throw new BusinessException(ResultCode.TABLE_STATUS_ERROR);
+    }
+
+    /**
      * 绑定当前顾客到指定桌台
      *
      * @author Henfon

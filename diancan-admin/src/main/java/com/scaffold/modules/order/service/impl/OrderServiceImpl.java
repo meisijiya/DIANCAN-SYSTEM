@@ -1367,19 +1367,17 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
                     updateById(order);
                 }
             }
-            syncTableStatusAfterOrderClosed(order.getTableId(), false);
             logOperation(order.getId(), null, "AUTO_CANCEL_EMPTY", "ALL_RETURN",
                     "{\"actualAmount\":0}");
             return;
         }
 
-        // 订单项仍存在但应付金额为0（全赠送）：自动结单并推进桌台待清洁
+        // 订单项仍存在但应付金额为0（全赠送）：只结清当前订单，桌台继续保留当前用餐场次。
         if (order.getStatus() != null && order.getStatus() == 0 && actualAmount.compareTo(BigDecimal.ZERO) == 0) {
             order.setPaidAmount(BigDecimal.ZERO);
             order.setStatus(1); // 已支付
             updateById(order);
             handleCouponAfterOrderClosed(order, actualAmount);
-            syncTableStatusAfterOrderClosed(order.getTableId(), true);
             logOperation(order.getId(), null, "AUTO_CLOSE_ZERO", "ALL_GIFT",
                     String.format("{\"originalAmount\":%s,\"actualAmount\":%s}", originalAmount, actualAmount));
             return;
@@ -1479,44 +1477,6 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             couponService.markCouponUsed(order.getId());
         } else {
             couponService.releaseLockedCoupon(order.getId());
-        }
-    }
-
-    /**
-     * 订单自动收口后的桌台状态联动
-     *
-     * @param tableId 桌台ID
-     * @param paidLike 是否按“已结账链路”处理（占用->已结账->待清洁）
-     */
-    private void syncTableStatusAfterOrderClosed(Long tableId, boolean paidLike) {
-        if (tableId == null) {
-            return;
-        }
-        try {
-            var table = diningTableService.getById(tableId);
-            if (table == null || table.getStatus() == null) {
-                return;
-            }
-            Integer status = table.getStatus();
-            if (paidLike) {
-                if (status == 1) {
-                    diningTableService.updateTableStatus(tableId, 2);
-                    diningTableService.updateTableStatus(tableId, 3);
-                } else if (status == 2) {
-                    diningTableService.updateTableStatus(tableId, 3);
-                }
-            } else {
-                if (status == 1) {
-                    diningTableService.updateTableStatus(tableId, 0);
-                } else if (status == 2) {
-                    diningTableService.updateTableStatus(tableId, 3);
-                    diningTableService.updateTableStatus(tableId, 0);
-                } else if (status == 3) {
-                    diningTableService.updateTableStatus(tableId, 0);
-                }
-            }
-        } catch (Exception e) {
-            log.warn("订单自动收口后桌台状态联动失败: tableId={}, paidLike={}, msg={}", tableId, paidLike, e.getMessage());
         }
     }
 

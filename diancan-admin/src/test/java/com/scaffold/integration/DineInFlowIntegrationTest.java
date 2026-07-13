@@ -1,9 +1,11 @@
 package com.scaffold.integration;
 
+import cn.dev33.satoken.stp.StpUtil;
 import com.scaffold.DiancanAdminApplication;
 import com.scaffold.modules.cart.dto.CartItemDTO;
 import com.scaffold.modules.cart.service.CartService;
 import com.scaffold.modules.cart.vo.CartVO;
+import com.scaffold.modules.coupon.service.CouponService;
 import com.scaffold.modules.dish.dto.DishCategoryCreateDTO;
 import com.scaffold.modules.dish.dto.DishCreateDTO;
 import com.scaffold.modules.dish.entity.Dish;
@@ -11,11 +13,13 @@ import com.scaffold.modules.dish.entity.DishCategory;
 import com.scaffold.modules.dish.service.DishCategoryService;
 import com.scaffold.modules.dish.service.DishService;
 import com.scaffold.modules.kitchen.service.KitchenService;
+import com.scaffold.modules.member.service.MemberSettlementService;
 import com.scaffold.modules.order.dto.OrderCreateDTO;
 import com.scaffold.modules.order.dto.AdminOrderCreateDTO;
 import com.scaffold.modules.order.service.OrderService;
 import com.scaffold.modules.order.vo.OrderItemVO;
 import com.scaffold.modules.order.vo.OrderVO;
+import com.scaffold.modules.payment.dto.AAPayDTO;
 import com.scaffold.modules.payment.dto.CashPayDTO;
 import com.scaffold.modules.payment.service.PaymentService;
 import com.scaffold.modules.payment.vo.CashPayVO;
@@ -23,9 +27,14 @@ import com.scaffold.modules.table.dto.TableCreateDTO;
 import com.scaffold.modules.table.entity.DiningTable;
 import com.scaffold.modules.table.service.DiningTableService;
 import com.scaffold.modules.table.vo.DiningTableVO;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.math.BigDecimal;
@@ -37,11 +46,13 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * 19.1 堂食正餐完整流程集成测试：
  * 扫码开台 -> 浏览菜品 -> 加入购物车 -> 提交订单 ->
- * 后厨接单/划单 -> 支付 -> 桌台待清洁 -> 标记清洁恢复空闲
+ * 后厨接单/划单 -> 小程序支付后继续加菜 -> 管理端结台 -> 标记清洁恢复空闲
  */
 @SpringBootTest(classes = DiancanAdminApplication.class)
 @ActiveProfiles("test")
 class DineInFlowIntegrationTest {
+
+    private MockedStatic<StpUtil> stpUtilMock;
 
     @Autowired
     private DishCategoryService dishCategoryService;
@@ -63,6 +74,39 @@ class DineInFlowIntegrationTest {
 
     @Autowired
     private PaymentService paymentService;
+
+    @MockBean
+    private CouponService couponService;
+
+    @MockBean
+    private MemberSettlementService memberSettlementService;
+
+    /**
+     * 初始化小程序用户登录态
+     *
+     * @author Henfon
+     * @date 2026-07-13
+     * @description 集成测试直接调用小程序订单服务时，固定返回测试用户ID，避免依赖真实请求上下文。
+     */
+    @BeforeEach
+    void setUpLoginContext() {
+        stpUtilMock = Mockito.mockStatic(StpUtil.class);
+        stpUtilMock.when(StpUtil::getLoginIdAsLong).thenReturn(1L);
+    }
+
+    /**
+     * 清理小程序用户登录态
+     *
+     * @author Henfon
+     * @date 2026-07-13
+     * @description 每个测试结束后释放静态模拟，避免影响同一测试进程中的其他用例。
+     */
+    @AfterEach
+    void tearDownLoginContext() {
+        if (stpUtilMock != null) {
+            stpUtilMock.close();
+        }
+    }
 
     @Test
     void dineInFullFlow_shouldWorkEndToEnd() {
@@ -180,22 +224,50 @@ class DineInFlowIntegrationTest {
         OrderVO allCompleted = orderService.getOrderDetail(order.getId());
         assertTrue(allCompleted.getItems().stream().allMatch(i -> i.getStatus() == 2), "应全部出餐完成");
 
-        // 7) 支付（现金）并校验桌台状态变更为待清洁
+        // 7) 模拟小程序订单支付：只结清当前订单，桌台继续保持占用以支持多人加菜。
+        AAPayDTO appPayDTO = new AAPayDTO();
+        appPayDTO.setOrderId(order.getId());
+        appPayDTO.setAmount(allCompleted.getActualAmount());
+        paymentService.aaPay(openid, appPayDTO);
+
+        OrderVO appPaidOrder = orderService.getOrderDetail(order.getId());
+        assertEquals(1, appPaidOrder.getStatus(), "小程序支付后订单应为已支付");
+        DiningTable diningTable = diningTableService.getById(tableId);
+        assertEquals(1, diningTable.getStatus(), "小程序支付后桌台应继续保持占用");
+
+        // 8) 同一桌次再次下单，验证加菜订单与首单共享桌次且不会被已支付状态阻断。
+        CartItemDTO addedCartItemDTO = new CartItemDTO();
+        addedCartItemDTO.setDishId(dish.getId());
+        addedCartItemDTO.setQuantity(1);
+        addedCartItemDTO.setRemark("加菜");
+        cartService.addItem(openid, tableId, addedCartItemDTO);
+
+        OrderCreateDTO addedOrderDTO = new OrderCreateDTO();
+        addedOrderDTO.setTableId(tableId);
+        addedOrderDTO.setPaymentMode(1);
+        addedOrderDTO.setOrderType(0);
+        addedOrderDTO.setRemark("集成测试加菜订单");
+        OrderVO addedOrder = orderService.createOrder(openid, addedOrderDTO);
+        assertEquals(order.getTableSessionCode(), addedOrder.getTableSessionCode(), "加菜订单应归属同一桌次");
+        assertFalse(diningTableService.checkoutTableIfSettled(tableId), "存在待支付加菜订单时不允许结台");
+        assertEquals(1, diningTableService.getById(tableId).getStatus(), "未结清时桌台应保持占用");
+
+        // 9) 管理端现金结清最后一笔订单后，整桌次完成结台并进入待清洁。
         CashPayDTO cashPayDTO = new CashPayDTO();
-        cashPayDTO.setOrderId(order.getId());
-        cashPayDTO.setReceivedAmount(allCompleted.getActualAmount().add(new BigDecimal("10.00")));
+        cashPayDTO.setOrderId(addedOrder.getId());
+        cashPayDTO.setReceivedAmount(addedOrder.getActualAmount().add(new BigDecimal("10.00")));
         CashPayVO payVO = paymentService.cashPay(cashPayDTO);
         assertNotNull(payVO.getId());
         assertEquals(1, payVO.getStatus());
 
-        OrderVO paidOrder = orderService.getOrderDetail(order.getId());
-        assertEquals(1, paidOrder.getStatus(), "支付后订单应为已支付");
+        OrderVO paidAddedOrder = orderService.getOrderDetail(addedOrder.getId());
+        assertEquals(1, paidAddedOrder.getStatus(), "管理端收款后加菜订单应为已支付");
 
         DiningTable toCleanTable = diningTableService.getById(tableId);
         assertNotNull(toCleanTable);
-        assertEquals(3, toCleanTable.getStatus(), "支付后桌台应为待清洁");
+        assertEquals(3, toCleanTable.getStatus(), "管理端结清当前桌次后桌台应为待清洁");
 
-        // 8) 标记清洁，桌台恢复空闲
+        // 10) 标记清洁，桌台恢复空闲
         diningTableService.markClean(tableId);
         DiningTable cleanedTable = diningTableService.getById(tableId);
         assertNotNull(cleanedTable);
