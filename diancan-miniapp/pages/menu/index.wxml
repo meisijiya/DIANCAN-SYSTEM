@@ -3,6 +3,21 @@
   <view class="page-glow page-glow-b"></view>
   <view class="top-card">
     <view class="menu-hero" style="padding-top: {{statusBarHeight + 6}}px;">
+      <view class="hero-head">
+        <view class="hero-main-copy">
+          <view class="hero-kicker">
+            <text class="hero-kicker-dot"></text>
+            <text>{{heroStatusText}}</text>
+          </view>
+          <view class="hero-title">{{menuHeroTitle}}</view>
+          <view class="hero-subtitle">先选菜，购物车统一确认口味和数量</view>
+        </view>
+        <view class="hero-table-badge">
+          <text class="hero-table-label">桌台</text>
+          <text class="hero-table-code">{{tableDisplayCode}}</text>
+        </view>
+      </view>
+
       <view class="hero-banner-stage" wx:if="{{banners.length > 0}}">
         <swiper
           class="hero-banner-swiper"
@@ -25,12 +40,6 @@
             </view>
           </swiper-item>
         </swiper>
-      </view>
-
-      <view class="hero-chip-row">
-        <view class="hero-chip">今日可点 {{totalDishCount}} 道</view>
-        <view class="hero-chip">点过 {{orderedDishCount}} 道</view>
-        <view class="hero-chip">推荐 {{recommendDishCount}} 道</view>
       </view>
 
       <view class="filter-card compact">

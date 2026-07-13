@@ -395,13 +395,13 @@
   line-height: 84rpx;
   margin: 0;
   padding: 0;
-  border: 1rpx solid rgba(143, 31, 36, 0.16);
+  border: 1rpx solid rgba(100, 116, 139, 0.18);
   border-radius: 24rpx;
-  background: linear-gradient(180deg, #fff8f5 0%, #f8ecec 100%);
-  color: #8f1f24;
+  background: linear-gradient(180deg, #f8fafc 0%, #edf1f5 100%);
+  color: #64748b;
   font-size: 28rpx;
   font-weight: 700;
-  box-shadow: 0 8rpx 18rpx rgba(111, 23, 28, 0.06);
+  box-shadow: 0 8rpx 18rpx rgba(71, 85, 105, 0.06);
   box-sizing: border-box;
 }
 

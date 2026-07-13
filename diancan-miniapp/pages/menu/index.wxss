@@ -49,31 +49,111 @@
   top: 0;
   z-index: 30;
   flex-shrink: 0;
-  padding: 4rpx 8rpx 0;
+  padding: 6rpx 10rpx 0;
 }
 
 .menu-hero {
   position: relative;
   overflow: hidden;
-  padding: 8rpx;
-  border-radius: 18rpx;
+  padding: 14rpx;
+  border-radius: 22rpx;
   background:
-    radial-gradient(circle at top right, rgba(255, 255, 255, 0.14), transparent 28%),
-    linear-gradient(145deg, #057a3d 0%, #07c160 48%, #18d071 100%);
-  box-shadow: 0 24rpx 50rpx rgba(5, 122, 61, 0.22);
+    linear-gradient(118deg, rgba(255, 255, 255, 0.92) 0%, rgba(255, 249, 239, 0.82) 48%, rgba(226, 247, 232, 0.92) 100%),
+    linear-gradient(145deg, #fdf8ef 0%, #eaf8ee 100%);
+  border: 1rpx solid rgba(255, 255, 255, 0.78);
+  box-shadow: 0 18rpx 42rpx rgba(70, 78, 57, 0.10);
+}
+
+.hero-head {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16rpx;
+  padding: 2rpx 4rpx 14rpx;
+}
+
+.hero-main-copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.hero-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8rpx;
+  min-height: 30rpx;
+  padding: 0 12rpx;
+  border-radius: 999rpx;
+  color: #057a3d;
+  background: rgba(7, 193, 96, 0.10);
+  font-size: 18rpx;
+  font-weight: 800;
+}
+
+.hero-kicker-dot {
+  width: 8rpx;
+  height: 8rpx;
+  border-radius: 999rpx;
+  background: #07c160;
+  box-shadow: 0 0 0 5rpx rgba(7, 193, 96, 0.10);
+}
+
+.hero-title {
+  margin-top: 10rpx;
+  color: #1f2b1d;
+  font-size: 34rpx;
+  line-height: 1.2;
+  font-weight: 900;
+}
+
+.hero-subtitle {
+  margin-top: 6rpx;
+  color: #788373;
+  font-size: 21rpx;
+  line-height: 1.45;
+}
+
+.hero-table-badge {
+  width: 124rpx;
+  min-height: 86rpx;
+  padding: 12rpx 10rpx;
+  border-radius: 18rpx;
+  background: linear-gradient(180deg, #1f2b1d 0%, #314a2d 100%);
+  box-shadow: 0 14rpx 26rpx rgba(49, 74, 45, 0.16);
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.hero-table-label {
+  display: block;
+  color: rgba(247, 252, 243, 0.62);
+  font-size: 17rpx;
+  line-height: 1.2;
+}
+
+.hero-table-code {
+  display: block;
+  margin-top: 8rpx;
+  color: #f7fcf3;
+  font-size: 23rpx;
+  line-height: 1.2;
+  font-weight: 900;
+  word-break: break-all;
 }
 
 .hero-banner-swiper {
-  height: 220rpx;
+  height: 176rpx;
 }
 
 .hero-banner-card {
   position: relative;
-  height: 220rpx;
+  height: 176rpx;
   overflow: hidden;
-  border-radius: 22rpx;
+  border-radius: 18rpx;
   background: rgba(255, 255, 255, 0.16);
-  box-shadow: 0 18rpx 34rpx rgba(5, 122, 61, 0.18);
+  box-shadow: 0 14rpx 28rpx rgba(70, 78, 57, 0.12);
 }
 
 .hero-banner-image {
@@ -85,7 +165,7 @@
 .hero-banner-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(108deg, rgba(18, 34, 22, 0.72) 0%, rgba(18, 34, 22, 0.14) 86%);
+  background: linear-gradient(108deg, rgba(18, 34, 22, 0.76) 0%, rgba(18, 34, 22, 0.18) 86%);
 }
 
 .hero-banner-copy {
@@ -98,7 +178,7 @@
 
 .hero-banner-title {
   color: #fff7f2;
-  font-size: 32rpx;
+  font-size: 30rpx;
   line-height: 1.18;
   font-weight: 800;
 }
@@ -111,32 +191,12 @@
   line-height: 1.55;
 }
 
-.hero-chip-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10rpx;
-  margin-top: 12rpx;
-}
-
-.hero-chip {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 28rpx;
-  padding: 0 8rpx;
-  border-radius: 999rpx;
-  font-size: 16rpx;
-  font-weight: 700;
-  color: #fff4ee;
-  background: rgba(255, 255, 255, 0.12);
-}
-
 .filter-card {
-  margin-top: 6rpx;
-  padding: 8rpx;
-  border-radius: 12rpx;
-  background: rgba(250, 251, 246, 0.94);
-  border: 1rpx solid rgba(255, 255, 255, 0.34);
+  margin-top: 8rpx;
+  padding: 10rpx;
+  border-radius: 18rpx;
+  background: rgba(255, 255, 255, 0.78);
+  border: 1rpx solid rgba(95, 127, 82, 0.10);
 }
 
 .search-caption {
@@ -156,10 +216,10 @@
   align-items: center;
   width: 100%;
   box-sizing: border-box;
-  border-radius: 10rpx;
+  border-radius: 14rpx;
   background: #ffffff;
   border: 1rpx solid rgba(95, 127, 82, 0.16);
-  padding: 0 10rpx;
+  padding: 0 14rpx;
   box-shadow: inset 0 1rpx 0 rgba(255, 255, 255, 0.88);
 }
 
@@ -171,8 +231,8 @@
 
 .search-input {
   flex: 1;
-  height: 52rpx;
-  font-size: 20rpx;
+  height: 58rpx;
+  font-size: 22rpx;
   color: var(--menu-text);
 }
 
