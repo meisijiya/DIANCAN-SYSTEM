@@ -1165,9 +1165,10 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentRecordMapper, Payment
      *
      * @author Henfon
      * @date 2026-06-25
-     * @description 同一订单同一支付入口优先复用待支付记录，避免生成多个支付单号。
+     * @description 同一订单同一支付入口优先复用待支付记录；若订单金额已变化，则作废旧记录并生成新支付单。
      */
     private PaymentRecord findOrCreatePendingWechatRecord(Order order, BigDecimal amount, String payerOpenid) {
+        BigDecimal expectedAmount = amount != null ? amount : BigDecimal.ZERO;
         LambdaQueryWrapper<PaymentRecord> wrapper = new LambdaQueryWrapper<PaymentRecord>()
                 .eq(PaymentRecord::getOrderId, order.getId())
                 .eq(PaymentRecord::getPaymentMethod, 0)
@@ -1184,9 +1185,19 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentRecordMapper, Payment
 
         PaymentRecord record = getOne(wrapper);
         if (record != null) {
+            BigDecimal recordAmount = record.getAmount() != null ? record.getAmount() : BigDecimal.ZERO;
+            // 订单加菜、优惠重算后金额会变化，旧 prepay 记录不能继续复用。
+            if (recordAmount.compareTo(expectedAmount) != 0) {
+                log.warn("待支付记录金额和订单金额不一致，作废旧支付记录: orderId={}, paymentNo={}, oldAmount={}, newAmount={}",
+                        order.getId(), record.getPaymentNo(), recordAmount, expectedAmount);
+                markPaymentFailed(record.getId(),
+                        String.format("{\"reason\":\"amount_changed\",\"oldAmount\":%s,\"newAmount\":%s}",
+                                recordAmount, expectedAmount));
+                return createPaymentRecord(order, 0, expectedAmount, payerOpenid);
+            }
             return record;
         }
-        return createPaymentRecord(order, 0, amount, payerOpenid);
+        return createPaymentRecord(order, 0, expectedAmount, payerOpenid);
     }
 
     /**

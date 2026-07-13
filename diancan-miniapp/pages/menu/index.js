@@ -749,6 +749,10 @@ Page({
     wx.navigateTo({ url: '/pages/cart/index' });
   },
 
+  goTableEntry() {
+    wx.navigateTo({ url: '/pages/table/index' });
+  },
+
   openBanner(e) {
     const banner = e.currentTarget.dataset.banner || {};
     const targetPath = banner.targetPath || '';

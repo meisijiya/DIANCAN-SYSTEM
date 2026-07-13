@@ -2,7 +2,6 @@ const orderApi = require('../../api/order');
 const reviewApi = require('../../api/review');
 const { addSocketListener, connectSocket } = require('../../utils/socket');
 const { KEYS, get, set, getTableBindingKey } = require('../../utils/storage');
-const { env } = require('../../config/env');
 
 function pickId(obj) {
   if (!obj || typeof obj !== 'object') return '';
@@ -34,78 +33,10 @@ function mapItemStatus(status) {
   return '已完成';
 }
 
-function normalizeImageUrl(raw) {
-  if (!raw) return '';
-  let url = String(raw).trim();
-  if (!url) return '';
-  if (/^data:image\//i.test(url)) return url;
-  if (/^https?:\/\//i.test(url)) {
-    // MinIO 预签名 URL 的签名依赖完整地址，不能改写 host
-    if (/x-amz-signature=/i.test(url)) {
-      return url;
-    }
-    const hostMatch = String(env.apiHost || '').match(/^https?:\/\/([^/:]+)/i);
-    const lanHost = hostMatch && hostMatch[1] ? hostMatch[1] : '';
-    if (lanHost) {
-      url = url.replace(/^(https?:\/\/)(127\.0\.0\.1|localhost)/i, `$1${lanHost}`);
-    }
-    return url;
-  }
-  if (url.startsWith('//')) return `https:${url}`;
-  if (url.startsWith('/pages/')) return '';
-  if (url.startsWith('/')) {
-    if (url.startsWith('/api/')) return `${env.apiHost}${url}`;
-    return `${env.apiHost}/api${url}`;
-  }
-  return `${env.apiHost}/${url}`;
-}
-
 function formatShortTime(v) {
   if (!v) return '--';
   const s = String(v).replace('T', ' ');
   return s.length >= 16 ? s.slice(0, 16) : s;
-}
-
-function stripUrlQuery(url) {
-  if (!url) return '';
-  return String(url).split('?')[0];
-}
-
-function preserveItemImageUrl(prevOrders, nextOrders) {
-  const prevMap = new Map();
-  (prevOrders || []).forEach((order) => {
-    const orderId = String(order.id || '');
-    (order.items || []).forEach((item) => {
-      const itemId = String(item.id || '');
-      if (orderId && itemId) {
-        prevMap.set(`${orderId}:${itemId}`, item);
-      }
-    });
-  });
-
-  return (nextOrders || []).map((order) => {
-    const orderId = String(order.id || '');
-    const items = (order.items || []).map((item) => {
-      const itemId = String(item.id || '');
-      const prevItem = prevMap.get(`${orderId}:${itemId}`);
-      if (!prevItem) return item;
-
-      const prevUrl = prevItem.dishImageUrl || '';
-      const nextUrl = item.dishImageUrl || '';
-      if (!prevUrl || !nextUrl) return item;
-
-      if (stripUrlQuery(prevUrl) === stripUrlQuery(nextUrl)) {
-        return {
-          ...item,
-          dishImageUrl: prevUrl,
-          imageError: !!prevItem.imageError
-        };
-      }
-
-      return item;
-    });
-    return { ...order, items };
-  });
 }
 
 function getReviewedSet() {
@@ -139,8 +70,6 @@ function normalizeOrder(order, mockPaidSet, reviewedSet) {
     items: (order.items || []).map((it) => ({
       ...it,
       id: pickItemId(it),
-      dishImageUrl: normalizeImageUrl(it.dishImage || it.image || it.thumbnail),
-      imageError: false,
       statusText: mapItemStatus(it.status)
     }))
   };
@@ -154,9 +83,7 @@ Page({
     paidOrderCount: 0,
     unpaidOrderCount: 0,
     completedDishCount: 0,
-    pollTimer: null,
-    detailVisible: false,
-    currentOrderDetail: null
+    pollTimer: null
   },
 
   onLoad() {
@@ -216,9 +143,7 @@ Page({
       orders: [],
       paidOrderCount: 0,
       unpaidOrderCount: 0,
-      completedDishCount: 0,
-      detailVisible: false,
-      currentOrderDetail: null
+      completedDishCount: 0
     });
   },
 
@@ -239,7 +164,7 @@ Page({
       const orders = (list || [])
         .map((o) => normalizeOrder(o, mockPaidSet, reviewedSet))
         .filter((o) => !!o.id);
-      const nextOrders = preserveItemImageUrl(this.data.orders, orders);
+      const nextOrders = orders;
       const paidOrderCount = nextOrders.filter((item) => Number(item.status) === 1).length;
       const unpaidOrderCount = nextOrders.filter((item) => Number(item.status) === 0).length;
       const completedDishCount = nextOrders.reduce((sum, order) => {
@@ -272,36 +197,6 @@ Page({
       wx.showToast({ title: err.message || '催单失败', icon: 'none' });
     }
   },
-
-  onDishImageError(e) {
-    const orderId = String(e.currentTarget.dataset.orderId || '');
-    const itemId = String(e.currentTarget.dataset.itemId || '');
-    if (!orderId || !itemId) return;
-
-    const orders = (this.data.orders || []).map((order) => {
-      if (String(order.id) !== orderId) return order;
-      const items = (order.items || []).map((dish) =>
-        String(dish.id) === itemId ? { ...dish, imageError: true } : dish
-      );
-      return { ...order, items };
-    });
-
-    this.setData({ orders });
-  },
-
-  openOrderDetail(e) {
-    const orderId = String(e.currentTarget.dataset.orderId || '');
-    if (!orderId) return;
-    const currentOrderDetail = (this.data.orders || []).find(order => String(order.id) === orderId) || null;
-    if (!currentOrderDetail) return;
-    this.setData({ detailVisible: true, currentOrderDetail });
-  },
-
-  closeOrderDetail() {
-    this.setData({ detailVisible: false, currentOrderDetail: null });
-  },
-
-  noop() {},
 
   goMenuForAddItem() {
     wx.switchTab({ url: '/pages/menu/index' });

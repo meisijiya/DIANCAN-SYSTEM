@@ -53,6 +53,14 @@
           <view class="quick-filter {{quickFilter === 'ordered' ? 'active' : ''}}" data-filter="ordered" bindtap="selectQuickFilter">点过</view>
         </view>
       </view>
+
+      <view class="table-entry-notice" wx:if="{{!table}}">
+        <view class="table-entry-copy">
+          <view class="table-entry-title">还没有关联桌台</view>
+          <view class="table-entry-sub">扫码或输入桌台编码后，才能加入购物车和支付。</view>
+        </view>
+        <button class="table-entry-btn" bindtap="goTableEntry">关联桌台</button>
+      </view>
     </view>
   </view>
 

@@ -1,11 +1,9 @@
 <view class="container table-page">
   <view class="hero-wrap">
-    <view class="hero-glow hero-glow-left"></view>
-    <view class="hero-glow hero-glow-right"></view>
     <view class="hero-content">
-      <view class="hero-chip">堂食点餐</view>
-      <view class="hero-title">欢迎来到云点餐</view>
-      <view class="hero-sub">扫码开台后即可选菜、下单、支付与评价</view>
+      <view class="hero-chip">入座开台</view>
+      <view class="hero-title">找到你的餐桌</view>
+      <view class="hero-sub">关联桌台后，点餐、加菜和支付都会归到当前桌次。</view>
       <view class="hero-table" wx:if="{{table}}">
         <text class="hero-table-label">当前桌台</text>
         <text class="hero-table-value">{{table.code || '-'}} {{table.name || ''}}</text>
@@ -17,9 +15,9 @@
   <view class="card login-card" wx:if="{{!loggedIn}}">
     <view class="section-head">
       <view class="title">微信登录</view>
-      <view class="scene-tag">首次使用</view>
+      <view class="scene-tag">需要登录</view>
     </view>
-    <view class="sub">授权手机号即可开始使用</view>
+    <view class="sub">登录后可关联桌台，并把订单同步到当前账号。</view>
     <view class="agreement-row" bindtap="toggleAgreeProtocol">
       <view class="agreement-check {{agreeProtocol ? 'checked' : ''}}">
         <text wx:if="{{agreeProtocol}}">✓</text>
@@ -44,9 +42,9 @@
   <view class="card entry-card" wx:if="{{loggedIn}}">
     <view class="section-head">
       <view class="title">扫码开台</view>
-      <view class="scene-tag">快速入桌</view>
+      <view class="scene-tag">桌台关联</view>
     </view>
-    <view class="sub">可扫码识别桌台二维码，或手动输入桌号编码</view>
+    <view class="sub">扫桌面小程序码，或输入服务员提供的桌台编码。</view>
 
     <view class="input-box">
       <view class="input-label">桌台编码</view>
@@ -54,8 +52,8 @@
     </view>
 
     <view class="row">
-      <button class="btn-primary" bindtap="scanCode">扫码识别</button>
-      <button class="btn-muted" bindtap="loadTable">查询桌台</button>
+      <button class="btn-primary scan-btn" bindtap="scanCode">扫码识别</button>
+      <button class="btn-muted query-btn" bindtap="loadTable">查询桌台</button>
     </view>
   </view>
 

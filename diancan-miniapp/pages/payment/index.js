@@ -8,6 +8,10 @@ function normalizeOrderId(v) {
   return s && s !== '0' ? s : '';
 }
 
+function amountToFen(value) {
+  return Math.round(Number(value || 0) * 100);
+}
+
 Page({
   data: {
     orderId: '',
@@ -61,6 +65,10 @@ Page({
 
     try {
       const payData = await paymentApi.wechatPay(orderId);
+      if (payData && payData.amount !== undefined && amountToFen(payData.amount) !== amountToFen(amount)) {
+        await this.loadOrder(orderId);
+        throw new Error('支付金额已更新，请重新确认后再支付');
+      }
       await this.requestWechatPayment(payData);
       await this.loadOrder(orderId);
       this.setData({ paymentStatusText: '支付成功' });
