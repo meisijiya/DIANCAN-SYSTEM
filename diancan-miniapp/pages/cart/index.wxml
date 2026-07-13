@@ -1,4 +1,5 @@
 <view class="page">
+  <app-navbar title="购物车" backgroundColor="#fbf8f4" />
   <view class="page-glow page-glow-a"></view>
   <view class="page-glow page-glow-b"></view>
 

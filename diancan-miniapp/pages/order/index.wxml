@@ -1,9 +1,9 @@
 <view class="order-page">
+  <app-navbar title="订单" backgroundColor="#fcfaf7" />
   <view class="order-page__glow order-page__glow-a"></view>
   <view class="order-page__glow order-page__glow-b"></view>
 
   <view class="order-topbar">
-    <view class="order-topbar__title">我的订单</view>
     <view class="order-topbar__hint">{{tableId ? ('桌号 ' + tableId) : '当前桌台'}}</view>
   </view>
 

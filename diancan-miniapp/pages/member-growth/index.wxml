@@ -1,4 +1,5 @@
 <view class="page">
+  <app-navbar title="成长明细" />
   <view class="tips-card">
     <view class="tips-title">成长值说明</view>
     <view class="tips-desc">成长值用于会员升级，一期规则为消费后自动累计，不参与抵扣。</view>

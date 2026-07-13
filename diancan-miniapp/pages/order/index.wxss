@@ -43,19 +43,10 @@
   position: relative;
   z-index: 2;
   display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
+  align-items: center;
+  justify-content: flex-start;
   gap: 16rpx;
-  padding: 8rpx 4rpx 4rpx;
-}
-
-.order-topbar__title {
-  color: var(--order-text);
-  font-size: 42rpx;
-  font-weight: 800;
-  line-height: 1.32;
-  text-align: left;
-  letter-spacing: 0.02em;
+  padding: 6rpx 4rpx 4rpx;
 }
 
 .order-topbar__hint {

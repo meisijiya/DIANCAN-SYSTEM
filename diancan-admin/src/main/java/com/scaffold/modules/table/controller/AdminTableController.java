@@ -105,11 +105,11 @@ public class AdminTableController {
      *
      * @author Henfon
      * @date 2026-07-09
-     * @description 将已结账或待清洁桌台直接释放为空闲，进行中桌台会直接拒绝。
+     * @description 将空占用、已结账或待清洁桌台释放为空闲，已有订单的占用桌台会直接拒绝。
      * @param id 桌台ID
      * @return 处理结果
      */
-    @Operation(summary = "一键释放桌台")
+    @Operation(summary = "一键释放空占用/已结账/待清洁桌台")
     @PutMapping("/{id}/release")
     public Result<Void> release(@Parameter(description = "桌台ID") @PathVariable Long id) {
         diningTableService.releaseTable(id);

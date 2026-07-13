@@ -2,6 +2,7 @@ package com.scaffold.integration;
 
 import cn.dev33.satoken.stp.StpUtil;
 import com.scaffold.DiancanAdminApplication;
+import com.scaffold.common.exception.BusinessException;
 import com.scaffold.modules.cart.dto.CartItemDTO;
 import com.scaffold.modules.cart.service.CartService;
 import com.scaffold.modules.cart.vo.CartVO;
@@ -203,6 +204,8 @@ class DineInFlowIntegrationTest {
         assertNotNull(order.getItems());
         assertFalse(order.getItems().isEmpty());
         assertTrue(order.getItems().stream().allMatch(i -> i.getStatus() == 0), "下单后订单项应为待制作");
+        assertThrows(BusinessException.class, () -> diningTableService.releaseTable(tableId),
+                "当前桌次已有订单时不得直接释放占用桌台");
 
         // 6) 后厨接单与划单
         Long firstItemId = order.getItems().get(0).getId();
@@ -272,6 +275,39 @@ class DineInFlowIntegrationTest {
         DiningTable cleanedTable = diningTableService.getById(tableId);
         assertNotNull(cleanedTable);
         assertEquals(0, cleanedTable.getStatus(), "清洁后桌台应恢复空闲");
+    }
+
+    /**
+     * 验证占用空桌可以直接释放
+     *
+     * @author Henfon
+     * @date 2026-07-13
+     * @description 模拟顾客扫码开台但未提交订单，管理端释放后应清空桌态和当前桌次。
+     */
+    @Test
+    void releaseOccupiedTableWithoutOrders_shouldReturnToFree() {
+        final String suffix = String.valueOf(System.currentTimeMillis());
+
+        TableCreateDTO tableDTO = new TableCreateDTO();
+        tableDTO.setCode("ER" + suffix.substring(Math.max(0, suffix.length() - 6)));
+        tableDTO.setName("空占用桌-" + suffix);
+        tableDTO.setCapacity(4);
+        diningTableService.createTable(tableDTO);
+
+        DiningTable table = diningTableService.list().stream()
+                .filter(item -> tableDTO.getCode().equals(item.getCode()))
+                .findFirst()
+                .orElseThrow();
+        diningTableService.openTable(table.getId());
+
+        DiningTable occupiedTable = diningTableService.getById(table.getId());
+        assertEquals(1, occupiedTable.getStatus(), "扫码开台后应为占用状态");
+        assertNotNull(occupiedTable.getCurrentSessionCode(), "扫码开台后应生成当前桌次");
+
+        diningTableService.releaseTable(table.getId());
+        DiningTable releasedTable = diningTableService.getById(table.getId());
+        assertEquals(0, releasedTable.getStatus(), "未产生订单的占用桌应允许释放");
+        assertNull(releasedTable.getCurrentSessionCode(), "释放空桌后应清空当前桌次");
     }
 
     @Test

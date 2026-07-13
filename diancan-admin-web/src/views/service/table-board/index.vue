@@ -242,6 +242,11 @@ const currentOrderRemainingAmount = computed(() => {
   const paidAmount = currentOrderDetail.value?.paidAmount || 0;
   return Math.max(actualAmount - paidAmount, 0);
 });
+const canReleaseSelectedTable = computed(() => {
+  const status = selectedTable.value?.status;
+  if (status === 2 || status === 3) return true;
+  return status === 1 && !orderLoading.value && tableOrders.value.length === 0;
+});
 
 function isSameId(left: Api.Business.IdType | null | undefined, right: Api.Business.IdType | null | undefined) {
   return String(left ?? '') === String(right ?? '');
@@ -380,6 +385,9 @@ async function handleTableClick(table: Api.Business.DiningTable) {
   selectedTable.value = table;
   drawerMode.value = resolveDrawerMode(table);
   showOrderDrawer.value = true;
+  tableOrders.value = [];
+  currentOrderDetail.value = null;
+  receivedAmount.value = null;
   resetQuickForms();
   resetQuickCarts();
   await Promise.all([loadDrawerDishes(), refreshDrawerData()]);
@@ -400,7 +408,7 @@ async function loadData(showLoading = true) {
 }
 
 async function handleReleaseTable(table: Api.Business.DiningTable) {
-  if ((table.status !== 2 && table.status !== 3) || cleanLoadingTableId.value) return;
+  if (!canReleaseSelectedTable.value || cleanLoadingTableId.value) return;
   cleanLoadingTableId.value = table.id;
   try {
     const { error } = await releaseTable(Number(table.id));
@@ -829,13 +837,13 @@ onUnmounted(() => {
               <span>容纳 {{ selectedTable.capacity }} 人</span>
               <span>{{ selectedTable.areaName || '未分区' }}</span>
             </div>
-            <div v-if="selectedTable.status === 2 || selectedTable.status === 3" class="drawer-summary__clean-actions">
+            <div v-if="canReleaseSelectedTable" class="drawer-summary__clean-actions">
               <NButton
                 type="warning"
                 :loading="cleanLoadingTableId === selectedTable.id"
                 @click="handleReleaseTable(selectedTable)"
               >
-                释放桌台
+                {{ selectedTable.status === 1 ? '释放空桌' : '释放桌台' }}
               </NButton>
             </div>
             <div v-if="selectedTable.status === 3" class="drawer-summary__notice">
@@ -843,6 +851,9 @@ onUnmounted(() => {
             </div>
             <div v-else-if="selectedTable.status === 2" class="drawer-summary__notice">
               当前桌台已结账，如已完成现场收尾，可直接释放桌台。
+            </div>
+            <div v-else-if="selectedTable.status === 1 && !orderLoading && tableOrders.length === 0" class="drawer-summary__notice">
+              当前桌次尚未产生订单，可直接释放空桌。
             </div>
           </div>
 

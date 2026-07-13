@@ -9,6 +9,16 @@
         <view class="hero-chip">{{table ? '桌台已绑定' : '堂食点餐'}}</view>
         <view class="hero-scene">{{loggedIn ? '已登录' : '未登录'}}</view>
       </view>
+      <view class="hero-copy">
+        <view class="hero-title">{{heroTitle}}</view>
+        <view class="hero-desc">{{heroDesc}}</view>
+      </view>
+      <view class="hero-footer" wx:if="{{loading || table}}">
+        <view class="hero-status">
+          <view class="hero-status-label">当前桌台</view>
+          <view class="hero-status-value">{{tableStatusText}}</view>
+        </view>
+      </view>
     </view>
   </view>
 

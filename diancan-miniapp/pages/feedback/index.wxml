@@ -1,4 +1,5 @@
 <view class="page">
+  <app-navbar title="意见反馈" />
   <view class="composer-card">
     <view class="section-title">告诉我们哪里还不够好用</view>
     <view class="section-desc">可以反馈页面问题、点餐流程问题，或你希望增加的功能。</view>

@@ -354,8 +354,8 @@ public class DiningTableServiceImpl extends ServiceImpl<DiningTableMapper, Dinin
      * 释放桌台
      *
      * @author Henfon
-     * @date 2026-07-09
-     * @description 管理端可将已结账或待清洁桌台直接释放为空闲，进行中桌台不允许直接释放。
+     * @date 2026-07-13
+     * @description 管理端可释放未产生订单的占用桌，以及已结账或待清洁桌台；已有订单的占用桌仍禁止释放。
      * @param id 桌台ID
      */
     @Override
@@ -373,7 +373,17 @@ public class DiningTableServiceImpl extends ServiceImpl<DiningTableMapper, Dinin
         }
 
         if (currentStatus == STATUS_OCCUPIED) {
-            throw new BusinessException(ResultCode.PARAM_ERROR, "当前桌台仍有进行中点单，请先完成支付或处理订单后再释放桌台");
+            long currentSessionOrderCount = countCurrentSessionOrders(table);
+            if (currentSessionOrderCount > 0) {
+                throw new BusinessException(ResultCode.PARAM_ERROR, "当前桌次已有订单，请先完成结账后再释放桌台");
+            }
+
+            // 仅扫码绑定但没有提交订单的空桌次可以直接收口，同时清理桌次和顾客绑定。
+            String releasedSessionCode = table.getCurrentSessionCode();
+            doUpdateStatus(table, STATUS_FREE);
+            log.info("释放占用空桌成功: id={}, code={}, sessionCode={}",
+                    id, table.getCode(), releasedSessionCode);
+            return;
         }
 
         // 已结账桌台先补齐待清洁流转，再统一回到空闲，避免状态跳变过于突兀。
@@ -389,6 +399,32 @@ public class DiningTableServiceImpl extends ServiceImpl<DiningTableMapper, Dinin
         }
 
         throw new BusinessException(ResultCode.TABLE_STATUS_ERROR);
+    }
+
+    /**
+     * 统计当前桌次订单数量
+     *
+     * @author Henfon
+     * @date 2026-07-13
+     * @description 优先按桌次编码统计全部未删除订单；桌次缺失时仅检查该桌台仍处于活动状态的订单。
+     * @param table 桌台实体
+     * @return 当前桌次订单数量
+     */
+    private long countCurrentSessionOrders(DiningTable table) {
+        LambdaQueryWrapper<Order> wrapper = new LambdaQueryWrapper<Order>()
+                .eq(Order::getTableId, table.getId())
+                .eq(Order::getDeleted, 0);
+
+        String sessionCode = StrUtil.trimToNull(table.getCurrentSessionCode());
+        if (StrUtil.isNotBlank(sessionCode)) {
+            wrapper.eq(Order::getTableSessionCode, sessionCode);
+        } else {
+            // 兼容历史异常数据：没有桌次编码时，至少不能释放仍有待支付或已支付订单的桌台。
+            wrapper.in(Order::getStatus, ORDER_STATUS_PENDING, ORDER_STATUS_PAID);
+        }
+
+        Long orderCount = orderMapper.selectCount(wrapper);
+        return orderCount == null ? 0L : orderCount;
     }
 
     @Override

@@ -1,6 +1,8 @@
 .page {
   --home-red: #07c160;
   --home-red-deep: #057a3d;
+  --home-ink: #2e241e;
+  --home-subtext: #76685f;
   min-height: 100vh;
   position: relative;
   background:
@@ -35,11 +37,14 @@
 .hero-shell {
   position: relative;
   overflow: hidden;
-  padding: 0 24rpx 22rpx;
-  background: linear-gradient(150deg, #057a3d 0%, #07c160 56%, #18d071 100%);
+  padding: 0 24rpx 28rpx;
+  background:
+    radial-gradient(circle at top right, rgba(255, 255, 255, 0.72), transparent 26%),
+    radial-gradient(circle at bottom left, rgba(195, 219, 202, 0.34), transparent 34%),
+    linear-gradient(150deg, #fffaf5 0%, #f5ece2 56%, #eadfd2 100%);
   border-bottom-left-radius: 42rpx;
   border-bottom-right-radius: 42rpx;
-  box-shadow: 0 28rpx 60rpx rgba(5, 122, 61, 0.16);
+  box-shadow: 0 24rpx 54rpx rgba(77, 63, 50, 0.12);
 }
 
 .hero-orb {
@@ -53,7 +58,7 @@
   right: -84rpx;
   width: 280rpx;
   height: 280rpx;
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.52);
 }
 
 .hero-orb-b {
@@ -61,7 +66,7 @@
   bottom: -120rpx;
   width: 340rpx;
   height: 340rpx;
-  background: rgba(5, 122, 61, 0.20);
+  background: rgba(185, 205, 191, 0.42);
 }
 
 .hero-main {
@@ -87,17 +92,62 @@
 }
 
 .hero-chip {
-  color: #f7fcf3;
-  background: rgba(255, 255, 255, 0.14);
+  color: #655449;
+  background: rgba(255, 255, 255, 0.68);
+  border: 1rpx solid rgba(123, 102, 88, 0.10);
 }
 
 .hero-scene {
   color: var(--home-red);
-  background: #edf9f2;
+  background: rgba(237, 249, 242, 0.96);
 }
 
 .hero-title {
-  display: none;
+  display: block;
+  margin-top: 28rpx;
+  color: var(--home-ink);
+  font-size: 52rpx;
+  line-height: 1.16;
+  font-weight: 800;
+}
+
+.hero-copy {
+  max-width: 560rpx;
+}
+
+.hero-desc {
+  margin-top: 14rpx;
+  color: var(--home-subtext);
+  font-size: 24rpx;
+  line-height: 1.7;
+}
+
+.hero-footer {
+  margin-top: 24rpx;
+}
+
+.hero-status {
+  padding: 20rpx 22rpx;
+  border-radius: 24rpx;
+  background: rgba(255, 253, 249, 0.88);
+  border: 1rpx solid rgba(123, 102, 88, 0.08);
+  box-shadow: 0 12rpx 28rpx rgba(84, 72, 60, 0.06);
+}
+
+.hero-status-label {
+  color: #8e8076;
+  font-size: 20rpx;
+}
+
+.hero-status-value {
+  margin-top: 8rpx;
+  color: var(--home-ink);
+  font-size: 28rpx;
+  line-height: 1.3;
+  font-weight: 800;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .content-wrap {

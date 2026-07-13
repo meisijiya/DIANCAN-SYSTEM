@@ -78,11 +78,11 @@ public interface DiningTableService extends IService<DiningTable> {
     void markClean(Long id);
 
     /**
-     * 释放桌台（已结账/待清洁→空闲）
+     * 释放桌台（空占用/已结账/待清洁→空闲）
      *
      * @author Henfon
      * @date 2026-07-09
-     * @description 为管理端提供一键释放桌台入口，进行中桌台不允许直接释放。
+     * @description 为管理端提供一键释放入口；占用桌仅在当前桌次没有任何订单时允许释放。
      * @param id 桌台ID
      */
     void releaseTable(Long id);
