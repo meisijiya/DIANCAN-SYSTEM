@@ -137,4 +137,14 @@ public interface OrderService extends IService<Order> {
      * @return 订单详情
      */
     OrderDetailVO getAdminOrderDetail(Long orderId);
+
+    /**
+     * 小程序餐前付订单支付成功后推送后厨新单
+     *
+     * @param orderId 订单ID
+     * @author Henfon
+     * @date 2026-07-14
+     * @description 仅对支付成功后才允许出餐的订单推送后厨与前厅播报，避免未支付订单提前制作。
+     */
+    void notifyKitchenOrderPaid(Long orderId);
 }

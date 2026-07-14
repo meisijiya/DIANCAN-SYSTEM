@@ -47,16 +47,16 @@ button::after {
   align-items: center;
   justify-content: center;
   height: 88rpx;
-  background: linear-gradient(180deg, #f5fcf8 0%, #e8f8ee 100%);
-  color: #07c160;
+  background: linear-gradient(135deg, #07c160 0%, #06ad56 100%);
+  color: #ffffff;
   font-size: 32rpx;
   font-weight: 700;
   border-radius: 24rpx;
-  border: 1rpx solid rgba(7, 193, 96, 0.16);
-  box-shadow: 0 8rpx 18rpx rgba(5, 122, 61, 0.06);
+  border: 1rpx solid rgba(7, 193, 96, 0.28);
+  box-shadow: 0 12rpx 26rpx rgba(7, 193, 96, 0.18);
 }
 .btn-primary:active {
-  background: linear-gradient(180deg, #f4fcf7 0%, #e3f6ea 100%);
+  background: linear-gradient(135deg, #06b85a 0%, #059b4d 100%);
 }
 .btn-primary[disabled] {
   background: #e6dad4;

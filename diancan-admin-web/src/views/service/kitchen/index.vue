@@ -30,6 +30,34 @@ const statusMap: Record<number, { label: string; type: 'warning' | 'info' | 'suc
   2: { label: '已完成', type: 'success' }
 };
 
+function parseKitchenTime(value?: string) {
+  if (!value) return 0;
+  const match = value.match(
+    /^(\d{4})-(\d{2})-(\d{2})[T\s](\d{2}):(\d{2}):(\d{2})(?:\.\d+)?$/
+  );
+  if (!match) {
+    const timestamp = Date.parse(value);
+    return Number.isNaN(timestamp) ? 0 : timestamp;
+  }
+
+  const [, year, month, day, hour, minute, second] = match;
+  return new Date(
+    Number(year),
+    Number(month) - 1,
+    Number(day),
+    Number(hour),
+    Number(minute),
+    Number(second)
+  ).getTime();
+}
+
+function formatKitchenTime(value?: string) {
+  if (!value) return '-';
+  const [datePart, timePart = ''] = value.replace('T', ' ').split(' ');
+  if (!datePart) return value;
+  return timePart ? `${datePart} ${timePart.slice(0, 8)}` : datePart;
+}
+
 const visibleTasks = computed(() => {
   const orderKeyword = orderNoKeyword.value.trim().toLowerCase();
   const tableKeyword = tableCodeKeyword.value.trim().toLowerCase();
@@ -39,7 +67,7 @@ const visibleTasks = computed(() => {
       const matchTable = !tableKeyword || (task.tableCode || '').toLowerCase().includes(tableKeyword);
       return matchOrder && matchTable;
     })
-    .sort((a, b) => +new Date(a.addedAt) - +new Date(b.addedAt));
+    .sort((a, b) => parseKitchenTime(a.addedAt) - parseKitchenTime(b.addedAt));
 });
 
 const pendingCount = computed(() => tasks.value.filter(t => t.status === 0).length);
@@ -80,7 +108,7 @@ function notifyNewKitchenTasks(nextTasks: KitchenTask[]) {
   const newTasks = nextTasks.filter(task => !previousIds.has(String(task.id)));
   if (!newTasks.length || !hasTaskSnapshot.value) return;
 
-  const latestTask = [...newTasks].sort((a, b) => +new Date(b.addedAt) - +new Date(a.addedAt))[0];
+  const latestTask = [...newTasks].sort((a, b) => parseKitchenTime(b.addedAt) - parseKitchenTime(a.addedAt))[0];
   const tableCode = latestTask.tableCode || '未知桌号';
   const quantity = latestTask.quantity || 1;
   if (autoAcceptEnabled.value) {
@@ -299,7 +327,7 @@ onUnmounted(() => {
                   <NTag v-if="task.overtime" type="error">超时</NTag>
                   <NTag v-if="rushItemIds.has(String(task.id))" type="warning">催单</NTag>
                 </NSpace>
-                <div class="kitchen-task-card__meta">下单时间：{{ task.addedAt }}</div>
+                <div class="kitchen-task-card__meta">下单时间：{{ formatKitchenTime(task.addedAt) }}</div>
               </NSpace>
 
               <div class="kitchen-task-card__body">

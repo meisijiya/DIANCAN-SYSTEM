@@ -671,6 +671,13 @@ Page({
     }
   },
 
+  handlePhoneLoginTap() {
+    if (this.data.agreeProtocol) {
+      return;
+    }
+    wx.showToast({ title: '请先勾选用户协议与隐私政策', icon: 'none' });
+  },
+
   async confirmDetailAdd() {
     if (!isLoggedIn()) {
       this.setData({ detailVisible: false });

@@ -61,6 +61,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -222,10 +224,10 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
                 }
             }
 
-            // 10. WebSocket 推送 NEW_ORDER 事件至后厨端和服务端
-            autoAcceptKitchenItemsIfNeeded(order, orderItems, false);
-            wsService.broadcast(WsEventType.NEW_ORDER, "/topic/kitchen", orderVO);
-            wsService.broadcast(WsEventType.NEW_ORDER, "/topic/service", orderVO);
+            // 10. 餐后付订单下单后即可进后厨；餐前付订单需等支付成功后再推送。
+            if (shouldNotifyKitchenBeforePayment(order)) {
+                publishNewOrderNotifications(order, orderItems, false);
+            }
 
             log.info("订单创建成功: orderNo={}, tableId={}, itemCount={}, amount={}",
                     order.getOrderNo(), tableId, orderItems.size(), originalAmount);
@@ -363,9 +365,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 
             // 7. 非预订单模式：推送 WebSocket 通知
             if (!isPreOrder) {
-                autoAcceptKitchenItemsIfNeeded(order, orderItems, true);
-                wsService.broadcast(WsEventType.NEW_ORDER, "/topic/kitchen", orderVO);
-                wsService.broadcast(WsEventType.NEW_ORDER, "/topic/service", orderVO);
+                publishNewOrderNotifications(order, orderItems, true);
             }
 
             log.info("管理端订单创建成功: orderNo={}, tableId={}, preOrder={}, itemCount={}, amount={}",
@@ -567,10 +567,10 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         // 5. 构建返回 VO
         OrderVO orderVO = buildOrderVO(order, allItems);
 
-        // 6. WebSocket 推送 NEW_ORDER 事件
-        autoAcceptKitchenItemsIfNeeded(order, List.of(newItem), false);
-        wsService.broadcast(WsEventType.NEW_ORDER, "/topic/kitchen", orderVO);
-        wsService.broadcast(WsEventType.NEW_ORDER, "/topic/service", orderVO);
+        // 6. 餐后付未结账订单允许边点边做；餐前付订单的加菜需等待支付成功后统一通知后厨。
+        if (shouldNotifyKitchenBeforePayment(order)) {
+            publishNewOrderNotifications(order, List.of(newItem), false);
+        }
 
         log.info("加菜成功: orderId={}, dishId={}, quantity={}, newAmount={}",
                 orderId, dto.getDishId(), dto.getQuantity(), newActualAmount);
@@ -958,6 +958,44 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         detailVO.setOperationLogs(logVOs);
 
         return detailVO;
+    }
+
+    /**
+     * 小程序餐前付订单支付成功后推送后厨新单
+     *
+     * @author Henfon
+     * @date 2026-07-14
+     * @description 仅在订单支付完成后再触发后厨和前厅播报，避免未支付订单提前进入制作流程。
+     * @param orderId 订单ID
+     */
+    @Override
+    public void notifyKitchenOrderPaid(Long orderId) {
+        if (orderId == null) {
+            return;
+        }
+
+        Order order = getById(orderId);
+        if (order == null) {
+            throw new BusinessException(ResultCode.ORDER_NOT_FOUND);
+        }
+        if (order.getStatus() == null || order.getStatus() != 1) {
+            log.info("订单未完成支付，跳过后厨新单推送: orderId={}, status={}", orderId, order.getStatus());
+            return;
+        }
+        if (order.getPaymentMode() == null || order.getPaymentMode() != 0) {
+            log.info("订单不是餐前付场景，跳过支付后后厨推送: orderId={}, paymentMode={}", orderId, order.getPaymentMode());
+            return;
+        }
+
+        List<OrderItem> orderItems = queryOrderItems(orderId);
+        if (orderItems.isEmpty()) {
+            log.info("订单无可推送订单项，跳过支付后后厨推送: orderId={}", orderId);
+            return;
+        }
+
+        publishNewOrderNotifications(order, orderItems, false);
+        log.info("餐前付订单支付成功，已推送后厨新单: orderId={}, orderNo={}, itemCount={}",
+                orderId, order.getOrderNo(), orderItems.size());
     }
 
     // ==================== 私有方法 ====================
@@ -1514,6 +1552,69 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         }
         SysUser user = sysUserMapper.selectById(userId);
         return user == null ? null : user.getOpenid();
+    }
+
+    /**
+     * 判断订单是否应在支付前进入后厨
+     *
+     * @author Henfon
+     * @date 2026-07-14
+     * @description 餐后付订单允许先出餐后支付；餐前付订单则必须等待支付成功后再推送后厨。
+     * @param order 订单
+     * @return true 表示下单后即可推送后厨，false 表示需等待支付成功
+     */
+    private boolean shouldNotifyKitchenBeforePayment(Order order) {
+        return order != null && order.getPaymentMode() != null && order.getPaymentMode() == 1;
+    }
+
+    /**
+     * 推送后厨新单通知
+     *
+     * @author Henfon
+     * @date 2026-07-14
+     * @description 统一封装后厨自动接单与 WebSocket 新单广播，保证管理端与支付成功场景使用同一套推送逻辑。
+     * @param order 订单
+     * @param orderItems 本次需要进入后厨的订单项
+     * @param adminOrder 是否管理端订单
+     */
+    private void publishNewOrderNotifications(Order order, List<OrderItem> orderItems, boolean adminOrder) {
+        if (order == null || orderItems == null || orderItems.isEmpty()) {
+            return;
+        }
+
+        if (TransactionSynchronizationManager.isActualTransactionActive()) {
+            // 等事务真正提交后再通知后厨，避免前端收到事件时数据库里还查不到最新任务。
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    doPublishNewOrderNotifications(order, orderItems, adminOrder);
+                }
+            });
+            return;
+        }
+
+        doPublishNewOrderNotifications(order, orderItems, adminOrder);
+    }
+
+    /**
+     * 执行后厨新单通知
+     *
+     * @author Henfon
+     * @date 2026-07-14
+     * @description 在事务提交后执行自动接单和 WebSocket 推送，确保后厨刷新任务时能查到最新订单项。
+     * @param order 订单
+     * @param orderItems 本次需要进入后厨的订单项
+     * @param adminOrder 是否管理端订单
+     */
+    private void doPublishNewOrderNotifications(Order order, List<OrderItem> orderItems, boolean adminOrder) {
+        if (order == null || orderItems == null || orderItems.isEmpty()) {
+            return;
+        }
+
+        OrderVO orderVO = buildOrderVO(order, orderItems);
+        autoAcceptKitchenItemsIfNeeded(order, orderItems, adminOrder);
+        wsService.broadcast(WsEventType.NEW_ORDER, "/topic/kitchen", orderVO);
+        wsService.broadcast(WsEventType.NEW_ORDER, "/topic/service", orderVO);
     }
 
     private String pickDishImage(Dish dish) {

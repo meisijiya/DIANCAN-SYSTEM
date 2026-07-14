@@ -167,10 +167,11 @@
 }
 
 .login-btn--disabled {
-  background: #e6dad4 !important;
-  color: #887872 !important;
-  border-color: rgba(136, 120, 114, 0.28) !important;
-  box-shadow: none !important;
+  background: rgba(255, 255, 255, 0.96) !important;
+  color: #07c160 !important;
+  border-color: rgba(7, 193, 96, 0.42) !important;
+  box-shadow: 0 8rpx 18rpx rgba(7, 193, 96, 0.08) !important;
+  opacity: 1;
 }
 
 .input-box {
@@ -261,6 +262,12 @@
   color: #166534;
   background: #edfdf3;
   border: 1rpx solid #b7ebc6;
+}
+
+.entry-hint--info {
+  color: #1d4f91;
+  background: #eef6ff;
+  border: 1rpx solid #bfdcff;
 }
 
 .entry-hint--warm {

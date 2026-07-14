@@ -3,21 +3,6 @@
   <view class="page-glow page-glow-b"></view>
   <view class="top-card">
     <view class="menu-hero" style="padding-top: {{statusBarHeight + 6}}px;">
-      <view class="hero-head">
-        <view class="hero-main-copy">
-          <view class="hero-kicker">
-            <text class="hero-kicker-dot"></text>
-            <text>{{heroStatusText}}</text>
-          </view>
-          <view class="hero-title">{{menuHeroTitle}}</view>
-          <view class="hero-subtitle">先选菜，购物车统一确认口味和数量</view>
-        </view>
-        <view class="hero-table-badge">
-          <text class="hero-table-label">桌台</text>
-          <text class="hero-table-code">{{tableDisplayCode}}</text>
-        </view>
-      </view>
-
       <view class="hero-banner-stage" wx:if="{{banners.length > 0}}">
         <swiper
           class="hero-banner-swiper"
@@ -149,7 +134,10 @@
 
   <view class="cart-bar safe-bottom" wx:if="{{table}}">
     <view class="bar-info" bindtap="goCart">
-      <view class="bar-icon">🛒</view>
+      <view class="bar-icon">
+        <view class="bar-icon__handle"></view>
+        <view class="bar-icon__bag"></view>
+      </view>
       <view class="bar-copy">
         <view class="bar-sub">已点 {{cartSummary.totalCount}} 份菜品</view>
         <view class="bar-price">¥{{cartSummary.totalPrice}}</view>
@@ -244,8 +232,8 @@
       </view>
       <button
         class="btn-primary login-popup-btn {{!agreeProtocol ? 'login-popup-btn--disabled' : ''}}"
-        disabled="{{!agreeProtocol}}"
-        open-type="getPhoneNumber"
+        open-type="{{agreeProtocol ? 'getPhoneNumber' : ''}}"
+        bindtap="handlePhoneLoginTap"
         bindgetphonenumber="handlePhoneLogin"
       >
         手机号快捷登录

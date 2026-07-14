@@ -97,9 +97,9 @@
         </view>
       </view>
       <button
-        class="login-popup-btn {{!agreeProtocol ? 'login-popup-btn--disabled' : ''}}"
-        disabled="{{!agreeProtocol}}"
-        open-type="getPhoneNumber"
+        class="btn-primary login-popup-btn {{!agreeProtocol ? 'login-popup-btn--disabled' : ''}}"
+        open-type="{{agreeProtocol ? 'getPhoneNumber' : ''}}"
+        bindtap="handlePhoneLoginTap"
         bindgetphonenumber="handlePhoneLogin"
       >
         手机号快捷登录

@@ -32,8 +32,8 @@
     </view>
     <button
       class="btn-primary login-btn {{!agreeProtocol ? 'login-btn--disabled' : ''}}"
-      disabled="{{!agreeProtocol}}"
-      open-type="getPhoneNumber"
+      open-type="{{agreeProtocol ? 'getPhoneNumber' : ''}}"
+      bindtap="handlePhoneLoginTap"
       bindgetphonenumber="handlePhoneLogin"
     >
       手机号快速登录

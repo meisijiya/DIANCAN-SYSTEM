@@ -43,6 +43,16 @@ async function ensureCurrentUserTableBinding(tableOrId) {
   return boundTable;
 }
 
+async function previewTableByCode(tableCode) {
+  if (!tableCode) {
+    throw new Error('桌号编码不能为空');
+  }
+
+  const targetTable = await tableApi.getTableByCode(tableCode);
+  assertTableAvailable(Number(targetTable.status));
+  return targetTable;
+}
+
 async function bindTableByCode(tableCode, options = {}) {
   if (!tableCode) {
     throw new Error('桌号编码不能为空');
@@ -80,6 +90,7 @@ async function bindTableByCode(tableCode, options = {}) {
 
 module.exports = {
   bindTableByCode,
+  previewTableByCode,
   ensureCurrentUserTableBinding,
   normalizeTableCode
 };

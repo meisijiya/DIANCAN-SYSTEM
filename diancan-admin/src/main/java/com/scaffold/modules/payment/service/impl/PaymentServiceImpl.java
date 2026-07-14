@@ -1414,6 +1414,10 @@ public class PaymentServiceImpl extends ServiceImpl<PaymentRecordMapper, Payment
                         paymentNo, record.getPaymentMethod(), record.getAmount(), payResult.fullyPaid));
         if (payResult.fullyPaid) {
             markRemainingOrderItemsPaid(record.getOrderId());
+            if (!isAdminCheckoutPayment(record)) {
+                // 小程序餐前付订单在支付成功后才允许进入后厨，避免未支付订单提前播报和制作。
+                orderService.notifyKitchenOrderPaid(record.getOrderId());
+            }
             // 回调场景与现金/分单保持一致，只有整单付清后才做会员结算。
             memberSettlementService.settleAfterOrderPaid(record.getOrderId());
             if (isAdminCheckoutPayment(record)) {

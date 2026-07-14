@@ -413,20 +413,17 @@
   height: 84rpx;
   line-height: 84rpx;
   margin-top: 34rpx;
-  border: 1rpx solid rgba(7, 193, 96, 0.16);
   border-radius: 24rpx;
-  background: linear-gradient(180deg, #f5fcf8 0%, #e8f8ee 100%);
-  color: #07c160;
   font-size: 28rpx;
-  font-weight: 700;
-  box-shadow: 0 8rpx 18rpx rgba(5, 122, 61, 0.06);
+  font-weight: 800;
 }
 
 .login-popup-btn--disabled {
-  background: #e6dad4;
-  color: #887872;
-  border-color: rgba(136, 120, 114, 0.28);
-  box-shadow: none;
+  background: rgba(255, 255, 255, 0.96) !important;
+  color: #07c160 !important;
+  border-color: rgba(7, 193, 96, 0.42) !important;
+  box-shadow: 0 8rpx 18rpx rgba(7, 193, 96, 0.08) !important;
+  opacity: 1;
 }
 
 .login-popup-cancel {

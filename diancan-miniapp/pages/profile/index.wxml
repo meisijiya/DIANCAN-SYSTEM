@@ -54,9 +54,9 @@
 
   <view class="login-section" wx:if="{{!loggedIn}}">
     <button
-      class="identity-card__btn {{!agreeProtocol ? 'identity-card__btn--disabled' : ''}}"
-      disabled="{{!agreeProtocol}}"
-      open-type="getPhoneNumber"
+      class="btn-primary identity-card__btn {{!agreeProtocol ? 'identity-card__btn--disabled' : ''}}"
+      open-type="{{agreeProtocol ? 'getPhoneNumber' : ''}}"
+      bindtap="handlePhoneLoginTap"
       bindgetphonenumber="handlePhoneLogin"
     >
       手机号快捷登录

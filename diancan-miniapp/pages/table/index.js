@@ -1,6 +1,6 @@
 const { KEYS, get } = require('../../utils/storage');
 const { isLoggedIn, wxLogin, phoneLogin } = require('../../utils/auth');
-const { bindTableByCode, ensureCurrentUserTableBinding, normalizeTableCode } = require('../../utils/table-binding');
+const { bindTableByCode, previewTableByCode, ensureCurrentUserTableBinding, normalizeTableCode } = require('../../utils/table-binding');
 
 Page({
   data: {
@@ -68,7 +68,8 @@ Page({
     try {
       const code = await wxLogin();
       await phoneLogin(code, e.detail.code);
-      const reboundTable = await ensureCurrentUserTableBinding(this.data.table || get(KEYS.TABLE));
+      const cachedTable = get(KEYS.TABLE);
+      const reboundTable = await ensureCurrentUserTableBinding(cachedTable);
       this.setData({
         loggedIn: true,
         table: reboundTable || this.data.table || null,
@@ -80,6 +81,13 @@ Page({
     } finally {
       wx.hideLoading();
     }
+  },
+
+  handlePhoneLoginTap() {
+    if (this.data.agreeProtocol) {
+      return;
+    }
+    wx.showToast({ title: '请先勾选用户协议与隐私政策', icon: 'none' });
   },
 
   toggleAgreeProtocol() {
@@ -152,14 +160,14 @@ Page({
     this.setData({ entryHintText: '', entryHintTone: '' });
     wx.showLoading({ title: '加载中' });
     try {
-      const { table: boundTable, entryMode, originalStatus } = await bindTableByCode(tableCode);
+      const previewTable = await previewTableByCode(tableCode);
       if (requestCode !== normalizeTableCode(this.data.tableCode)) {
         return;
       }
-      const entryHint = this.buildEntryHint(originalStatus, entryMode);
+      const entryHint = this.buildEntryHint(Number(previewTable.status));
       this.setData({
-        table: boundTable,
-        tableCode: boundTable.code || tableCode,
+        table: previewTable,
+        tableCode: previewTable.code || tableCode,
         entryHintText: entryHint.text,
         entryHintTone: entryHint.tone
       });
@@ -170,25 +178,18 @@ Page({
     }
   },
 
-  buildEntryHint(originalStatus, entryMode) {
-    if (entryMode === 'join') {
+  buildEntryHint(status) {
+    if (status === 0) {
       return {
-        tone: 'success',
-        text: '已进入该桌当前桌次，可与同桌一起加菜或支付。'
+        tone: 'info',
+        text: '桌台当前空闲，进入点餐后会自动开台。'
       };
     }
 
-    if (originalStatus === 0) {
-      return {
-        tone: 'success',
-        text: '已为当前桌台开台，可直接开始点餐。'
-      };
-    }
-
-    if (originalStatus === 1) {
+    if (status === 1) {
       return {
         tone: 'warm',
-        text: '该桌已有进行中点单，可继续加菜或支付。'
+        text: '该桌已有进行中点单，进入后可继续加菜或支付。'
       };
     }
 
@@ -198,12 +199,21 @@ Page({
     };
   },
 
-  enterMenu() {
+  async enterMenu() {
     const { table } = this.data;
     if (!table || !table.id) {
       wx.showToast({ title: '请先关联桌台', icon: 'none' });
       return;
     }
-    wx.switchTab({ url: '/pages/menu/index' });
+    wx.showLoading({ title: '进入点餐', mask: true });
+    try {
+      const { table: boundTable } = await bindTableByCode(table.code || this.data.tableCode);
+      this.setData({ table: boundTable, tableCode: boundTable.code || this.data.tableCode });
+      wx.switchTab({ url: '/pages/menu/index' });
+    } catch (err) {
+      wx.showToast({ title: err.message || '进入点餐失败', icon: 'none' });
+    } finally {
+      wx.hideLoading();
+    }
   }
 });
