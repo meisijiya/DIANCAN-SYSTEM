@@ -132,7 +132,7 @@
     {{cartFeedbackText}}
   </view>
 
-  <view class="cart-bar safe-bottom" wx:if="{{table}}">
+  <view class="cart-bar" wx:if="{{table}}">
     <view class="bar-info" bindtap="goCart">
       <view class="bar-icon">
         <view class="bar-icon__handle"></view>
