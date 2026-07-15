@@ -23,6 +23,9 @@ const autoAcceptEnabled = ref(false);
 const autoAcceptSaving = ref(false);
 const hasTaskSnapshot = ref(false);
 const suppressNextTaskDiffNotify = ref(false);
+const voiceEnabled = ref(true);
+const VOICE_PREF_KEY = 'admin_voice_enabled';
+const KITCHEN_LAST_SEEN_AT_KEY = 'kitchen_last_seen_task_at';
 
 const statusMap: Record<number, { label: string; type: 'warning' | 'info' | 'success' | 'default' }> = {
   0: { label: '待制作', type: 'warning' },
@@ -75,16 +78,108 @@ const cookingCount = computed(() => tasks.value.filter(t => t.status === 1).leng
 const overtimeCount = computed(() => tasks.value.filter(t => t.overtime).length);
 let lastVoiceAt = 0;
 let pollTimer: number | null = null;
+let selectedChineseVoice: SpeechSynthesisVoice | null = null;
+let pendingVoiceText = '';
+let lastSeenKitchenTaskAt = 0;
+
+function handleVoicesChanged() {
+  if (!('speechSynthesis' in window)) return;
+  const voices = window.speechSynthesis.getVoices();
+  selectedChineseVoice = voices.find(voice => voice.lang.toLowerCase() === 'zh-cn' && voice.localService)
+    || voices.find(voice => voice.lang.toLowerCase().startsWith('zh'))
+    || null;
+
+  if (pendingVoiceText && voices.length > 0 && voiceEnabled.value) {
+    const text = pendingVoiceText;
+    pendingVoiceText = '';
+    playVoice(text, 0);
+  }
+}
 
 function playVoice(text: string, cooldownMs = 1200) {
+  if (!voiceEnabled.value) return;
   if (!('speechSynthesis' in window)) return;
+  if (window.speechSynthesis.getVoices().length === 0) {
+    pendingVoiceText = text;
+    return;
+  }
   const now = Date.now();
   if (now - lastVoiceAt < cooldownMs) return;
   lastVoiceAt = now;
+  window.speechSynthesis.resume();
   const utter = new SpeechSynthesisUtterance(text);
   utter.lang = 'zh-CN';
+  if (selectedChineseVoice) utter.voice = selectedChineseVoice;
   utter.rate = 1;
+  utter.volume = 1;
+  utter.onerror = event => {
+    console.error('[Kitchen Voice] 播报失败:', event.error);
+    message.warning(`后厨语音播报失败：${event.error || '未知错误'}`);
+  };
   window.speechSynthesis.speak(utter);
+}
+
+function initVoicePreference() {
+  try {
+    const saved = window.localStorage.getItem(VOICE_PREF_KEY);
+    if (saved === '0') voiceEnabled.value = false;
+    if (saved === '1') voiceEnabled.value = true;
+  } catch {
+    // 浏览器禁用本地存储时保持默认开启。
+  }
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.addEventListener('voiceschanged', handleVoicesChanged);
+    handleVoicesChanged();
+  }
+}
+
+function initKitchenTaskCursor() {
+  try {
+    lastSeenKitchenTaskAt = Number(window.localStorage.getItem(KITCHEN_LAST_SEEN_AT_KEY) || 0);
+  } catch {
+    lastSeenKitchenTaskAt = 0;
+  }
+}
+
+function markKitchenTasksSeen(nextTasks: KitchenTask[]) {
+  const latestAddedAt = nextTasks.reduce((latest, task) => Math.max(latest, parseKitchenTime(task.addedAt)), 0);
+  if (latestAddedAt <= lastSeenKitchenTaskAt) return;
+  lastSeenKitchenTaskAt = latestAddedAt;
+  try {
+    window.localStorage.setItem(KITCHEN_LAST_SEEN_AT_KEY, String(latestAddedAt));
+  } catch {
+    // 浏览器禁用本地存储时仅保留当前页面游标。
+  }
+}
+
+function handleVoiceEnabledChange(value: boolean) {
+  voiceEnabled.value = value;
+  try {
+    window.localStorage.setItem(VOICE_PREF_KEY, value ? '1' : '0');
+  } catch {
+    // 浏览器禁用本地存储时仅保留当前页面状态。
+  }
+  message.success(value ? '后厨语音播报已开启' : '后厨语音播报已关闭');
+  if (value) {
+    testVoice();
+  }
+}
+
+function testVoice() {
+  if (!('speechSynthesis' in window)) {
+    message.warning('当前浏览器不支持语音播报');
+    return;
+  }
+  voiceEnabled.value = true;
+  try {
+    window.localStorage.setItem(VOICE_PREF_KEY, '1');
+  } catch {
+    // 浏览器禁用本地存储时仍允许本次试播。
+  }
+  window.speechSynthesis.cancel();
+  lastVoiceAt = 0;
+  playVoice('后厨语音播报正常', 0);
+  message.success('正在测试后厨语音播报');
 }
 
 function markRush(itemId: string) {
@@ -98,45 +193,74 @@ function markRush(itemId: string) {
   }, 3 * 60 * 1000);
 }
 
+function formatDishSummary(items: Array<{ dishName?: string | null; quantity?: number | null }>) {
+  return items
+    .map(item => `${item.dishName || '菜品'}${item.quantity || 1}份`)
+    .join('、');
+}
+
+function announceNewKitchenOrder(payload: {
+  paymentMode?: number | null;
+  areaName?: string | null;
+  tableCode?: string | null;
+  dishes: Array<{ dishName?: string | null; quantity?: number | null }>;
+}) {
+  const autoAccepted = autoAcceptEnabled.value;
+  let text: string;
+
+  if (Number(payload.paymentMode) === 0) {
+    text = autoAccepted
+      ? '您有新的小程序堂食订单，已为您自动接单。'
+      : '您有新的小程序堂食订单，请及时接单。';
+  } else {
+    const areaName = payload.areaName || '未分区';
+    const tableCode = payload.tableCode || '未知桌号';
+    const dishSummary = formatDishSummary(payload.dishes);
+    text = autoAccepted
+      ? `您有新的前厅堂食订单，${areaName}，${tableCode}桌，菜品：${dishSummary}，已为您自动接单。`
+      : `您有新的前厅堂食订单，${areaName}，${tableCode}桌，菜品：${dishSummary}，请及时接单。`;
+  }
+
+  autoAccepted ? message.success(text) : message.info(text);
+  playVoice(text);
+}
+
 function notifyNewKitchenTasks(nextTasks: KitchenTask[]) {
   if (suppressNextTaskDiffNotify.value) {
     suppressNextTaskDiffNotify.value = false;
+    markKitchenTasksSeen(nextTasks);
     return;
   }
 
   const previousIds = new Set(tasks.value.map(task => String(task.id)));
-  const newTasks = nextTasks.filter(task => !previousIds.has(String(task.id)));
-  if (!newTasks.length || !hasTaskSnapshot.value) return;
+  const newTasks = hasTaskSnapshot.value
+    ? nextTasks.filter(task => !previousIds.has(String(task.id)))
+    : (lastSeenKitchenTaskAt > 0
+        ? nextTasks.filter(task => parseKitchenTime(task.addedAt) > lastSeenKitchenTaskAt)
+        : []);
+  markKitchenTasksSeen(nextTasks);
+  if (!newTasks.length) return;
 
   const latestTask = [...newTasks].sort((a, b) => parseKitchenTime(b.addedAt) - parseKitchenTime(a.addedAt))[0];
-  const tableCode = latestTask.tableCode || '未知桌号';
-  const quantity = latestTask.quantity || 1;
-  if (autoAcceptEnabled.value) {
-    message.success('您有新的堂食订单，已为您自动接单。');
-    playVoice('您有新的堂食订单，已为您自动接单。');
-    return;
-  }
-
-  message.info(`您有新的堂食订单，${tableCode}，${latestTask.dishName} ${quantity} 份，请及时接单。`);
-  playVoice(`您有新的堂食订单，${tableCode}，${latestTask.dishName}${quantity}份，请及时接单。`);
+  announceNewKitchenOrder({
+    paymentMode: latestTask.paymentMode,
+    areaName: latestTask.areaName,
+    tableCode: latestTask.tableCode,
+    dishes: newTasks.filter(task => task.orderId === latestTask.orderId)
+  });
 }
 
 function notifyNewOrderFromEvent(order: Api.Business.Order) {
   const firstItem = order.items?.[0];
   if (!firstItem) return;
 
-  const tableCode = order.tableCode || '未知桌号';
-  const quantity = firstItem.quantity || 1;
   suppressNextTaskDiffNotify.value = true;
-
-  if (autoAcceptEnabled.value) {
-    message.success('您有新的堂食订单，已为您自动接单。');
-    playVoice('您有新的堂食订单，已为您自动接单。');
-    return;
-  }
-
-  message.info(`您有新的堂食订单，${tableCode}，${firstItem.dishName} ${quantity} 份，请及时接单。`);
-  playVoice(`您有新的堂食订单，${tableCode}，${firstItem.dishName}${quantity}份，请及时接单。`);
+  announceNewKitchenOrder({
+    paymentMode: order.paymentMode,
+    areaName: order.areaName,
+    tableCode: order.tableCode,
+    dishes: order.items
+  });
 }
 
 async function loadTasks() {
@@ -235,6 +359,8 @@ function handleKitchenEvent(msg: WsMessage<any>) {
 let unsubscribeKitchen: (() => void) | null = null;
 
 onMounted(() => {
+  initVoicePreference();
+  initKitchenTaskCursor();
   loadTasks();
   loadAutoAcceptEnabled();
   connectWebSocket();
@@ -246,6 +372,9 @@ onMounted(() => {
 
 onUnmounted(() => {
   unsubscribeKitchen?.();
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.removeEventListener('voiceschanged', handleVoicesChanged);
+  }
   if (pollTimer) {
     window.clearInterval(pollTimer);
     pollTimer = null;
@@ -280,6 +409,14 @@ onUnmounted(() => {
           </NSpace>
           <NSpace align="center" :size="8">
             <NSpace align="center" :size="8" class="auto-accept-switch">
+              <span style="font-size: 13px; color: #666;">语音播报</span>
+              <span :class="['auto-accept-badge', voiceEnabled ? 'is-on' : 'is-off']">
+                {{ voiceEnabled ? '已开启' : '已关闭' }}
+              </span>
+              <NSwitch :value="voiceEnabled" @update:value="handleVoiceEnabledChange" />
+              <NButton size="small" secondary @click="testVoice">测试播报</NButton>
+            </NSpace>
+            <NSpace align="center" :size="8" class="auto-accept-switch">
               <span style="font-size: 13px; color: #666;">自动接单</span>
               <span :class="['auto-accept-badge', autoAcceptEnabled ? 'is-on' : 'is-off']">
                 {{ autoAcceptEnabled ? '已开启' : '已关闭' }}
@@ -311,21 +448,22 @@ onUnmounted(() => {
 
       <NEmpty v-if="visibleTasks.length === 0" description="暂无后厨任务" />
 
-      <NGrid v-else :cols="1" :y-gap="12">
+      <NGrid v-else :cols="1" :y-gap="6">
         <NGi v-for="task in visibleTasks" :key="task.id">
           <NCard
             :bordered="true"
+            content-style="padding: 12px 16px;"
             :class="[
               'kitchen-task-card',
               { 'is-overtime': task.overtime, 'is-rush': rushItemIds.has(String(task.id)) }
             ]"
           >
-            <NSpace vertical :size="10">
+            <NSpace vertical :size="6">
               <NSpace align="center" justify="space-between">
                 <NSpace align="center">
-                  <NTag :type="statusMap[task.status]?.type || 'default'">{{ statusMap[task.status]?.label || '未知' }}</NTag>
-                  <NTag v-if="task.overtime" type="error">超时</NTag>
-                  <NTag v-if="rushItemIds.has(String(task.id))" type="warning">催单</NTag>
+                  <NTag size="small" :type="statusMap[task.status]?.type || 'default'">{{ statusMap[task.status]?.label || '未知' }}</NTag>
+                  <NTag v-if="task.overtime" size="small" type="error">超时</NTag>
+                  <NTag v-if="rushItemIds.has(String(task.id))" size="small" type="warning">催单</NTag>
                 </NSpace>
                 <div class="kitchen-task-card__meta">下单时间：{{ formatKitchenTime(task.addedAt) }}</div>
               </NSpace>
@@ -339,6 +477,7 @@ onUnmounted(() => {
                 <NSpace>
                   <NButton
                     v-if="task.status === 0"
+                    size="small"
                     type="primary"
                     :loading="actionLoadingKey === `accept-${task.id}`"
                     @click="handleAccept(task)"
@@ -347,6 +486,7 @@ onUnmounted(() => {
                   </NButton>
                   <NButton
                     v-if="task.status === 1"
+                    size="small"
                     type="success"
                     :loading="actionLoadingKey === `complete-${task.id}`"
                     @click="handleComplete(task)"
@@ -354,6 +494,7 @@ onUnmounted(() => {
                     划单
                   </NButton>
                   <NButton
+                    size="small"
                     secondary
                     type="warning"
                     :loading="actionLoadingKey === `soldout-${task.id}`"

@@ -29,6 +29,12 @@ public class KitchenTaskVO implements Serializable {
     /** 桌台编号 */
     private String tableCode;
 
+    /** 桌台区域名称 */
+    private String areaName;
+
+    /** 支付模式（0餐前付 1餐后付） */
+    private Integer paymentMode;
+
     /** 菜品ID */
     private Long dishId;
 

@@ -6,6 +6,8 @@ export interface KitchenTask {
   orderId: number;
   orderNo: string;
   tableCode: string;
+  areaName: string | null;
+  paymentMode: number;
   dishId: number;
   dishName: string;
   dishImage: string | null;

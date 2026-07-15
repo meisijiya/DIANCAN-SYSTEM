@@ -773,7 +773,7 @@
   gap: 12rpx;
   padding: 8rpx 10rpx;
   border-radius: 999rpx;
-  background: rgba(255, 251, 246, 0.88);
+  background: rgba(255, 251, 246, 0.96);
   border: 1rpx solid rgba(255, 255, 255, 0.82);
   box-shadow: 0 18rpx 34rpx rgba(55, 66, 48, 0.12);
   backdrop-filter: blur(18rpx);
@@ -1065,6 +1065,13 @@
   min-width: 0;
 }
 
+.bar-btn-wrap {
+  flex: 0 0 auto;
+  width: 132rpx;
+  display: flex;
+  align-items: stretch;
+}
+
 .bar-sub {
   color: #64725f;
   font-size: 20rpx;
@@ -1079,18 +1086,22 @@
 }
 
 .bar-btn {
-  width: 144rpx;
-  height: 58rpx;
-  line-height: 58rpx;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-width: 0;
+  height: 68rpx;
+  line-height: 1;
   border-radius: 999rpx;
-  border: 1rpx solid rgba(41, 58, 35, 0.24);
-  padding: 0;
+  border: 1rpx solid rgba(7, 193, 96, 0.28);
+  padding: 0 20rpx;
   margin: 0;
-  background: linear-gradient(135deg, #2b3d26 0%, #435b3b 100%);
+  background: linear-gradient(135deg, #07c160 0%, #06ad56 100%);
   color: #ffffff;
   font-size: 22rpx;
   font-weight: 700;
-  box-shadow: 0 10rpx 22rpx rgba(43, 61, 38, 0.18);
+  box-shadow: 0 8rpx 18rpx rgba(7, 193, 96, 0.18);
 }
 
 .mask {

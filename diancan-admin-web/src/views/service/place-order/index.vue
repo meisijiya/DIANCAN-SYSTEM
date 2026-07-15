@@ -29,12 +29,6 @@ const pendingOfflineCount = ref(0);
 // ==================== 桌台选择 ====================
 const tables = ref<Api.Business.DiningTable[]>([]);
 const selectedTableId = ref<number | null>(null);
-const tableStatusMetaMap: Record<number, { label: string; accent: string; tone: string; hint: string }> = {
-  0: { label: '空闲', accent: 'var(--table-status-free-accent)', tone: 'free', hint: '可直接开台点单' },
-  1: { label: '占用', accent: 'var(--table-status-busy-accent)', tone: 'busy', hint: '已有进行中订单，建议前往桌台看板加菜' },
-  2: { label: '已结账', accent: 'var(--table-status-paid-accent)', tone: 'paid', hint: '需先流转到待清洁后再开台' },
-  3: { label: '待清洁', accent: 'var(--table-status-cleaning-accent)', tone: 'cleaning', hint: '需先完成清洁收尾再继续接待' }
-};
 
 const tableOptions = computed<SelectOption[]>(() =>
   tables.value.map(t => ({
@@ -47,17 +41,6 @@ const selectedTable = computed(() => tables.value.find(t => t.id === selectedTab
 const selectedTableHasActiveOrder = computed(() => selectedTable.value?.status === 1);
 const selectedTableIsPaid = computed(() => selectedTable.value?.status === 2);
 const selectedTableIsToClean = computed(() => selectedTable.value?.status === 3);
-const selectedTableStatusMeta = computed(() => {
-  if (!selectedTable.value) return null;
-  return tableStatusMetaMap[selectedTable.value.status] || tableStatusMetaMap[0];
-});
-const selectedTableNoticeList = computed(() => {
-  const notices: string[] = [];
-  if (selectedTableHasActiveOrder.value) notices.push('当前桌台已有进行中订单，请到桌台看板加菜');
-  if (selectedTableIsPaid.value) notices.push('当前桌台已结账，请先完成清洁流转后再开台点单');
-  if (selectedTableIsToClean.value) notices.push('当前桌台待清洁，请先完成清洁后再开台点单');
-  return notices;
-});
 
 function initSelectedTableFromRoute() {
   const tableId = Number(route.query.tableId || 0);
@@ -383,21 +366,6 @@ onUnmounted(() => {
 <template>
   <div class="service-place-order-page">
     <NSpace vertical :size="12">
-      <NCard :bordered="false" class="order-hero">
-        <div class="order-hero__eyebrow">SERVICE ORDERING</div>
-        <div class="order-hero__head">
-          <div>
-            <h2 class="order-hero__title">把桌台选择、菜品浏览和购物车提交收成一个前厅工作台</h2>
-            <p class="order-hero__desc">适合服务员在高峰时段快速完成点单，并兼容离线缓存和预订单场景，减少因网络波动打断出单节奏。</p>
-          </div>
-          <div class="order-hero__stats">
-            <div class="order-hero__stat"><span>菜品数量</span><strong>{{ dishList.length }}</strong></div>
-            <div class="order-hero__stat"><span>购物车件数</span><strong>{{ cartCount }}</strong></div>
-            <div class="order-hero__stat"><span>待补传</span><strong>{{ pendingOfflineCount }}</strong></div>
-          </div>
-        </div>
-      </NCard>
-
       <!-- 顶部：桌台选择 + 搜索 -->
       <NCard :bordered="false" class="order-toolbar">
         <NSpace :size="16" align="center">
@@ -437,29 +405,6 @@ onUnmounted(() => {
             </NButton>
           </NBadge>
         </NSpace>
-      </NCard>
-
-      <NCard v-if="selectedTable && selectedTableStatusMeta" :bordered="false" class="table-selection-surface">
-        <div class="table-selection-card" :data-tone="selectedTableStatusMeta.tone">
-          <div class="table-selection-card__main">
-            <div class="table-selection-card__eyebrow">ACTIVE TABLE</div>
-            <div class="table-selection-card__title">
-              {{ selectedTable.areaName || '未分区' }} · {{ selectedTable.name }}（{{ selectedTable.code }}）
-            </div>
-            <div class="table-selection-card__meta">
-              <span>{{ selectedTable.capacity }} 人位</span>
-              <span>{{ selectedTableStatusMeta.hint }}</span>
-            </div>
-          </div>
-          <div class="table-selection-card__side">
-            <NTag :bordered="false" :style="{ background: selectedTableStatusMeta.accent, color: '#fff' }">
-              {{ selectedTableStatusMeta.label }}
-            </NTag>
-          </div>
-          <div v-if="selectedTableNoticeList.length" class="table-selection-card__alerts">
-            <span v-for="notice in selectedTableNoticeList" :key="notice">{{ notice }}</span>
-          </div>
-        </div>
       </NCard>
 
       <NGrid :cols="24" :x-gap="16">
@@ -602,160 +547,8 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
-.order-hero {
-  background:
-    radial-gradient(circle at top right, rgba(15, 111, 255, 0.18), transparent 24%),
-    linear-gradient(135deg, rgba(252, 254, 255, 0.98), rgba(227, 239, 255, 0.98)) !important;
-}
-
-.order-hero__eyebrow {
-  margin-bottom: 10px;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.24em;
-  color: rgba(15, 62, 124, 0.68);
-}
-
-.order-hero__head {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 18px;
-}
-
-.order-hero__title {
-  margin: 0;
-  font-size: 28px;
-  color: #123055;
-}
-
-.order-hero__desc {
-  max-width: 760px;
-  margin: 10px 0 0;
-  line-height: 1.75;
-  color: rgba(21, 44, 76, 0.72);
-}
-
-.order-hero__stats {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(120px, 1fr));
-  gap: 12px;
-}
-
-.order-hero__stat {
-  padding: 16px 18px;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.78);
-  border: 1px solid rgba(15, 111, 255, 0.1);
-}
-
-.order-hero__stat span {
-  display: block;
-  font-size: 12px;
-  color: rgba(15, 62, 124, 0.68);
-}
-
-.order-hero__stat strong {
-  display: block;
-  margin-top: 8px;
-  font-size: 28px;
-  color: #0f6fff;
-}
-
 .order-toolbar {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(239, 247, 255, 0.96)) !important;
-}
-
-.table-selection-surface {
-  background:
-    radial-gradient(circle at top right, rgba(var(--admin-accent-rgb), 0.08), transparent 26%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(244, 249, 255, 0.92)) !important;
-}
-
-.table-selection-card {
-  --table-card-accent: var(--table-status-free-accent);
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 14px;
-  align-items: start;
-  padding: 2px;
-  border-radius: 20px;
-}
-
-.table-selection-card[data-tone='free'] {
-  --table-card-accent: var(--table-status-free-accent);
-}
-
-.table-selection-card[data-tone='busy'] {
-  --table-card-accent: var(--table-status-busy-accent);
-}
-
-.table-selection-card[data-tone='paid'] {
-  --table-card-accent: var(--table-status-paid-accent);
-}
-
-.table-selection-card[data-tone='cleaning'] {
-  --table-card-accent: var(--table-status-cleaning-accent);
-}
-
-.table-selection-card__main {
-  min-width: 0;
-}
-
-.table-selection-card__eyebrow {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.18em;
-  color: color-mix(in srgb, var(--table-card-accent) 62%, #5e708b);
-}
-
-.table-selection-card__title {
-  margin-top: 6px;
-  font-size: 18px;
-  font-weight: 700;
-  color: #123055;
-}
-
-.table-selection-card__meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 10px;
-}
-
-.table-selection-card__meta span,
-.table-selection-card__alerts span {
-  display: inline-flex;
-  align-items: center;
-  min-height: 30px;
-  padding: 0 12px;
-  border-radius: 999px;
-  font-size: 12px;
-  line-height: 1.4;
-}
-
-.table-selection-card__meta span {
-  color: color-mix(in srgb, var(--table-card-accent) 58%, #38506f);
-  background: color-mix(in srgb, var(--table-card-accent) 10%, white);
-  border: 1px solid color-mix(in srgb, var(--table-card-accent) 18%, rgba(15, 111, 255, 0.08));
-}
-
-.table-selection-card__side {
-  display: flex;
-  align-items: flex-start;
-}
-
-.table-selection-card__alerts {
-  grid-column: 1 / -1;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.table-selection-card__alerts span {
-  color: color-mix(in srgb, var(--table-card-accent) 68%, #314a69);
-  background: color-mix(in srgb, var(--table-card-accent) 12%, white);
-  border: 1px solid color-mix(in srgb, var(--table-card-accent) 22%, rgba(15, 111, 255, 0.08));
 }
 
 .dish-skeleton-grid {
@@ -899,86 +692,13 @@ onUnmounted(() => {
 }
 
 @media (max-width: 960px) {
-  .order-hero__head {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .order-hero__stats {
-    grid-template-columns: 1fr;
-    width: 100%;
-  }
-
-  .table-selection-card {
-    grid-template-columns: 1fr;
-  }
-
   .dish-skeleton-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-html.dark .order-hero {
-  background:
-    radial-gradient(circle at top right, rgba(var(--admin-accent-rgb), 0.18), transparent 24%),
-    linear-gradient(135deg, rgba(8, 12, 20, 0.98), rgba(14, 19, 30, 0.98)) !important;
-}
-
-html.dark .order-hero__eyebrow {
-  color: rgba(183, 198, 228, 0.68);
-}
-
-html.dark .order-hero__title {
-  color: rgba(241, 246, 255, 0.96);
-}
-
-html.dark .order-hero__desc {
-  color: rgba(206, 216, 236, 0.76);
-}
-
-html.dark .order-hero__stat {
-  background: rgba(255, 255, 255, 0.04);
-  border-color: rgba(255, 255, 255, 0.08);
-}
-
-html.dark .order-hero__stat span {
-  color: rgba(183, 198, 228, 0.68);
-}
-
-html.dark .order-hero__stat strong {
-  color: #dbe5ff;
-}
-
 html.dark .order-toolbar {
   background: linear-gradient(180deg, rgba(9, 13, 21, 0.96), rgba(14, 19, 30, 0.98)) !important;
-}
-
-html.dark .table-selection-surface {
-  background:
-    radial-gradient(circle at top right, rgba(var(--admin-accent-rgb), 0.12), transparent 26%),
-    linear-gradient(180deg, rgba(9, 13, 21, 0.96), rgba(14, 19, 30, 0.98)) !important;
-}
-
-html.dark .table-selection-card__eyebrow {
-  color: color-mix(in srgb, var(--table-card-accent) 58%, rgba(203, 217, 244, 0.82));
-}
-
-html.dark .table-selection-card__title {
-  color: rgba(241, 246, 255, 0.96);
-}
-
-html.dark .table-selection-card__meta span,
-html.dark .table-selection-card__alerts span {
-  color: rgba(230, 238, 252, 0.92);
-  border-color: color-mix(in srgb, var(--table-card-accent) 24%, rgba(255, 255, 255, 0.08));
-}
-
-html.dark .table-selection-card__meta span {
-  background: color-mix(in srgb, var(--table-card-accent) 16%, rgba(8, 13, 22, 0.92));
-}
-
-html.dark .table-selection-card__alerts span {
-  background: color-mix(in srgb, var(--table-card-accent) 18%, rgba(8, 13, 22, 0.96));
 }
 
 html.dark .dish-card {

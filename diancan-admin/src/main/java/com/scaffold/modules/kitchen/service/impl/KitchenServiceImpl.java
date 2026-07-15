@@ -14,6 +14,8 @@ import com.scaffold.modules.order.entity.OrderItem;
 import com.scaffold.modules.order.mapper.OrderItemMapper;
 import com.scaffold.modules.order.mapper.OrderMapper;
 import com.scaffold.modules.system.service.SysConfigService;
+import com.scaffold.modules.table.entity.DiningTable;
+import com.scaffold.modules.table.mapper.DiningTableMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -35,6 +37,7 @@ public class KitchenServiceImpl implements KitchenService {
 
     private final OrderItemMapper orderItemMapper;
     private final OrderMapper orderMapper;
+    private final DiningTableMapper diningTableMapper;
     private final DishService dishService;
     private final WsService wsService;
     private final SysConfigService sysConfigService;
@@ -68,6 +71,16 @@ public class KitchenServiceImpl implements KitchenService {
         Map<Long, Order> orderMap = orders.stream()
                 .collect(Collectors.toMap(Order::getId, o -> o));
 
+        // 批量读取桌台区域，供后厨播报区域和桌号。
+        Set<Long> tableIds = orders.stream()
+                .map(Order::getTableId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+        Map<Long, DiningTable> tableMap = tableIds.isEmpty()
+                ? Collections.emptyMap()
+                : diningTableMapper.selectBatchIds(tableIds).stream()
+                        .collect(Collectors.toMap(DiningTable::getId, table -> table));
+
         // 3. 批量查询关联的菜品（获取 preparationTime）
         Set<Long> dishIds = items.stream()
                 .map(OrderItem::getDishId)
@@ -85,8 +98,8 @@ public class KitchenServiceImpl implements KitchenService {
         List<KitchenTaskVO> result = new ArrayList<>();
         for (OrderItem item : items) {
             Order order = orderMap.get(item.getOrderId());
-            if (order == null) {
-                // 订单不在活跃状态，跳过
+            if (!isVisibleKitchenOrder(order)) {
+                // 餐前付订单必须完成支付后才能进入后厨，餐后付订单允许待支付时制作。
                 continue;
             }
             KitchenTaskVO vo = new KitchenTaskVO();
@@ -94,6 +107,9 @@ public class KitchenServiceImpl implements KitchenService {
             vo.setOrderId(item.getOrderId());
             vo.setOrderNo(order.getOrderNo());
             vo.setTableCode(order.getTableCode());
+            DiningTable table = tableMap.get(order.getTableId());
+            vo.setAreaName(table == null ? null : table.getAreaName());
+            vo.setPaymentMode(order.getPaymentMode());
             vo.setDishId(item.getDishId());
             vo.setDishName(item.getDishName());
             vo.setDishImage(item.getDishImage());
@@ -115,6 +131,23 @@ public class KitchenServiceImpl implements KitchenService {
             result.add(vo);
         }
         return result;
+    }
+
+    /**
+     * 判断订单是否允许展示在后厨任务列表
+     *
+     * @author Henfon
+     * @date 2026-07-15
+     * @description 餐前付订单仅在支付完成后展示，餐后付和历史未标记支付模式的订单允许先制作后结账。
+     * @param order 订单
+     * @return true 表示允许进入后厨任务列表
+     */
+    private boolean isVisibleKitchenOrder(Order order) {
+        if (order == null) {
+            return false;
+        }
+        boolean prepayOrder = order.getPaymentMode() != null && order.getPaymentMode() == 0;
+        return !prepayOrder || (order.getStatus() != null && order.getStatus() == 1);
     }
 
     @Override
