@@ -46,7 +46,7 @@ public class HomeBanner extends BaseEntity {
     private String targetPath;
 
     /**
-     * 投放位置（HOME首页 MENU_HERO点餐页头图 PROFILE_HERO我的页头图）
+     * 投放位置（HOME首页轮播 MENU_HERO点餐页头图 MENU_BANNER点餐页轮播 PROFILE_HERO我的页头图）
      */
     private String scene;
 

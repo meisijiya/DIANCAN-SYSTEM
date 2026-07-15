@@ -74,19 +74,22 @@ const actionOptions: SelectOption[] = [
 const searchSceneOptions: SelectOption[] = [
   { label: '全部位置', value: undefined },
   { label: '首页轮播', value: 'HOME' },
-  { label: '点餐页 HERO', value: 'MENU_HERO' },
+  { label: '点餐页顶部背景图', value: 'MENU_HERO' },
+  { label: '点餐页轮播图', value: 'MENU_BANNER' },
   { label: '我的页 HERO', value: 'PROFILE_HERO' }
 ];
 
 const formSceneOptions: SelectOption[] = [
   { label: '首页轮播', value: 'HOME' },
-  { label: '点餐页 HERO', value: 'MENU_HERO' },
+  { label: '点餐页顶部背景图', value: 'MENU_HERO' },
+  { label: '点餐页轮播图', value: 'MENU_BANNER' },
   { label: '我的页 HERO', value: 'PROFILE_HERO' }
 ];
 
 const sceneLabelMap: Record<string, string> = {
   HOME: '首页轮播',
-  MENU_HERO: '点餐页 HERO',
+  MENU_HERO: '点餐页顶部背景图',
+  MENU_BANNER: '点餐页轮播图',
   PROFILE_HERO: '我的页 HERO'
 };
 
@@ -94,7 +97,7 @@ const columns: DataTableColumns<Api.Banner.HomeBanner> = [
   {
     title: '投放位置',
     key: 'scene',
-    width: 130,
+    width: 180,
     render(row) {
       return sceneLabelMap[row.scene] || row.scene;
     }
@@ -332,7 +335,7 @@ onMounted(() => {
       <div class="banner-hero__head">
         <div>
           <h2 class="banner-hero__title">把小程序顶部轮播图做成可分位置运营的内容陈列位</h2>
-          <p class="banner-hero__desc">首页、点餐页 HERO、我的页 HERO 各自独立配置，活动投放和入口管理不会再互相串用。</p>
+          <p class="banner-hero__desc">首页轮播、点餐页顶部背景图、点餐页轮播图、我的页 HERO 各自独立配置，运营内容不会互相串用。</p>
         </div>
         <div class="banner-hero__badge">
           <span>当前轮播数</span>
@@ -408,6 +411,12 @@ onMounted(() => {
         </template>
         <div v-else class="banner-scene-tip">
           我的页 HERO 当前按纯图片展示，标题和副标题不会在小程序里显示。
+        </div>
+        <div v-if="formModel.scene === 'MENU_HERO'" class="banner-scene-tip">
+          点餐页顶部按单张背景图展示；存在多张启用图片时，使用排序值最小的一张。
+        </div>
+        <div v-if="formModel.scene === 'MENU_BANNER'" class="banner-scene-tip">
+          点餐页菜品分类上方按轮播图展示，支持配置多张启用图片和跳转动作。
         </div>
         <NFormItem label="图片">
           <NSpace vertical :size="8" style="width: 100%;">

@@ -467,7 +467,7 @@ CREATE TABLE `home_banner`  (
   `image_url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '图片地址或对象键',
   `action_type` tinyint NOT NULL DEFAULT 0 COMMENT '操作类型（0无动作 1页面跳转 2切换Tab）',
   `target_path` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '跳转路径',
-  `scene` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'HOME' COMMENT '投放位置（HOME首页 MENU_HERO点餐页头图 PROFILE_HERO我的页头图）',
+  `scene` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'HOME' COMMENT '投放位置（HOME首页轮播 MENU_HERO点餐页头图 MENU_BANNER点餐页轮播 PROFILE_HERO我的页头图）',
   `sort` int NOT NULL DEFAULT 0 COMMENT '排序',
   `status` tinyint NOT NULL DEFAULT 1 COMMENT '状态（0停用 1启用）',
   `create_by` bigint NULL DEFAULT NULL,

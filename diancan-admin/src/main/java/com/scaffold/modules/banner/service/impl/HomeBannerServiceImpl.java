@@ -36,8 +36,14 @@ public class HomeBannerServiceImpl implements HomeBannerService {
 
     private static final String SCENE_HOME = "HOME";
     private static final String SCENE_MENU_HERO = "MENU_HERO";
+    private static final String SCENE_MENU_BANNER = "MENU_BANNER";
     private static final String SCENE_PROFILE_HERO = "PROFILE_HERO";
-    private static final Set<String> SUPPORTED_SCENES = Set.of(SCENE_HOME, SCENE_MENU_HERO, SCENE_PROFILE_HERO);
+    private static final Set<String> SUPPORTED_SCENES = Set.of(
+            SCENE_HOME,
+            SCENE_MENU_HERO,
+            SCENE_MENU_BANNER,
+            SCENE_PROFILE_HERO
+    );
 
     private final HomeBannerMapper homeBannerMapper;
     private final MinioStorageService minioStorageService;

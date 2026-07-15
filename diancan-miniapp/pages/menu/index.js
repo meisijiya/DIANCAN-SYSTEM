@@ -99,6 +99,30 @@ function buildDishBrief(dish) {
   return dish.description || dish.ingredientsText || '点击查看菜品详情';
 }
 
+function formatCountBadge(count) {
+  const value = Number(count || 0);
+  if (value <= 0) return '';
+  return value > 99 ? '99+' : String(value);
+}
+
+function createEmptyCartSummary() {
+  return {
+    totalCount: 0,
+    totalPrice: '0.00',
+    totalCountText: ''
+  };
+}
+
+function createEmptyCartState() {
+  return {
+    cartItems: [],
+    cartSummary: createEmptyCartSummary(),
+    allCategoryCartCount: 0,
+    allCategoryCartCountText: '',
+    cartSheetVisible: false
+  };
+}
+
 Page({
   data: {
     statusBarHeight: 0,
@@ -106,10 +130,11 @@ Page({
     loggedIn: false,
     tableCode: '',
     table: null,
+    menuHeroBanners: [],
     banners: [],
     showTableInput: false,
     categories: [],
-    categoryScrollIntoView: 'category-all',
+    categoryScrollIntoView: '',
     dishMap: {},
     allDishList: [],
     recommendDishIds: [],
@@ -124,7 +149,12 @@ Page({
     keyword: '',
     quickFilter: 'all',
     orderedDishIds: [],
-    cartSummary: { totalCount: 0, totalPrice: '0.00' },
+    cartItems: [],
+    cartSummary: createEmptyCartSummary(),
+    allCategoryCartCount: 0,
+    allCategoryCartCountText: '',
+    cartSheetVisible: false,
+    cartUpdatingDishId: '',
     heroStatusText: '等待绑定桌台',
     menuHeroTitle: '选好菜，再确认下单',
     tableDisplayCode: '未绑定',
@@ -169,7 +199,7 @@ Page({
         {
           orderedDishIds: [],
           orderedDishCount: 0,
-          cartSummary: { totalCount: 0, totalPrice: '0.00' }
+          ...createEmptyCartState()
         },
         () => {
           this.updateDishListFromState();
@@ -183,12 +213,16 @@ Page({
       this.setData({ tableCode: activeTable.code || '', showTableInput: false });
       this.loadMenu();
       this.loadOrderedDishIds();
-      if (loggedIn) this.loadCart();
+      if (loggedIn) {
+        this.loadCart();
+      } else {
+        this.setData({ ...createEmptyCartState() }, () => this.updateDishListFromState());
+      }
     } else if (sceneTableCode) {
       this.loadTable(this.data.tableCode);
     } else {
       this.loadMenu();
-      this.setData({ orderedDishIds: [], orderedDishCount: 0, cartSummary: { totalCount: 0, totalPrice: '0.00' } }, () => {
+      this.setData({ orderedDishIds: [], orderedDishCount: 0, ...createEmptyCartState() }, () => {
         this.updateDishListFromState();
       });
     }
@@ -256,7 +290,7 @@ Page({
       if (isLoggedIn()) {
         await this.loadCart();
       } else {
-        this.setData({ cartSummary: { totalCount: 0, totalPrice: '0.00' } });
+        this.setData({ ...createEmptyCartState() }, () => this.updateDishListFromState());
       }
     } catch (err) {
       this.setData({ sceneRefreshPending: false });
@@ -267,14 +301,17 @@ Page({
   },
 
   async loadBanners() {
-    try {
-      const banners = await bannerApi.getBannerList('MENU_HERO');
-      this.setData({ banners: Array.isArray(banners) ? banners : [] });
-    } catch (err) {
-      if (!Array.isArray(this.data.banners) || this.data.banners.length === 0) {
-        this.setData({ banners: [] });
-      }
-    }
+    const [menuHeroBanners, menuBanners, homeBanners] = await Promise.all([
+      bannerApi.getBannerList('MENU_HERO').catch(() => []),
+      bannerApi.getBannerList('MENU_BANNER').catch(() => []),
+      bannerApi.getBannerList('HOME').catch(() => [])
+    ]);
+    this.setData({
+      menuHeroBanners: Array.isArray(menuHeroBanners) ? menuHeroBanners : [],
+      banners: Array.isArray(menuBanners) && menuBanners.length > 0
+        ? menuBanners
+        : (Array.isArray(homeBanners) ? homeBanners : [])
+    });
   },
 
   toggleTableInput() {
@@ -403,26 +440,29 @@ Page({
 
   async loadCart() {
     const currentTableId = Number((this.data.table || {}).id || 0);
-    if (!currentTableId) return;
+    if (!currentTableId) {
+      this.setData({ ...createEmptyCartState() }, () => this.updateDishListFromState());
+      return;
+    }
     try {
       const cart = await cartApi.getCart(currentTableId);
       if (currentTableId !== Number((this.data.table || {}).id || 0)) {
         return;
       }
+      const totalCount = Number(cart.totalCount || 0);
+      const cartItems = this.enrichCartItems(Array.isArray(cart.items) ? cart.items : []);
 
       this.setData({
+        cartItems,
         cartSummary: {
-          totalCount: cart.totalCount || 0,
-          totalPrice: formatPrice(cart.totalPrice)
-        }
-      });
+          totalCount,
+          totalPrice: formatPrice(cart.totalPrice),
+          totalCountText: formatCountBadge(totalCount)
+        },
+        cartSheetVisible: totalCount > 0 && this.data.cartSheetVisible
+      }, () => this.updateDishListFromState());
     } catch (err) {
-      this.setData({
-        cartSummary: {
-          totalCount: 0,
-          totalPrice: '0.00'
-        }
-      });
+      this.setData({ ...createEmptyCartState() }, () => this.updateDishListFromState());
     }
   },
 
@@ -434,17 +474,6 @@ Page({
         activeCategoryId: id,
         activeCategoryName: selected ? selected.name : '全部菜品',
         categoryScrollIntoView: `category-${id}`
-      },
-      () => this.updateDishListFromState()
-    );
-  },
-
-  selectAllCategory() {
-    this.setData(
-      {
-        activeCategoryId: null,
-        activeCategoryName: '全部菜品',
-        categoryScrollIntoView: 'category-all'
       },
       () => this.updateDishListFromState()
     );
@@ -526,14 +555,97 @@ Page({
     });
   },
 
+  enrichCartItems(items) {
+    const dishNameMap = {};
+    const dishMap = (this.data.allDishList || []).reduce((acc, dish) => {
+      if (dish && dish._idStr) {
+        acc[dish._idStr] = dish;
+      }
+      if (dish && dish.name) {
+        dishNameMap[dish.name] = dish;
+      }
+      return acc;
+    }, {});
+
+    return (items || []).map(item => {
+      const dishId = extractDishIdFromOrderItem(item);
+      const dish = dishMap[dishId] || dishNameMap[item.dishName] || {};
+      const itemImage = item.imageView || item.dishImage || item.imageUrl || '';
+      const usableItemImage = /^(https?:\/\/|\/assets\/)/.test(itemImage) ? itemImage : '';
+      return {
+        ...item,
+        dishId,
+        dishName: item.dishName || dish.name || '菜品',
+        imageView: dish.imageView || usableItemImage,
+        priceText: formatPrice(item.price ?? dish.price ?? 0),
+        amountText: formatPrice(item.amount ?? item.subtotal ?? (Number(item.price || dish.price || 0) * Number(item.quantity || 0)))
+      };
+    });
+  },
+
+  buildCartCountState(cartItems = this.data.cartItems) {
+    const dishCategoryMap = (this.data.allDishList || []).reduce((acc, item) => {
+      if (item && item._idStr) {
+        acc[item._idStr] = normalizeId(item.categoryId);
+      }
+      return acc;
+    }, {});
+    const dishCountMap = {};
+    const categoryCountMap = {};
+    let totalCount = 0;
+
+    (cartItems || []).forEach(item => {
+      const dishId = extractDishIdFromOrderItem(item);
+      const quantity = Number(item.quantity || 0);
+      if (!dishId || quantity <= 0) {
+        return;
+      }
+
+      dishCountMap[dishId] = Number(dishCountMap[dishId] || 0) + quantity;
+      totalCount += quantity;
+
+      const fallbackCategoryId = normalizeCategoryId(item.categoryId, item.category_id, '');
+      const categoryKey = dishCategoryMap[dishId] || fallbackCategoryId;
+      if (categoryKey) {
+        categoryCountMap[categoryKey] = Number(categoryCountMap[categoryKey] || 0) + quantity;
+      }
+    });
+
+    return { dishCountMap, categoryCountMap, totalCount };
+  },
+
+  buildCategoryListWithCartCount(categoryCountMap) {
+    return (this.data.categories || []).map(item => {
+      const cartCount = Number(categoryCountMap[item._idStr] || 0);
+      return {
+        ...item,
+        _cartCount: cartCount,
+        _cartCountText: formatCountBadge(cartCount)
+      };
+    });
+  },
+
   updateDishListFromState() {
+    const cartItems = this.enrichCartItems(this.data.cartItems || []);
+    const { dishCountMap, categoryCountMap, totalCount } = this.buildCartCountState(cartItems);
     const baseList = this.getBaseDishList();
     const filterList = this.applyQuickFilter(baseList);
-    const dishList = this.applyKeywordFilter(filterList);
+    const dishList = this.applyKeywordFilter(filterList).map(item => {
+      const cartCount = Number(dishCountMap[item._idStr] || 0);
+      return {
+        ...item,
+        _cartCount: cartCount,
+        _cartCountText: formatCountBadge(cartCount)
+      };
+    });
     this.setData({
+      cartItems,
+      categories: this.buildCategoryListWithCartCount(categoryCountMap),
       dishList,
       visibleDishCount: dishList.length,
-      activeCategoryCount: baseList.length
+      activeCategoryCount: baseList.length,
+      allCategoryCartCount: totalCount,
+      allCategoryCartCountText: formatCountBadge(totalCount)
     });
   },
 
@@ -744,6 +856,61 @@ Page({
 
     await cartApi.addCartItem(this.data.table.id, dish.id, Number(this.data.detailQty || 1), this.data.detailRemark || '');
     await this.loadCart();
+  },
+
+  toggleCartSheet() {
+    if (!this.data.cartSummary.totalCount) {
+      wx.showToast({ title: '还没有选择菜品', icon: 'none' });
+      return;
+    }
+    this.setData({ cartSheetVisible: !this.data.cartSheetVisible });
+  },
+
+  closeCartSheet() {
+    this.setData({ cartSheetVisible: false });
+  },
+
+  async changeCartQuantity(e) {
+    const item = e.currentTarget.dataset.item || {};
+    const delta = Number(e.currentTarget.dataset.delta || 0);
+    const dishId = extractDishIdFromOrderItem(item);
+    const nextQuantity = Number(item.quantity || 0) + delta;
+    if (!dishId || !delta || this.data.cartUpdatingDishId) return;
+
+    this.setData({ cartUpdatingDishId: dishId });
+    try {
+      if (nextQuantity <= 0) {
+        await cartApi.removeCartItem(dishId, this.data.table.id);
+      } else {
+        await cartApi.updateCartItem(dishId, this.data.table.id, nextQuantity);
+      }
+      await this.loadCart();
+    } catch (err) {
+      wx.showToast({ title: err.message || '更新购物车失败', icon: 'none' });
+    } finally {
+      this.setData({ cartUpdatingDishId: '' });
+    }
+  },
+
+  clearMenuCart() {
+    if (!this.data.table || !this.data.cartSummary.totalCount) return;
+    wx.showModal({
+      title: '清空已选菜品',
+      content: '清空后需要重新选择，确定继续吗？',
+      confirmText: '清空',
+      confirmColor: '#4f6845',
+      success: async res => {
+        if (!res.confirm) return;
+        try {
+          await cartApi.clearCart(this.data.table.id);
+          this.setData({ cartSheetVisible: false });
+          await this.loadCart();
+          wx.showToast({ title: '已清空', icon: 'none' });
+        } catch (err) {
+          wx.showToast({ title: err.message || '清空失败', icon: 'none' });
+        }
+      }
+    });
   },
 
   goCart() {

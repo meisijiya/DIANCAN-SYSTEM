@@ -2,7 +2,22 @@
   <view class="page-glow page-glow-a"></view>
   <view class="page-glow page-glow-b"></view>
   <view class="top-card">
-    <view class="menu-hero" style="padding-top: {{statusBarHeight + 6}}px;">
+    <view class="store-visual" style="padding-top: {{statusBarHeight + 8}}px; min-height: {{statusBarHeight + navBarHeight + 92}}px;">
+      <image wx:if="{{menuHeroBanners.length > 0}}" class="store-visual__image" src="{{menuHeroBanners[0].imageUrl}}" mode="aspectFill" />
+      <view class="store-visual__wash"></view>
+      <view class="store-visual__content">
+        <view class="store-visual__eyebrow">堂食点单 · 现点现做</view>
+        <view class="store-visual__title">{{menuHeroTitle}}</view>
+        <view class="store-visual__meta">
+          <view class="store-visual__status-dot"></view>
+          <text>{{heroStatusText}}</text>
+          <text class="store-visual__divider">·</text>
+          <text>{{table ? '桌台 ' + tableDisplayCode : '请先关联桌台'}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="menu-hero">
       <view class="hero-banner-stage" wx:if="{{banners.length > 0}}">
         <swiper
           class="hero-banner-swiper"
@@ -51,13 +66,6 @@
 
   <view class="layout">
     <scroll-view class="left-side" scroll-y scroll-with-animation scroll-into-view="{{categoryScrollIntoView}}" show-scrollbar="{{false}}">
-      <view id="category-all" class="cat-item {{activeCategoryId === null ? 'active' : ''}}" bindtap="selectAllCategory">
-        <view class="cat-item__icon">全部</view>
-        <view class="cat-item__copy">
-          <text class="cat-item__label">全部菜品</text>
-        </view>
-        <text class="cat-item__active-dot" wx:if="{{activeCategoryId === null}}"></text>
-      </view>
       <view
         wx:for="{{categories}}"
         wx:key="id"
@@ -66,9 +74,12 @@
         data-id="{{item.id}}"
         bindtap="selectCategory"
       >
-        <view class="cat-item__icon">
-          <image wx:if="{{item.imageView}}" class="cat-item__image" src="{{item.imageView}}" mode="aspectFill" lazy-load />
-          <text wx:else>{{item.shortLabel}}</text>
+        <view class="cat-item__icon-wrap">
+          <view class="cat-item__icon">
+            <image wx:if="{{item.imageView}}" class="cat-item__image" src="{{item.imageView}}" mode="aspectFill" lazy-load />
+            <text wx:else>{{item.shortLabel}}</text>
+          </view>
+          <text class="cat-item__badge" wx:if="{{item._cartCount > 0}}">{{item._cartCountText}}</text>
         </view>
         <view class="cat-item__copy">
           <text class="cat-item__label">{{item.name}}</text>
@@ -84,17 +95,18 @@
     <scroll-view class="right-side" scroll-y show-scrollbar="{{false}}">
       <view class="right-surface">
         <view class="dish-card" wx:for="{{dishList}}" wx:key="id" bindtap="openDetail" data-id="{{item.id}}">
-          <image class="thumb" src="{{item.imageView}}" mode="aspectFill" lazy-load />
+          <view class="dish-card__media">
+            <image class="thumb" src="{{item.imageView}}" mode="aspectFill" lazy-load />
+            <text class="dish-card__badge" wx:if="{{item._recommended}}">推荐</text>
+          </view>
           <view class="info">
             <view class="dish-meta-row">
-              <text class="meta-pill">{{item.categoryName}}</text>
-              <text class="meta-pill spice">{{item.spiceLabel}}</text>
+              <text class="meta-pill spice" wx:if="{{item.spiceLabel}}">{{item.spiceLabel}}</text>
               <text class="meta-pill" wx:if="{{item.preparationTime}}">{{item.preparationTime}} 分钟</text>
             </view>
 
             <view class="dish-topline">
               <view class="dish-name">{{item.name}}</view>
-              <view class="dish-sales">月售{{item.monthlySales || 0}}</view>
             </view>
 
             <view class="dish-sub">{{item.briefText}}</view>
@@ -102,9 +114,9 @@
             <view class="dish-bottom">
               <view class="dish-bottom__main">
                 <view class="dish-tags">
-                  <text class="mini-tag rec" wx:if="{{item._recommended}}">推荐</text>
                   <text class="mini-tag had" wx:if="{{item._ordered}}">点过</text>
                   <text class="soldout-tag" wx:if="{{item.soldOutFlag}}">售罄</text>
+                  <text class="dish-sales">月售{{item.monthlySales || 0}}</text>
                 </view>
                 <view class="dish-price-row">
                   <view class="dish-price">¥{{item.price}}</view>
@@ -117,7 +129,8 @@
                 data-id="{{item.id}}"
                 catchtap="openDetail"
               >
-                {{item.soldOutFlag ? '售罄' : '选规格'}}
+                <text class="spec-btn__text">{{item.soldOutFlag ? '售罄' : '选规格'}}</text>
+                <text class="spec-btn__badge" wx:if="{{item._cartCount > 0}}">{{item._cartCountText}}</text>
               </button>
             </view>
           </view>
@@ -133,10 +146,11 @@
   </view>
 
   <view class="cart-bar" wx:if="{{table}}">
-    <view class="bar-info" bindtap="goCart">
+    <view class="bar-info" bindtap="toggleCartSheet">
       <view class="bar-icon">
         <view class="bar-icon__handle"></view>
         <view class="bar-icon__bag"></view>
+        <text class="bar-icon__badge" wx:if="{{cartSummary.totalCount > 0}}">{{cartSummary.totalCountText}}</text>
       </view>
       <view class="bar-copy">
         <view class="bar-sub">已点 {{cartSummary.totalCount}} 份菜品</view>
@@ -146,6 +160,37 @@
     <view class="bar-btn-wrap">
       <button class="bar-btn" bindtap="goCart">去结算</button>
     </view>
+  </view>
+
+  <view class="cart-sheet-mask {{cartSheetVisible ? 'show' : ''}}" wx:if="{{cartSheetVisible}}" bindtap="closeCartSheet"></view>
+  <view class="cart-sheet {{cartSheetVisible ? 'show' : ''}}" wx:if="{{cartSheetVisible}}">
+    <view class="cart-sheet__head">
+      <view class="cart-sheet__select">
+        <view class="cart-sheet__check">✓</view>
+        <text>已选菜品</text>
+        <text class="cart-sheet__count">{{cartSummary.totalCount}} 份</text>
+      </view>
+      <view class="cart-sheet__clear" bindtap="clearMenuCart">
+        <view class="trash-icon"></view>
+        <text>清空</text>
+      </view>
+    </view>
+    <scroll-view class="cart-sheet__list" scroll-y show-scrollbar="{{false}}">
+      <view class="cart-sheet__item" wx:for="{{cartItems}}" wx:key="dishId">
+        <view class="cart-sheet__check cart-sheet__check--small">✓</view>
+        <image class="cart-sheet__image" src="{{item.imageView}}" mode="aspectFill" />
+        <view class="cart-sheet__info">
+          <view class="cart-sheet__name">{{item.dishName}}</view>
+          <view class="cart-sheet__remark" wx:if="{{item.remark}}">{{item.remark}}</view>
+          <view class="cart-sheet__price">¥{{item.priceText}}</view>
+        </view>
+        <view class="cart-sheet__stepper">
+          <view class="cart-sheet__step {{cartUpdatingDishId ? 'disabled' : ''}}" data-item="{{item}}" data-delta="-1" bindtap="changeCartQuantity">−</view>
+          <text class="cart-sheet__quantity">{{item.quantity}}</text>
+          <view class="cart-sheet__step cart-sheet__step--plus {{cartUpdatingDishId ? 'disabled' : ''}}" data-item="{{item}}" data-delta="1" bindtap="changeCartQuantity">＋</view>
+        </view>
+      </view>
+    </scroll-view>
   </view>
 
   <view class="mask sheet-mask" wx:if="{{detailVisible}}" bindtap="closeDetail">
