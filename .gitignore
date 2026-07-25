@@ -53,3 +53,9 @@ pnpm-debug.log*
 
 # ===== Docker Compose 排除 =====
 .dockerignore
+
+# ===== Agent 系统生成的 AGENTS.md（每个项目都自动生成，不入库）=====
+# 递归匹配任意目录下的 AGENTS.md
+**/AGENTS.md
+# 也匹配根目录的 AGENTS.md（双星号在某些 git 版本下行为差异）
+/AGENTS.md
