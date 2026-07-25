@@ -4,34 +4,56 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>代码练习册 · 点餐系统 · 8 道填空 + 1 个 mini-project</title>
-<style>  /* === 字体：中文衬线 + 英文 Charter === */
+<style>  /* === Solarized Light 暖米色 === */
   body {
     font-family: "Source Han Serif SC", "Noto Serif CJK SC", "Songti SC",
                  "STSong", "SimSun", Charter, "Source Serif Pro",
-                 "Georgia", "Times New Roman", serif;
+                 Georgia, "Times New Roman", serif;
     line-height: 1.85;
-    color: #1a1a1a;
-    background: #ffffff;
+    color: #586e75;
+    background: #fdf6e3;
     margin: 0; padding: 0;
     font-size: 17px;
   }
   code, pre {
-    font-family: "SF Mono", "JetBrains Mono", Consolas, Monaco,
-                 "Liberation Mono", monospace;
+    font-family: "SF Mono", "JetBrains Mono", Consolas, Monaco, monospace;
     font-size: 0.88em;
   }
-  /* === 顶部 hero（无渐变，纯白 + 黑线） === */
-  header.hero {
+  /* === 顶部 hero（无渐变，暖米色） === */
+  header.hero, header.masthead {
+    background: #fdf6e3;
     padding: 60px 0 40px;
-    border-bottom: 1px solid #1a1a1a;
+    border-bottom: 1px solid #eee8d5;
+    color: #586e75;
   }
-  header.hero h1 { font-size: 2.4em; font-weight: 700; margin: 0 0 12px; }
-  header.hero p { font-size: 1.1em; color: #555; font-style: italic; margin: 4px 0; }
+  header.hero h1, header.masthead h1 {
+    font-size: 2.4em;
+    font-weight: 700;
+    margin: 0 0 12px;
+    color: #073642;
+  }
+  header.hero p, header.masthead p {
+    font-size: 1.1em;
+    color: #586e75;
+    font-style: italic;
+    margin: 4px 0;
+  }
+  header.hero .kicker, header.masthead .kicker {
+    font-size: 13px;
+    color: #93a1a1;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
   /* === 容器 === */
-  .container { max-width: 760px; margin: 0 auto; padding: 0 32px; }
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 32px;
+  }
   /* === 章节 === */
   section.unit {
-    background: #ffffff;
+    background: transparent;
     margin: 48px 0;
     padding: 0;
     border: none;
@@ -42,8 +64,8 @@
     font-weight: 700;
     margin: 56px 0 20px;
     padding-bottom: 8px;
-    border-bottom: 1px solid #1a1a1a;
-    color: #1a1a1a;
+    border-bottom: 1px solid #eee8d5;
+    color: #073642;
   }
   section.unit h3 {
     font-size: 1.3em;
@@ -51,138 +73,168 @@
     margin: 36px 0 14px;
     padding-left: 0;
     border-left: none;
-    color: #1a1a1a;
+    color: #073642;
   }
   section.unit h4 {
     font-size: 1em;
     font-weight: 700;
     margin: 24px 0 8px;
-    color: #1a1a1a;
+    color: #073642;
     text-transform: none;
     letter-spacing: 0;
   }
-  /* === 注释框（去饱和度：浅灰底 + 左侧细线） === */
-  .why, .analogy, .pitfall, .summary, .note {
+  /* === 注释框（暖米色 + 1px 细线） === */
+  .why, .analogy, .summary, .note {
     padding: 16px 20px;
     margin: 24px 0;
-    background: #f6f6f6;
-    border-left: 1px solid #888;
+    background: #eee8d5;
+    border-left: 1px solid #93a1a1;
     border-radius: 0;
-    color: #1a1a1a;
+    color: #586e75;
   }
-  .why strong, .analogy strong, .pitfall strong, .summary strong, .note strong {
+  .why strong, .analogy strong, .summary strong, .note strong {
     display: block;
     margin-bottom: 6px;
-    color: #1a1a1a;
+    color: #073642;
     font-weight: 700;
   }
-  .analogy, .why { background: #f6f6f6; border-left: 1px solid #888; }
-  .pitfall { background: #faf5f5; border-left: 1px solid #888; }
-  .summary, .note { background: #f5f5f5; border-left: 1px solid #888; }
-  /* === 代码块（保留暗色：代码阅读体验） === */
+  .pitfall {
+    padding: 16px 20px;
+    margin: 24px 0;
+    background: #fdf0e8;
+    border-left: 1px solid #cb4b16;
+    border-radius: 0;
+    color: #586e75;
+  }
+  .pitfall strong {
+    display: block;
+    margin-bottom: 6px;
+    color: #cb4b16;
+    font-weight: 700;
+  }
+  /* === 代码块：Solarized Dark（与背景呼应） === */
   pre {
-    background: #1a1a1a;
-    color: #e8e8e8;
+    background: #002b36;
+    color: #93a1a1;
     padding: 18px 22px;
     border-radius: 0;
-    border-left: 3px solid #1a1a1a;
+    border-left: 3px solid #cb4b16;
     overflow-x: auto;
     line-height: 1.65;
     margin: 24px 0;
   }
-  pre code { font-family: "SF Mono", "JetBrains Mono", Consolas, Monaco, monospace; }
+  pre code {
+    font-family: "SF Mono", "JetBrains Mono", Consolas, Monaco, monospace;
+  }
   code.inline {
-    background: #f0f0f0;
+    background: #eee8d5;
     padding: 1px 6px;
     border-radius: 0;
     font-size: 0.92em;
-    color: #1a1a1a;
+    color: #073642;
     font-family: "SF Mono", Consolas, Monaco, monospace;
-    border: 1px solid #e0e0e0;
+    border: 1px solid #e0d8b8;
   }
-  /* === 表格（简洁） === */
+  /* === 表格 === */
   table {
     width: 100%;
     border-collapse: collapse;
     margin: 24px 0;
-    background: #ffffff;
+    background: transparent;
     border: none;
-    border-radius: 0;
     font-size: 0.95em;
   }
-  th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid #e0e0e0; }
-  th { background: transparent; color: #1a1a1a; font-weight: 700;
-       border-bottom: 2px solid #1a1a1a; }
+  th, td {
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 1px solid #eee8d5;
+  }
+  th {
+    background: transparent;
+    color: #073642;
+    font-weight: 700;
+    border-bottom: 2px solid #073642;
+  }
   tr:last-child td { border-bottom: none; }
   tr:hover { background: transparent; }
   /* === 链接 === */
-  a { color: #1a4d8f; text-decoration: none; border-bottom: 1px solid transparent; }
-  a:hover { text-decoration: underline; border-bottom: 1px solid #1a4d8f; }
-  /* === 步骤框（去饱和度） === */
+  a {
+    color: #268bd2;
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+  }
+  a:hover {
+    color: #cb4b16;
+    text-decoration: underline;
+    border-bottom: 1px solid #cb4b16;
+  }
+  /* === 步骤框 === */
   .step {
-    background: #ffffff;
-    border: 1px solid #d0d0d0;
-    border-left: 3px solid #1a1a1a;
+    background: #fdf6e3;
+    border: 1px solid #eee8d5;
+    border-left: 3px solid #268bd2;
     border-radius: 0;
     padding: 16px 20px;
     margin: 16px 0;
     position: relative;
+    color: #586e75;
   }
   .step-num {
     position: absolute;
     top: -10px; left: 16px;
-    background: #1a1a1a;
-    color: #ffffff;
+    background: #268bd2;
+    color: #fdf6e3;
     width: 24px; height: 24px;
     border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
     font-weight: 700; font-size: 0.85em;
   }
-  /* === Quiz（去饱和度） === */
+  /* === Quiz === */
   .quiz {
-    background: #f6f6f6;
-    border: 1px solid #d0d0d0;
-    border-left: 3px solid #888;
+    background: #eee8d5;
+    border: 1px solid #e0d8b8;
+    border-left: 3px solid #268bd2;
     border-radius: 0;
     padding: 18px 22px;
     margin: 24px 0;
+    color: #586e75;
   }
-  .quiz-q { font-weight: 700; margin-bottom: 10px; }
+  .quiz-q { font-weight: 700; margin-bottom: 10px; color: #073642; }
   .quiz-options { list-style: none; padding: 0; margin: 0; }
   .quiz-options li {
     padding: 6px 12px; margin: 4px 0;
-    background: #ffffff;
-    border: 1px solid #e0e0e0;
+    background: #fdf6e3;
+    border: 1px solid #e0d8b8;
     border-radius: 0;
     cursor: pointer;
   }
-  .quiz-options li:hover { background: #f0f0f0; }
-  .quiz-options li::before { content: "○ "; color: #888; }
-  .quiz-options li.correct { background: #f0f0f0; }
-  .quiz-options li.correct::before { content: "✓ "; color: #1a1a1a; font-weight: 700; }
-  .quiz-options li.wrong { background: #faf5f5; }
-  .quiz-options li.wrong::before { content: "✗ "; color: #888; font-weight: 700; }
+  .quiz-options li:hover { background: #eee8d5; }
+  .quiz-options li::before { content: "○ "; color: #93a1a1; }
+  .quiz-options li.correct { background: #eee8d5; }
+  .quiz-options li.correct::before { content: "✓ "; color: #859900; font-weight: 700; }
+  .quiz-options li.wrong { background: #fdf0e8; }
+  .quiz-options li.wrong::before { content: "✗ "; color: #cb4b16; font-weight: 700; }
   .quiz-answer {
     margin-top: 12px; padding: 10px 14px;
-    background: #f0f0f0;
-    border-left: 1px solid #888;
+    background: #eee8d5;
+    border-left: 1px solid #93a1a1;
     font-size: 0.95em;
-    color: #1a1a1a;
+    color: #586e75;
   }
   .quiz-type {
     display: inline-block;
     background: transparent;
-    color: #888;
+    color: #93a1a1;
     font-size: 0.75em;
     padding: 1px 8px;
-    border: 1px solid #888;
+    border: 1px solid #93a1a1;
     margin-right: 8px;
     font-weight: 700;
   }
-  /* === 顶部 nav.toc（去圆角、去阴影、改色） === */
+  /* === 顶部 nav.toc === */
   nav.toc {
-    background: #ffffff;
-    border-bottom: 1px solid #1a1a1a;
+    background: #fdf6e3;
+    border-bottom: 1px solid #eee8d5;
     padding: 16px 0;
     position: sticky;
     top: 0;
@@ -193,68 +245,115 @@
     display: flex; flex-wrap: wrap; gap: 8px;
   }
   nav.toc a {
-    color: #1a1a1a;
+    color: #586e75;
     padding: 4px 10px;
     border-radius: 0;
     background: transparent;
-    border: 1px solid #d0d0d0;
+    border: 1px solid #e0d8b8;
     font-size: 0.85em;
   }
   nav.toc a:hover {
-    background: #1a1a1a;
-    color: #ffffff;
+    background: #073642;
+    color: #fdf6e3;
     text-decoration: none;
   }
   nav.toc a.back-home {
-    background: #1a1a1a;
-    color: #ffffff !important;
+    background: #073642;
+    color: #fdf6e3 !important;
     font-weight: 700;
     border: none;
   }
   nav.toc a.back-home:hover {
-    background: #000000;
+    background: #002b36;
     transform: none;
     box-shadow: none;
   }
   /* === Footer === */
   footer {
-    background: #ffffff;
-    color: #888;
+    background: #fdf6e3;
+    color: #93a1a1;
     padding: 32px 0;
     margin-top: 60px;
     text-align: center;
-    border-top: 1px solid #1a1a1a;
+    border-top: 1px solid #eee8d5;
   }
-  footer p { margin: 6px 0; opacity: 1; font-style: italic; }
+  footer p {
+    margin: 6px 0;
+    opacity: 1;
+    font-style: italic;
+    color: #93a1a1;
+  }
+  footer a {
+    color: #268bd2;
+  }
   footer a.back-home {
     display: inline-block;
     padding: 8px 20px;
-    background: #1a1a1a;
-    color: #ffffff !important;
+    background: #073642;
+    color: #fdf6e3 !important;
     text-decoration: none;
     border-radius: 0;
     font-weight: 700;
     transition: none;
+    border: none;
   }
   footer a.back-home:hover {
-    background: #000000;
+    background: #002b36;
+    color: #fdf6e3 !important;
     transform: none;
     box-shadow: none;
+    text-decoration: none;
   }
-  footer a { color: #1a4d8f; }
   /* === 文件路径 === */
   .file-path {
     font-family: "SF Mono", "JetBrains Mono", Consolas, Monaco, monospace;
-    background: #f0f0f0;
+    background: #eee8d5;
     padding: 1px 6px;
     font-size: 0.92em;
-    color: #1a1a1a;
+    color: #073642;
+    border: 1px solid #e0d8b8;
+  }
+  /* === 资源列表（入口页用） === */
+  .resources {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .resources li {
+    padding: 20px 0;
+    border-bottom: 1px solid #eee8d5;
+  }
+  .resources li:last-child { border-bottom: none; }
+  .resources a {
+    color: #073642;
+    text-decoration: none;
+    display: block;
+    border-bottom: none;
+  }
+  .resources a:hover { color: #cb4b16; }
+  .resources .title {
+    font-size: 1.25em;
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: #073642;
+  }
+  .resources .desc {
+    color: #586e75;
+    font-size: 0.95em;
+    line-height: 1.6;
+  }
+  .resources .meta {
+    color: #93a1a1;
+    font-size: 0.85em;
+    margin-top: 6px;
+    font-style: italic;
   }
   /* === 响应式 === */
   @media (max-width: 720px) {
     body { font-size: 16px; }
     .container { padding: 0 20px; }
     section.unit h2 { font-size: 1.4em; }
+    header.hero, header.masthead { padding: 40px 0 30px; }
   }</style>
 </head>
 <body>
