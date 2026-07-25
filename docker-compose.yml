@@ -1,0 +1,150 @@
+# ============================================================
+# 点餐系统中间件 docker-compose（A 方案：仅中间件容器化）
+# ============================================================
+# 设计目标：
+#   - 一条命令启动 MySQL + Redis + RocketMQ + MinIO
+#   - SQL 自动导入（首次启动需 60 秒初始化）
+#   - 后端 / 管理端 / 小程序 仍本地启动（便于改代码）
+#
+# 首次启动：
+#   bash scripts/docker-up.sh
+#
+# 停止：
+#   bash scripts/docker-down.sh
+#
+# 数据重置：
+#   bash scripts/docker-reset.sh
+#
+# 端口一览：
+#   MySQL      3306  (root / 123456, 库: diancan-system)
+#   Redis      6379  (密码: 123456)
+#   RocketMQ   9876  (NameServer)
+#   MinIO API  9000  (minioadmin / minioadmin)
+#   MinIO Web  9001
+# ============================================================
+
+services:
+
+  # ----------------------------------------------------------
+  # MySQL 8 — 业务数据库
+  # ----------------------------------------------------------
+  mysql:
+    image: mysql:8.0
+    container_name: diancan-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-123456}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-diancan-system}
+      TZ: Asia/Shanghai
+    ports:
+      - "${MYSQL_PORT:-3306}:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      # SQL 文件挂载到 docker-entrypoint-initdb.d/，首次启动自动执行
+      # 注意：必须在 scripts/docker-up.sh 中预处理库名 digital_ordering_system → diancan-system
+      - ./.docker/initdb:/docker-entrypoint-initdb.d:ro
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --default-authentication-plugin=mysql_native_password
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${MYSQL_ROOT_PASSWORD:-123456}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  # ----------------------------------------------------------
+  # Redis 7 — 会话 + 缓存 + WebSocket Pub/Sub
+  # ----------------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    container_name: diancan-redis
+    restart: unless-stopped
+    command: redis-server --requirepass ${REDIS_PASSWORD:-123456} --appendonly yes
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-123456}", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # ----------------------------------------------------------
+  # RocketMQ NameServer
+  # ----------------------------------------------------------
+  rocketmq-namesrv:
+    image: apache/rocketmq:4.9.7
+    container_name: diancan-rocketmq-namesrv
+    restart: unless-stopped
+    ports:
+      - "${ROCKETMQ_NAMESRV_PORT:-9876}:9876"
+    environment:
+      JAVA_OPT_EXT: "-Xms256m -Xmx256m"
+    command: sh mqnamesrv
+    healthcheck:
+      test: ["CMD-SHELL", "echo 'namesrv is running' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  # ----------------------------------------------------------
+  # RocketMQ Broker — 优惠券发放任务依赖
+  # ----------------------------------------------------------
+  rocketmq-broker:
+    image: apache/rocketmq:4.9.7
+    container_name: diancan-rocketmq-broker
+    restart: unless-stopped
+    depends_on:
+      rocketmq-namesrv:
+        condition: service_started
+    ports:
+      - "${ROCKETMQ_BROKER_PORT:-10911}:10911"
+      - "${ROCKETMQ_BROKER_HA_PORT:-10912}:10912"
+    environment:
+      JAVA_OPT_EXT: "-Xms512m -Xmx512m"
+    command: >
+      /home/rocketmq/rocketmq-4.9.7/bin/mqbroker
+        -n rocketmq-namesrv:9876
+    volumes:
+      - ./scripts/rocketmq/broker.conf:/home/rocketmq/rocketmq-4.9.7/conf/broker.conf:ro
+      - rocketmq-data:/root/store
+
+  # ----------------------------------------------------------
+  # MinIO — 菜品图片 / 文件上传
+  # ----------------------------------------------------------
+  minio:
+    image: minio/minio:RELEASE.2024-08-29T01-40-52Z
+    container_name: diancan-minio
+    restart: unless-stopped
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
+    command: server /data --console-address ":${MINIO_CONSOLE_PORT:-9001}"
+    ports:
+      - "${MINIO_API_PORT:-9000}:9000"
+      - "${MINIO_CONSOLE_PORT:-9001}:9001"
+    volumes:
+      - minio-data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:${MINIO_API_PORT:-9000}/minio/health/live"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  # ----------------------------------------------------------
+  # MinIO bucket 自动创建说明：
+  # application-dev.yml 已经设置 MINIO_AUTO_CREATE_BUCKET=true，
+  # 后端启动时会自动调 MinIO 创建 dish-images bucket，无需 init 容器。
+  # ----------------------------------------------------------
+
+volumes:
+  mysql-data:
+    driver: local
+  redis-data:
+    driver: local
+  rocketmq-data:
+    driver: local
+  minio-data:
+    driver: local

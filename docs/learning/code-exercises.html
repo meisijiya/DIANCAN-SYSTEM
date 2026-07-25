@@ -1,0 +1,1329 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>代码练习册 · 点餐系统 · 8 道填空 + 1 个 mini-project</title>
+<style>
+  :root {
+    --primary: #2c5282;
+    --primary-light: #ebf4ff;
+    --success: #2f855a;
+    --warning: #c05621;
+    --danger: #c53030;
+    --text: #2d3748;
+    --text-light: #718096;
+    --bg: #ffffff;
+    --bg-soft: #f7fafc;
+    --border: #e2e8f0;
+    --code-bg: #1a202c;
+    --code-text: #e2e8f0;
+    --fill-bg: #fff5f5;
+    --fill-border: #fc8181;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    line-height: 1.8;
+    color: var(--text);
+    background: var(--bg-soft);
+    margin: 0; padding: 0;
+  }
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+  header.hero {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white; padding: 50px 24px; text-align: center;
+  }
+  header.hero h1 { font-size: 2.2em; margin: 0 0 12px; }
+  header.hero p { font-size: 1.05em; opacity: 0.95; margin: 6px 0; }
+  nav.toc {
+    background: white; border-bottom: 1px solid var(--border);
+    padding: 16px 24px; position: sticky; top: 0; z-index: 100;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+  }
+  nav.toc .container { display: flex; flex-wrap: wrap; gap: 8px; }
+  nav.toc a {
+    color: var(--primary); text-decoration: none; padding: 6px 12px;
+    border-radius: 6px; background: var(--primary-light);
+    font-size: 0.88em;
+  }
+  nav.toc a:hover { background: var(--primary); color: white; }
+  main { padding: 40px 24px; }
+  section.unit {
+    background: white; border-radius: 12px; margin-bottom: 32px;
+    padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    border: 1px solid var(--border);
+  }
+  section.unit h2 {
+    color: var(--primary); border-bottom: 3px solid var(--primary);
+    padding-bottom: 12px; margin-top: 0;
+  }
+  section.unit h3 {
+    color: var(--text); margin-top: 28px; padding-left: 12px;
+    border-left: 4px solid var(--primary);
+  }
+  section.unit h4 {
+    color: var(--text-light); margin-top: 20px; font-size: 1em;
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .cheat {
+    background: var(--bg-soft); padding: 16px 20px; border-radius: 8px;
+    margin: 16px 0; border-left: 4px solid var(--success);
+  }
+  .cheat strong { display: block; margin-bottom: 6px; color: var(--success); }
+  .fill {
+    background: var(--fill-bg); border: 2px dashed var(--fill-border);
+    border-radius: 8px; padding: 20px; margin: 20px 0;
+  }
+  .fill-head {
+    background: var(--danger); color: white; display: inline-block;
+    padding: 4px 12px; border-radius: 4px; font-weight: bold;
+    font-size: 0.9em; margin-bottom: 12px;
+  }
+  pre {
+    background: var(--code-bg); color: var(--code-text);
+    padding: 16px 20px; border-radius: 8px; overflow-x: auto;
+    font-size: 0.88em; line-height: 1.65; margin: 12px 0;
+  }
+  pre code { font-family: "SF Mono", Consolas, Monaco, monospace; }
+  .fill pre { background: #2d1f1f; }
+  .fill code { background: transparent; color: #fbb6ce; padding: 0; }
+  code.inline {
+    background: var(--bg-soft); border: 1px solid var(--border);
+    border-radius: 3px; padding: 2px 6px; font-size: 0.9em;
+    color: var(--danger);
+    font-family: "SF Mono", Consolas, Monaco, monospace;
+  }
+  table { width: 100%; border-collapse: collapse; margin: 12px 0; background: white;
+    border-radius: 8px; overflow: hidden; border: 1px solid var(--border); }
+  th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); }
+  th { background: var(--primary-light); color: var(--primary); font-weight: 600; }
+  tr:last-child td { border-bottom: none; }
+  details {
+    background: var(--bg-soft); border: 1px solid var(--border);
+    border-radius: 6px; padding: 8px 16px; margin: 8px 0;
+  }
+  details summary { cursor: pointer; font-weight: 600; color: var(--primary); }
+  details[open] { background: white; }
+  footer { background: var(--code-bg); color: white; padding: 32px 24px;
+    text-align: center; margin-top: 60px; }
+  footer p { margin: 6px 0; opacity: 0.85; }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="container">
+    <h1>🛠️ 代码练习册</h1>
+    <p>8 道填空练习 + 1 个 mini-project · 配套主教程使用</p>
+    <p>面向 Java 17 / Spring Boot 3 / Vue 3 / TS / 微信小程序</p>
+  </div>
+</header>
+
+<nav class="toc">
+  <div class="container">
+    <a href="#cheat-java">A Java 17</a>
+    <a href="#cheat-spring">B Spring Boot 3</a>
+    <a href="#cheat-mybatis">C MyBatis-Plus</a>
+    <a href="#cheat-vue">D Vue 3 + TS</a>
+    <a href="#cheat-typescript">E TypeScript</a>
+    <a href="#cheat-miniapp">F 小程序</a>
+    <a href="#fill-1">填空 1-8</a>
+    <a href="#mini-project">Mini-Project</a>
+  </div>
+</nav>
+
+<main class="container">
+
+<!-- ============================================================
+     A. Java 17 速查
+     ============================================================ -->
+<section class="unit" id="cheat-java">
+<h2>📘 A · Java 17 语法速查</h2>
+
+<h3>A.1 数据类型与变量</h3>
+<div class="cheat">
+<strong>速记卡</strong>
+<ul>
+  <li>基本类型：<code class="inline">int</code> <code class="inline">long</code> <code class="inline">double</code> <code class="inline">boolean</code> <code class="inline">char</code></li>
+  <li>引用类型：<code class="inline">String</code> <code class="inline">List&lt;X&gt;</code> <code class="inline">Map&lt;K,V&gt;</code></li>
+  <li>不可变：<code class="inline">final</code></li>
+  <li>类型推断：<code class="inline">var list = new ArrayList&lt;String&gt;()</code></li>
+</ul>
+</div>
+
+<h3>A.2 集合框架（高频）</h3>
+<pre><code class="language-java">// List 有序可重复
+List&lt;String&gt; names = new ArrayList&lt;&gt;();
+names.add("张三");
+names.add("李四");
+String first = names.get(0);
+int size = names.size();
+boolean has = names.contains("张三");
+
+// Map 键值对
+Map&lt;Long, String&gt; userMap = new HashMap&lt;&gt;();
+userMap.put(1L, "张三");
+String name = userMap.get(1L);     // 找不到返回 null
+String safe = userMap.getOrDefault(1L, "未知");
+
+// Set 去重
+Set&lt;Long&gt; ids = new HashSet&lt;&gt;();
+ids.add(1L);
+boolean contains = ids.contains(1L);
+
+// 遍历
+for (String n : names) { System.out.println(n); }
+for (Map.Entry&lt;Long, String&gt; e : userMap.entrySet()) {
+    System.out.println(e.getKey() + "=&gt;" + e.getValue());
+}</code></pre>
+
+<h3>A.3 Stream API（必会）</h3>
+<pre><code class="language-java">List&lt;Order&gt; orders = orderMapper.selectList(null);
+
+// filter + map + collect
+List&lt;Long&gt; paidOrderIds = orders.stream()
+    .filter(o -&gt; o.getStatus() == 20)              // 过滤已支付
+    .map(Order::getId)                              // 提取 ID
+    .collect(Collectors.toList());
+
+// 求和 / 平均 / 最大
+BigDecimal total = orders.stream()
+    .map(Order::getPayAmount)
+    .filter(Objects::nonNull)
+    .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+// 分组
+Map&lt;Integer, List&lt;Order&gt;&gt; byStatus = orders.stream()
+    .collect(Collectors.groupingBy(Order::getStatus));
+
+// 排序
+List&lt;Order&gt; sorted = orders.stream()
+    .sorted(Comparator.comparing(Order::getCreateTime).reversed())
+    .collect(Collectors.toList());
+
+// Optional 防 null
+String name = Optional.ofNullable(order)
+    .map(Order::getUserName)
+    .orElse("未知");</code></pre>
+
+<h3>A.4 异常处理</h3>
+<pre><code class="language-java">// 业务异常（推荐自己定义）
+public class BusinessException extends RuntimeException {
+    private final Integer code;
+    public BusinessException(String msg) { super(msg); this.code = 500; }
+    public BusinessException(Integer code, String msg) { super(msg); this.code = code; }
+}
+
+// 抛业务异常
+if (order == null) {
+    throw new BusinessException("订单不存在");
+}
+
+// 全局异常处理（Spring MVC）
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+    @ExceptionHandler(BusinessException.class)
+    public R&lt;?&gt; handleBiz(BusinessException e) {
+        return R.fail(e.getCode(), e.getMessage());
+    }
+    @ExceptionHandler(Exception.class)
+    public R&lt;?&gt; handleAll(Exception e) {
+        log.error("系统异常", e);
+        return R.fail("系统繁忙");
+    }
+}</code></pre>
+
+<h3>A.5 注解</h3>
+<div class="cheat">
+<strong>本项目高频注解</strong>
+<table>
+<tr><th>注解</th><th>作用</th></tr>
+<tr><td><code class="inline">@Data</code></td><td>Lombok：自动生成 getter/setter/toString</td></tr>
+<tr><td><code class="inline">@RequiredArgsConstructor</code></td><td>Lombok：构造器注入（final 字段）</td></tr>
+<tr><td><code class="inline">@Slf4j</code></td><td>Lombok：自动生成 log 字段</td></tr>
+<tr><td><code class="inline">@RestController</code></td><td>Spring MVC 控制器</td></tr>
+<tr><td><code class="inline">@Service</code></td><td>Spring 业务组件</td></tr>
+<tr><td><code class="inline">@Autowired</code></td><td>依赖注入</td></tr>
+<tr><td><code class="inline">@Transactional</code></td><td>事务边界</td></tr>
+<tr><td><code class="inline">@TableName</code></td><td>MyBatis-Plus 表映射</td></tr>
+<tr><td><code class="inline">@TableId(type=IdType.ASSIGN_ID)</code></td><td>雪花算法主键</td></tr>
+<tr><td><code class="inline">@TableLogic</code></td><td>逻辑删除字段</td></tr>
+</table>
+</div>
+
+</section>
+
+<!-- ============================================================
+     B. Spring Boot 3 速查
+     ============================================================ -->
+<section class="unit" id="cheat-spring">
+<h2>📗 B · Spring Boot 3 速查</h2>
+
+<h3>B.1 启动流程</h3>
+<pre><code class="language-java">// 启动入口
+@SpringBootApplication
+@MapperScan("com.scaffold.modules.**.mapper")
+@EnableAsync
+@EnableScheduling
+public class DiancanAdminApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(DiancanAdminApplication.class, args);
+    }
+}</code></pre>
+
+<h3>B.2 三层架构（Controller / Service / Mapper）</h3>
+<pre><code class="language-java">// Controller — 接 HTTP 请求
+@Tag(name = "管理端-订单")
+@RestController
+@RequestMapping("/admin/order")
+@RequiredArgsConstructor
+public class AdminOrderController {
+
+    private final OrderService orderService;       // 构造器注入
+
+    @Operation(summary = "订单列表")
+    @GetMapping("/list")
+    public R&lt;PageResult&lt;OrderVO&gt;&gt; list(OrderQueryDTO query) {
+        return R.ok(orderService.page(query));
+    }
+}
+
+// Service — 业务编排
+@Service
+@RequiredArgsConstructor
+public class OrderServiceImpl implements OrderService {
+    private final OrderMapper orderMapper;
+    private final CouponService couponService;
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public OrderVO create(OrderCreateDTO dto) {
+        // 1. 校验 2. 持久化 3. 调用其他 service 4. 返回
+        Order order = new Order();
+        orderMapper.insert(order);
+        return orderMapper.selectVOById(order.getId());
+    }
+}
+
+// Mapper — 数据库访问
+public interface OrderMapper extends BaseMapper&lt;Order&gt; {
+    // 通用 CRUD 已由 BaseMapper 提供
+    // 自定义复杂 SQL 在 XML 里
+}</code></pre>
+
+<h3>B.3 依赖注入三种方式</h3>
+<div class="cheat">
+<strong>推荐：构造器注入（用 Lombok 简化）</strong>
+<pre><code class="language-java">@Service
+@RequiredArgsConstructor   // 自动生成构造器
+public class OrderServiceImpl {
+    private final OrderMapper orderMapper;        // final 字段
+    private final CouponService couponService;    // Lombok 自动注入
+}
+
+// 不推荐：字段注入（难测试，隐藏依赖）
+@Autowired
+private OrderMapper orderMapper;
+
+// 也可用 Setter 注入（不常用）
+private OrderMapper orderMapper;
+@Autowired
+public void setMapper(OrderMapper m) { this.orderMapper = m; }</code></pre>
+</div>
+
+<h3>B.4 配置文件（application.yml）</h3>
+<pre><code class="language-yaml">server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+spring:
+  profiles:
+    active: dev              # 默认激活 dev
+  datasource:
+    url: jdbc:mysql://localhost:3307/diancan-system?...
+    username: root
+    password: 123456
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: 123456</code></pre>
+
+<h3>B.5 统一响应 Result&lt;T&gt;</h3>
+<pre><code class="language-java">// 项目里的统一响应
+@Data
+public class R&lt;T&gt; {
+    private Integer code;       // 0 = 成功
+    private String message;
+    private T data;
+    public static &lt;T&gt; R&lt;T&gt; ok() { return new R&lt;&gt;(0, "成功", null); }
+    public static &lt;T&gt; R&lt;T&gt; ok(T data) { return new R&lt;&gt;(0, "成功", data); }
+    public static &lt;T&gt; R&lt;T&gt; fail(String msg) { return new R&lt;&gt;(500, msg, null); }
+}</code></pre>
+
+</section>
+
+<!-- ============================================================
+     C. MyBatis-Plus 速查
+     ============================================================ -->
+<section class="unit" id="cheat-mybatis">
+<h2>📙 C · MyBatis-Plus 速查</h2>
+
+<h3>C.1 通用 CRUD（不写 SQL）</h3>
+<div class="cheat">
+<strong>BaseMapper&lt;T&gt; 已经提供的 14 个方法</strong>
+<table>
+<tr><th>方法</th><th>SQL 等价</th></tr>
+<tr><td><code class="inline">insert(T)</code></td><td>INSERT INTO ...</td></tr>
+<tr><td><code class="inline">deleteById(Serializable)</code></td><td>DELETE WHERE id = ?</td></tr>
+<tr><td><code class="inline">updateById(T)</code></td><td>UPDATE WHERE id = ?</td></tr>
+<tr><td><code class="inline">selectById(Serializable)</code></td><td>SELECT WHERE id = ?</td></tr>
+<tr><td><code class="inline">selectList(Wrapper)</code></td><td>SELECT WHERE ...</td></tr>
+<tr><td><code class="inline">selectCount(Wrapper)</code></td><td>SELECT COUNT(*)</td></tr>
+<tr><td><code class="inline">selectPage(IPage, Wrapper)</code></td><td>分页查询</td></tr>
+<tr><td><code class="inline">selectMaps(Wrapper)</code></td><td>返回 List&lt;Map&gt;</td></tr>
+</table>
+</div>
+
+<h3>C.2 条件构造器（Wrapper）</h3>
+<pre><code class="language-java">// QueryWrapper 链式构造 WHERE 条件
+QueryWrapper&lt;Order&gt; qw = new QueryWrapper&lt;&gt;();
+qw.eq("status", 20)                              // status = 20
+  .ge("pay_amount", 100)                         // pay_amount &gt;= 100
+  .like("order_no", "2024")                      // order_no LIKE '%2024%'
+  .in("user_id", Arrays.asList(1L, 2L, 3L))     // user_id IN (...)
+  .between("create_time", start, end)            // BETWEEN
+  .orderByDesc("create_time")                   // ORDER BY DESC
+  .last("LIMIT 10");                             // 末尾追加 SQL
+
+List&lt;Order&gt; orders = orderMapper.selectList(qw);
+
+// LambdaQueryWrapper（类型安全，重构友好）
+LambdaQueryWrapper&lt;Order&gt; lqw = new LambdaQueryWrapper&lt;&gt;();
+lqw.eq(Order::getStatus, 20)
+   .ge(Order::getPayAmount, 100)
+   .orderByDesc(Order::getCreateTime);</code></pre>
+
+<h3>C.3 自定义 XML（复杂 SQL）</h3>
+<pre><code class="language-xml">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd"&gt;
+&lt;mapper namespace="com.scaffold.modules.order.mapper.OrderMapper"&gt;
+
+    &lt;!-- 结果映射 --&gt;
+    &lt;resultMap id="orderVOMap" type="OrderVO"&gt;
+        &lt;id property="id" column="id"/&gt;
+        &lt;result property="orderNo" column="order_no"/&gt;
+        &lt;result property="payAmount" column="pay_amount"/&gt;
+    &lt;/resultMap&gt;
+
+    &lt;!-- 动态 SQL --&gt;
+    &lt;select id="selectPageVO" resultMap="orderVOMap"&gt;
+        SELECT o.*, u.nickname AS user_name
+        FROM t_order o LEFT JOIN t_user u ON o.user_id = u.id
+        &lt;where&gt;
+            &lt;if test="query.status != null"&gt;
+                AND o.status = #{query.status}
+            &lt;/if&gt;
+            &lt;if test="query.startDate != null"&gt;
+                AND o.create_time &gt;= #{query.startDate}
+            &lt;/if&gt;
+        &lt;/where&gt;
+        ORDER BY o.create_time DESC
+    &lt;/select&gt;
+&lt;/mapper&gt;</code></pre>
+
+<h3>C.4 分页</h3>
+<pre><code class="language-java">// Service 里
+public PageResult&lt;OrderVO&gt; page(OrderQueryDTO query) {
+    Page&lt;OrderVO&gt; page = new Page&lt;&gt;(query.getPageNum(), query.getPageSize());
+    IPage&lt;OrderVO&gt; result = orderMapper.selectPageVO(page, query);
+    return PageResult.of(result);
+}</code></pre>
+
+<h3>C.5 逻辑删除</h3>
+<pre><code class="language-java">// 实体字段
+@TableLogic
+private Integer deleted;     // 0 = 未删，1 = 已删
+
+// 调用 deleteById 会自动变成 UPDATE ... SET deleted = 1
+// 查询会自动 WHERE deleted = 0</code></pre>
+
+</section>
+
+<!-- ============================================================
+     D. Vue 3 + TS 速查
+     ============================================================ -->
+<section class="unit" id="cheat-vue">
+<h2>📕 D · Vue 3 + TypeScript 速查</h2>
+
+<h3>D.1 Composition API 三件套</h3>
+<pre><code class="language-ts">&lt;script setup lang="ts"&gt;
+import { ref, reactive, computed, onMounted } from 'vue'
+
+// ref 包装基本类型（要 .value）
+const count = ref(0)
+count.value++                  // JS 里这样改
+// 模板里直接 {{ count }}（自动解包）
+
+// reactive 包装对象（不用 .value）
+const state = reactive({ name: '张三', age: 18 })
+state.name = '李四'            // 直接改
+
+// computed 计算属性
+const doubleCount = computed(() =&gt; count.value * 2)
+
+// 生命周期
+onMounted(() =&gt; console.log('组件挂载'))
+&lt;/script&gt;</code></pre>
+
+<h3>D.2 组件通信</h3>
+<pre><code class="language-ts">// 父 → 子：props
+// Child.vue
+&lt;script setup lang="ts"&gt;
+interface Props { msg: string; count?: number }
+const props = withDefaults(defineProps&lt;Props&gt;(), { count: 0 })
+&lt;/script&gt;
+
+// Parent.vue
+&lt;Child :msg="'hello'" :count="5" /&gt;
+
+// 子 → 父：emits
+// Child.vue
+&lt;script setup lang="ts"&gt;
+const emit = defineEmits&lt;{
+  (e: 'change', value: string): void
+}&gt;()
+emit('change', 'new value')
+&lt;/script&gt;
+
+// Parent.vue
+&lt;Child @change="onChange" /&gt;</code></pre>
+
+<h3>D.3 Pinia store</h3>
+<pre><code class="language-ts">import { defineStore } from 'pinia'
+import { ref } from 'vue'
+
+export const useUserStore = defineStore('user', () =&gt; {
+    const token = ref('')
+    const userInfo = ref&lt;UserInfo | null&gt;(null)
+
+    const isLogin = computed(() =&gt; !!token.value)
+
+    function setToken(t: string) { token.value = t }
+    function logout() {
+        token.value = ''
+        userInfo.value = null
+    }
+
+    return { token, userInfo, isLogin, setToken, logout }
+})
+
+// 组件里用
+const userStore = useUserStore()
+userStore.setToken('abc123')</code></pre>
+
+<h3>D.4 API 封装</h3>
+<pre><code class="language-ts">// service/api/dish.ts
+import service from '@/service/request'
+import type { PageResult } from '@/service/api/types'
+
+export interface DishVO {
+  id: number
+  name: string
+  price: number
+}
+
+export const AdminDishAPI = {
+  list: (params: { pageNum: number; pageSize: number }) =&gt;
+    service.get&lt;PageResult&lt;DishVO&gt;&gt;('/admin/dish/list', { params }),
+
+  save: (data: DishVO) =&gt; service.post('/admin/dish/save', data),
+}</code></pre>
+
+</section>
+
+<!-- ============================================================
+     E. TypeScript 速查
+     ============================================================ -->
+<section class="unit" id="cheat-typescript">
+<h2>📓 E · TypeScript 速查</h2>
+
+<h3>E.1 类型基础</h3>
+<pre><code class="language-ts">// 基本类型
+let name: string = '张三'
+let age: number = 18
+let active: boolean = true
+let list: number[] = [1, 2, 3]
+let tuple: [string, number] = ['hello', 1]
+
+// 联合类型
+let id: string | number = '001'
+id = 100
+
+// 字面量类型
+let direction: 'up' | 'down' | 'left' | 'right'
+
+// any（尽量避免） vs unknown（必须先检查）
+let x: unknown = 'hello'
+if (typeof x === 'string') console.log(x.toUpperCase())
+
+// void（函数无返回值）
+function log(msg: string): void { console.log(msg) }</code></pre>
+
+<h3>E.2 interface vs type</h3>
+<pre><code class="language-ts">// interface — 描述对象形状，可扩展
+interface User {
+  id: number
+  name: string
+  age?: number                  // 可选
+  readonly createdAt: Date     // 只读
+}
+
+// 扩展接口
+interface Admin extends User {
+  role: 'admin' | 'super'
+}
+
+// type — 更通用，可以是联合、交叉、工具类型
+type ID = string | number
+type Maybe&lt;T&gt; = T | null
+
+// 对象类型
+type Point = { x: number; y: number }</code></pre>
+
+<h3>E.3 泛型</h3>
+<pre><code class="language-ts">// 函数泛型
+function first&lt;T&gt;(arr: T[]): T | undefined {
+  return arr[0]
+}
+
+// 约束泛型
+function getProperty&lt;T, K extends keyof T&gt;(obj: T, key: K): T[K] {
+  return obj[key]
+}
+
+// 接口泛型
+interface ApiResponse&lt;T&gt; {
+  code: number
+  data: T
+}</code></pre>
+
+</section>
+
+<!-- ============================================================
+     F. 微信小程序速查
+     ============================================================ -->
+<section class="unit" id="cheat-miniapp">
+<h2>📱 F · 微信小程序速查</h2>
+
+<h3>F.1 一个页面 = 4 个文件</h3>
+<pre><code class="language-bash">pages/order/
+├── order.js       # 页面逻辑（Page() 注册）
+├── order.json     # 页面配置（导航栏、背景色）
+├── order.wxml     # 模板（类 HTML）
+└── order.wxss     # 样式（类 CSS）</code></pre>
+
+<h3>F.2 JS 模板</h3>
+<pre><code class="language-js">// pages/order/order.js
+const { getOrderList } = require('../../api/order.js')
+
+Page({
+  data: {
+    orders: [],
+    loading: false,
+  },
+
+  onLoad() {
+    this.loadOrders()
+  },
+
+  onPullDownRefresh() {
+    this.loadOrders().then(() =&gt; wx.stopPullDownRefresh())
+  },
+
+  async loadOrders() {
+    this.setData({ loading: true })
+    try {
+      const res = await getOrderList({ pageNum: 1 })
+      this.setData({ orders: res.records })
+    } catch (e) {
+      wx.showToast({ title: e.message, icon: 'none' })
+    } finally {
+      this.setData({ loading: false })
+    }
+  },
+
+  onTapItem(e) {
+    const id = e.currentTarget.dataset.id
+    wx.navigateTo({ url: '/pages/order-detail/order-detail?id=' + id })
+  },
+})</code></pre>
+
+<h3>F.3 WXML（类 HTML）</h3>
+<pre><code class="language-html">&lt;!-- pages/order/order.wxml --&gt;
+&lt;view class="container"&gt;
+  &lt;view wx:for="{{orders}}" wx:key="id"
+        class="order-item"
+        data-id="{{item.id}}"
+        bindtap="onTapItem"&gt;
+    &lt;text class="order-no"&gt;{{item.orderNo}}&lt;/text&gt;
+    &lt;text class="amount"&gt;¥{{item.payAmount}}&lt;/text&gt;
+  &lt;/view&gt;
+
+  &lt;view wx:if="{{orders.length === 0}}" class="empty"&gt;
+    暂无订单
+  &lt;/view&gt;
+&lt;/view&gt;</code></pre>
+
+<h3>F.4 关键 API</h3>
+<div class="cheat">
+<strong>本项目常用 API</strong>
+<table>
+<tr><th>API</th><th>作用</th></tr>
+<tr><td><code class="inline">wx.request</code></td><td>HTTP 请求</td></tr>
+<tr><td><code class="inline">wx.setStorageSync / getStorageSync</code></td><td>本地存储</td></tr>
+<tr><td><code class="inline">wx.navigateTo / redirectTo</code></td><td>页面跳转</td></tr>
+<tr><td><code class="inline">wx.login</code></td><td>微信登录</td></tr>
+<tr><td><code class="inline">wx.showToast</code></td><td>吐司提示</td></tr>
+<tr><td><code class="inline">wx.showModal</code></td><td>确认弹窗</td></tr>
+<tr><td><code class="inline">wx.requestPayment</code></td><td>调起支付</td></tr>
+<tr><td><code class="inline">wx.scanCode</code></td><td>扫码（入桌）</td></tr>
+</table>
+</div>
+
+<h3>F.5 WXSS（rpx 单位）</h3>
+<pre><code class="language-css">/* pages/order/order.wxss */
+.order-item {
+  padding: 24rpx;        /* rpx 是小程序自适应单位 */
+  border-bottom: 1rpx solid #eee;
+}
+.order-no {
+  font-size: 28rpx;
+  color: #333;
+}
+.amount {
+  font-size: 32rpx;
+  color: #f56c2c;
+  float: right;
+}</code></pre>
+
+</section>
+
+<!-- ============================================================
+     填空练习 1-8
+     ============================================================ -->
+<section class="unit" id="fill-1">
+<h2>✍️ 8 道填空练习（做完才算掌握）</h2>
+
+<p>每道题有 <b>题目描述</b>、<b>带 TODO 的代码</b>、<b>参考答案</b>（折叠）。建议先自己写，再对照答案。</p>
+
+<!-- ============ 填空 1 ============ -->
+<div class="fill" id="fill-1-detail">
+  <span class="fill-head">填空 1 / 8 · Spring Boot Controller</span>
+  <h4>题目：菜品列表接口</h4>
+  <p>写一个管理端菜品 Controller，提供：</p>
+  <ul>
+    <li>GET <code class="inline">/admin/dish/list</code>：分页查询菜品列表</li>
+    <li>POST <code class="inline">/admin/dish/save</code>：新增菜品（@Valid）</li>
+    <li>DELETE <code class="inline">/admin/dish/{id}</code>：删除菜品</li>
+  </ul>
+  <p>依赖：<code class="inline">DishService</code>（已存在），<code class="inline">DishQueryDTO</code>，<code class="inline">DishSaveDTO</code>，<code class="inline">DishVO</code>，<code class="inline">R&lt;T&gt;</code>。</p>
+  <pre><code class="language-java">// 文件：modules/dish/controller/AdminDishController.java
+@Tag(name = "管理端-菜品")
+@RestController
+@RequestMapping("/admin/dish")
+@RequiredArgsConstructor
+public class AdminDishController {
+
+    private final DishService dishService;       // 填空：依赖注入的字段声明
+
+    @Operation(summary = "菜品列表")
+    @GetMapping("/list")
+    public R&lt;List&lt;DishVO&gt;&gt; list(DishQueryDTO query) {
+        // 填空：调用 service 的列表方法并返回 R.ok(...)
+        return R.ok(null);
+    }
+
+    @Operation(summary = "新增菜品")
+    @PostMapping("/save")
+    public R&lt;Void&gt; save(@RequestBody @Valid DishSaveDTO dto) {
+        // 填空：调用 service 保存
+        return R.ok();
+    }
+
+    @Operation(summary = "删除菜品")
+    @DeleteMapping("/{id}")
+    public R&lt;Void&gt; delete(@PathVariable Long id) {
+        // 填空：根据 id 删除
+        return R.ok();
+    }
+}</code></pre>
+  <details>
+    <summary>📋 参考答案</summary>
+    <pre><code class="language-java">private final DishService dishService;        // final 字段
+
+// list
+List&lt;DishVO&gt; data = dishService.list(query);
+return R.ok(data);
+
+// save
+dishService.save(dto);
+
+// delete
+dishService.removeById(id);</code></pre>
+  </details>
+</div>
+
+<!-- ============ 填空 2 ============ -->
+<div class="fill">
+  <span class="fill-head">填空 2 / 8 · Service 业务编排</span>
+  <h4>题目：优惠券发放</h4>
+  <p>实现一个 Service 方法：根据用户 ID 列表批量发放优惠券。逻辑：</p>
+  <ul>
+    <li>校验优惠券模板存在且未过期</li>
+    <li>校验每个用户未超限领次数</li>
+    <li>批量写入用户券表</li>
+    <li>整个过程在一个事务里</li>
+  </ul>
+  <pre><code class="language-java">@Service
+@RequiredArgsConstructor
+public class CouponServiceImpl implements CouponService {
+
+    private final CouponTemplateMapper templateMapper;
+    private final UserCouponMapper userCouponMapper;
+
+    @Override
+    // 填空：添加事务注解，所有异常都回滚
+    public void grantBatch(Long couponId, List&lt;Long&gt; userIds) {
+        // 1. 校验模板
+        CouponTemplate tpl = templateMapper.selectById(couponId);
+        if (tpl == null || tpl.getExpireTime().isBefore(LocalDateTime.now())) {
+            throw new BusinessException("优惠券不存在或已过期");
+        }
+
+        // 2. 遍历用户发放
+        for (Long userId : userIds) {
+            // 填空：先查 user_coupon 表，该用户已领这个券的数量
+            // 如果 &gt;= tpl.getPerUserLimit()，跳过
+            // 否则构造 UserCoupon 并 insert
+        }
+    }
+}</code></pre>
+  <details>
+    <summary>📋 参考答案</summary>
+    <pre><code class="language-java">// 类注解
+@Transactional(rollbackFor = Exception.class)
+
+// 循环内部
+Long count = userCouponMapper.selectCount(
+    new LambdaQueryWrapper&lt;UserCoupon&gt;()
+        .eq(UserCoupon::getUserId, userId)
+        .eq(UserCoupon::getCouponId, couponId)
+);
+if (count &gt;= tpl.getPerUserLimit()) {
+    continue;
+}
+UserCoupon uc = new UserCoupon();
+uc.setUserId(userId);
+uc.setCouponId(couponId);
+uc.setStatus(CouponStatusEnum.UNUSED.getCode());
+uc.setExpireTime(tpl.getExpireTime());
+userCouponMapper.insert(uc);</code></pre>
+  </details>
+</div>
+
+<!-- ============ 填空 3 ============ -->
+<div class="fill">
+  <span class="fill-head">填空 3 / 8 · MyBatis 动态 SQL</span>
+  <h4>题目：订单多条件查询 XML</h4>
+  <p>写一段动态 SQL，<b>支持所有字段为可选</b>的订单列表查询：</p>
+  <ul>
+    <li><code class="inline">query.orderNo</code>：模糊匹配</li>
+    <li><code class="inline">query.status</code>：精确匹配（Integer）</li>
+    <li><code class="inline">query.tableId</code>：精确匹配（Long）</li>
+    <li><code class="inline">query.startDate</code> / <code class="inline">query.endDate</code>：create_time 范围</li>
+  </ul>
+  <pre><code class="language-xml">&lt;!-- 文件：resources/mapper/order/OrderMapper.xml --&gt;
+&lt;select id="selectPageVO" resultMap="orderVOMap"&gt;
+    SELECT o.*, u.nickname AS user_name, t.name AS table_name
+    FROM t_order o
+    LEFT JOIN t_user u ON o.user_id = u.id
+    LEFT JOIN t_table t ON o.table_id = t.id
+    &lt;!-- 填空：动态 WHERE 块，按顺序处理 4 个可选条件 --&gt;
+    ORDER BY o.create_time DESC
+&lt;/select&gt;</code></pre>
+  <details>
+    <summary>📋 参考答案</summary>
+    <pre><code class="language-xml">&lt;where&gt;
+    &lt;if test="query.orderNo != null and query.orderNo != ''"&gt;
+        AND o.order_no LIKE CONCAT('%', #{query.orderNo}, '%')
+    &lt;/if&gt;
+    &lt;if test="query.status != null"&gt;
+        AND o.status = #{query.status}
+    &lt;/if&gt;
+    &lt;if test="query.tableId != null"&gt;
+        AND o.table_id = #{query.tableId}
+    &lt;/if&gt;
+    &lt;if test="query.startDate != null and query.endDate != null"&gt;
+        AND o.create_time BETWEEN #{query.startDate} AND #{query.endDate}
+    &lt;/if&gt;
+&lt;/where&gt;</code></pre>
+  </details>
+</div>
+
+<!-- ============ 填空 4 ============ -->
+<div class="fill">
+  <span class="fill-head">填空 4 / 8 · Vue 组件</span>
+  <h4>题目：菜品列表页面</h4>
+  <p>写一个菜品列表 Vue 3 组件：</p>
+  <ul>
+    <li>加载时调 <code class="inline">AdminDishAPI.list</code> 拉数据</li>
+    <li>显示 Naive UI 表格</li>
+    <li>"删除"按钮点击后调 <code class="inline">AdminDishAPI.remove(id)</code>，成功后刷新列表</li>
+    <li>loading 状态</li>
+  </ul>
+  <pre><code class="language-ts">&lt;script setup lang="ts"&gt;
+import { ref, onMounted } from 'vue'
+import { NDataTable, NButton, NSpace, useMessage } from 'naive-ui'
+import { AdminDishAPI, type DishVO } from '@/service/api/dish'
+
+const tableData = ref&lt;DishVO[]&gt;([])
+const loading = ref(false)
+const message = useMessage()
+
+async function loadData() {
+    loading.value = true
+    try {
+        const res = await AdminDishAPI.list({ pageNum: 1, pageSize: 20 })
+        tableData.value = res.records
+    } finally {
+        loading.value = false
+    }
+}
+
+async function handleDelete(id: number) {
+    // 填空：调 API，确认弹窗，删除后刷新 + 提示
+}
+
+const columns = [
+    { title: '菜品名', key: 'name' },
+    { title: '价格', key: 'price' },
+    {
+        title: '操作',
+        key: 'action',
+        render: (row: DishVO) =&gt;
+            // 填空：渲染一个"删除"按钮，点击调用 handleDelete
+            null,
+    },
+]
+
+onMounted(loadData)
+&lt;/script&gt;
+
+&lt;template&gt;
+    &lt;n-data-table :columns="columns" :data="tableData" :loading="loading" /&gt;
+&lt;/template&gt;</code></pre>
+  <details>
+    <summary>📋 参考答案</summary>
+    <pre><code class="language-ts">async function handleDelete(id: number) {
+    try {
+        await AdminDishAPI.remove(id)
+        message.success('删除成功')
+        await loadData()
+    } catch (e: any) {
+        message.error(e.message || '删除失败')
+    }
+}
+
+// render 函数
+render: (row: DishVO) =&gt;
+    h(NButton, {
+        size: 'small',
+        type: 'error',
+        onClick: () =&gt; handleDelete(row.id),
+    }, { default: () =&gt; '删除' })</code></pre>
+  </details>
+</div>
+
+<!-- ============ 填空 5 ============ -->
+<div class="fill">
+  <span class="fill-head">填空 5 / 8 · Pinia store</span>
+  <h4>题目：购物车 store</h4>
+  <p>用 Pinia setup 风格写一个购物车 store：</p>
+  <ul>
+    <li>state: <code class="inline">items: CartItem[]</code></li>
+    <li>computed: <code class="inline">totalCount</code>、<code class="inline">totalAmount</code></li>
+    <li>action: <code class="inline">addItem</code>、<code class="inline">removeItem</code>、<code class="inline">clear</code></li>
+  </ul>
+  <pre><code class="language-ts">import { defineStore } from 'pinia'
+import { ref, computed } from 'vue'
+
+export interface CartItem {
+    dishId: number
+    name: string
+    price: number
+    quantity: number
+}
+
+export const useCartStore = defineStore('cart', () =&gt; {
+    const items = ref&lt;CartItem[]&gt;([])
+
+    const totalCount = computed(() =&gt;
+        items.value.reduce((sum, i) =&gt; sum + i.quantity, 0)
+    )
+
+    const totalAmount = computed(() =&gt;
+        items.value.reduce((sum, i) =&gt; sum + i.price * i.quantity, 0)
+    )
+
+    function addItem(dish: { id: number; name: string; price: number }) {
+        // 填空：已存在则 +1，否则 push 新条目（quantity: 1）
+    }
+
+    function removeItem(dishId: number) {
+        // 填空：按 dishId 删除
+    }
+
+    function clear() {
+        items.value = []
+    }
+
+    return { items, totalCount, totalAmount, addItem, removeItem, clear }
+})</code></pre>
+  <details>
+    <summary>📋 参考答案</summary>
+    <pre><code class="language-ts">function addItem(dish: { id: number; name: string; price: number }) {
+    const exist = items.value.find(i =&gt; i.dishId === dish.id)
+    if (exist) {
+        exist.quantity++
+    } else {
+        items.value.push({
+            dishId: dish.id,
+            name: dish.name,
+            price: dish.price,
+            quantity: 1,
+        })
+    }
+}
+
+function removeItem(dishId: number) {
+    const idx = items.value.findIndex(i =&gt; i.dishId === dishId)
+    if (idx &gt;= 0) items.value.splice(idx, 1)
+}</code></pre>
+  </details>
+</div>
+
+<!-- ============ 填空 6 ============ -->
+<div class="fill">
+  <span class="fill-head">填空 6 / 8 · 小程序页面</span>
+  <h4>题目：菜品详情页</h4>
+  <p>写一个原生小程序菜品详情页 JS：</p>
+  <ul>
+    <li>接收 URL 参数 <code class="inline">id</code></li>
+    <li>加载时调 <code class="inline">getDishDetail(id)</code></li>
+    <li>显示菜品信息（name / price / image / description）</li>
+    <li>"加入购物车"按钮：调 <code class="inline">addToCart</code>（来自 <code class="inline">/utils/cart.js</code>）</li>
+  </ul>
+  <pre><code class="language-js">// pages/dish-detail/dish-detail.js
+const { getDishDetail } = require('../../api/dish.js')
+const { addToCart } = require('../../utils/cart.js')
+
+Page({
+    data: {
+        dish: null,
+        loading: true,
+    },
+
+    onLoad(options) {
+        const id = options.id
+        // 填空：调 getDishDetail(id)，结果存到 data.dish
+    },
+
+    onAddToCart() {
+        if (!this.data.dish) return
+        // 填空：调 addToCart(dish)，成功后 toast
+    },
+})</code></pre>
+  <details>
+    <summary>📋 参考答案</summary>
+    <pre><code class="language-js">onLoad(options) {
+    const id = options.id
+    getDishDetail(id).then(dish =&gt; {
+        this.setData({ dish, loading: false })
+    }).catch(e =&gt; {
+        wx.showToast({ title: e.message, icon: 'none' })
+        this.setData({ loading: false })
+    })
+},
+
+onAddToCart() {
+    if (!this.data.dish) return
+    addToCart(this.data.dish)
+    wx.showToast({ title: '已加入购物车', icon: 'success' })
+}</code></pre>
+  </details>
+</div>
+
+<!-- ============ 填空 7 ============ -->
+<div class="fill">
+  <span class="fill-head">填空 7 / 8 · TypeScript 类型</span>
+  <h4>题目：定义 API 响应 + DTO 类型</h4>
+  <p>为登录接口定义完整的 TS 类型，<b>让 TypeScript 在调用时给出智能提示</b>：</p>
+  <pre><code class="language-ts">// service/api/auth.ts
+import service from '@/service/request'
+
+// 填空：定义登录请求 DTO
+export interface ______ {                           // 1. LoginDTO
+    ______?: string                                  //    username
+    ______?: string                                  //    password
+}
+
+// 填空：定义登录响应 VO
+export interface ______ {                           // 2. LoginVO
+    ______: string                                   //    token
+    ______: ______                                   //    userInfo (UserInfo)
+    ______: string[]                                 //    roles
+}
+
+// 填空：定义登录 API 调用
+export const AuthAPI = {
+    login: (______: ______) =&gt;
+        service.post&lt;______&gt;('/admin/auth/login', ______),
+
+    logout: () =&gt; service.post('/admin/auth/logout'),
+}</code></pre>
+  <details>
+    <summary>📋 参考答案</summary>
+    <pre><code class="language-ts">export interface LoginDTO {
+    username?: string
+    password?: string
+}
+
+export interface LoginVO {
+    token: string
+    userInfo: UserInfo
+    roles: string[]
+}
+
+export const AuthAPI = {
+    login: (dto: LoginDTO) =&gt;
+        service.post&lt;LoginVO&gt;('/admin/auth/login', dto),
+
+    logout: () =&gt; service.post('/admin/auth/logout'),
+}</code></pre>
+  </details>
+</div>
+
+<!-- ============ 填空 8 ============ -->
+<div class="fill">
+  <span class="fill-head">填空 8 / 8 · Sa-Token 鉴权</span>
+  <h4>题目：自定义注解 + AOP 鉴权</h4>
+  <p>写一个 <code class="inline">@RequireRole("admin")</code> 注解 + AOP 切面，要求访问被注解的 Controller 方法必须有对应角色。</p>
+  <pre><code class="language-java">// 1. 注解定义
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface RequireRole {
+    String value();     // 填空：注解参数
+}
+
+// 2. AOP 切面
+@Aspect
+@Component
+@RequiredArgsConstructor
+public class RoleAspect {
+
+    @Around("@annotation(requireRole)")
+    public Object check(ProceedingJoinPoint pjp, RequireRole requireRole) throws Throwable {
+        // 填空：用 StpUtil 检查当前用户是否有所需角色
+        // 不足则抛 BusinessException
+        return pjp.proceed();
+    }
+}</code></pre>
+  <details>
+    <summary>📋 参考答案</summary>
+    <pre><code class="language-java">// 注解
+String value();
+
+// AOP
+String role = requireRole.value();
+if (!StpUtil.hasRole(role)) {
+    throw new BusinessException(403, "无权限访问");
+}
+return pjp.proceed();</code></pre>
+  </details>
+</div>
+
+</section>
+
+<!-- ============================================================
+     Mini-Project: 订单状态机实时看板
+     ============================================================ -->
+<section class="unit" id="mini-project">
+<h2>🎯 Mini-Project · 订单状态机实时看板（做完你就掌握了三层联动）</h2>
+
+<div class="why">
+<strong>目标</strong>：亲手做一个"实时订单看板"，覆盖后端 API + 前端组件 + 状态管理全链路。做完你就具备了真实项目的能力。
+</div>
+
+<h3>需求描述</h3>
+<ul>
+  <li>一个管理端页面，按状态分组显示订单（待支付 / 已支付 / 出餐中 / 已完成）</li>
+  <li>每 5 秒自动刷新（轮询实现）</li>
+  <li>点击"出餐"按钮，将"已支付"订单推进到"出餐中"</li>
+  <li>订单实时统计（总订单数 / 总金额）</li>
+</ul>
+
+<h3>后端：3 个接口</h3>
+<pre><code class="language-java">// 1. 看板概览
+@GetMapping("/admin/dashboard/overview")
+public R&lt;DashboardOverviewVO&gt; overview() {
+    return R.ok(dashboardService.getOverview());
+}
+
+// 2. 订单列表（按状态）
+@GetMapping("/admin/dashboard/orders-by-status")
+public R&lt;Map&lt;Integer, List&lt;OrderVO&gt;&gt;&gt; ordersByStatus() {
+    return R.ok(dashboardService.groupByStatus());
+}
+
+// 3. 推进订单状态
+@PostMapping("/admin/dashboard/advance-order/{id}")
+public R&lt;Void&gt; advanceOrder(@PathVariable Long id) {
+    dashboardService.advance(id);
+    return R.ok();
+}</code></pre>
+
+<h3>后端：Service 关键逻辑</h3>
+<pre><code class="language-java">@Service
+@RequiredArgsConstructor
+public class DashboardServiceImpl implements DashboardService {
+    private final OrderMapper orderMapper;
+
+    @Override
+    @Transactional
+    public void advance(Long orderId) {
+        Order order = orderMapper.selectById(orderId);
+        if (order == null) throw new BusinessException("订单不存在");
+
+        // 状态机：已支付 → 出餐中
+        if (order.getStatus() != OrderStatusEnum.PAID.getCode()) {
+            throw new BusinessException("只有已支付订单可以推进");
+        }
+        order.setStatus(OrderStatusEnum.SERVING.getCode());
+        orderMapper.updateById(order);
+    }
+
+    @Override
+    public Map&lt;Integer, List&lt;OrderVO&gt;&gt; groupByStatus() {
+        List&lt;OrderVO&gt; all = orderMapper.selectList(null)
+            .stream().map(this::toVO).collect(Collectors.toList());
+        return all.stream().collect(Collectors.groupingBy(OrderVO::getStatus));
+    }
+}</code></pre>
+
+<h3>前端：完整页面</h3>
+<pre><code class="language-ts">&lt;script setup lang="ts"&gt;
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { NCard, NStatistic, NButton, NSpace } from 'naive-ui'
+import { DashboardAPI, type OrderVO } from '@/service/api/dashboard'
+
+const ordersByStatus = ref&lt;Record&lt;number, OrderVO[]&gt;&gt;({})
+let timer: number | null = null
+
+const totalCount = computed(() =&gt;
+    Object.values(ordersByStatus.value).reduce((s, list) =&gt; s + list.length, 0)
+)
+
+const totalAmount = computed(() =&gt;
+    Object.values(ordersByStatus.value)
+        .flat()
+        .reduce((s, o) =&gt; s + (o.payAmount ?? 0), 0)
+)
+
+async function loadData() {
+    const data = await DashboardAPI.ordersByStatus()
+    ordersByStatus.value = data
+}
+
+async function handleAdvance(id: number) {
+    await DashboardAPI.advanceOrder(id)
+    await loadData()
+}
+
+onMounted(() =&gt; {
+    loadData()
+    timer = window.setInterval(loadData, 5000)
+})
+onUnmounted(() =&gt; {
+    if (timer) clearInterval(timer)
+})
+&lt;/script&gt;
+
+&lt;template&gt;
+    &lt;div class="dashboard"&gt;
+        &lt;h2&gt;实时看板&lt;/h2&gt;
+        &lt;n-space&gt;
+            &lt;n-card&gt;&lt;n-statistic label="总订单" :value="totalCount" /&gt;&lt;/n-card&gt;
+            &lt;n-card&gt;&lt;n-statistic label="总金额" :value="totalAmount" /&gt;&lt;/n-card&gt;
+        &lt;/space&gt;
+
+        &lt;div class="columns"&gt;
+            &lt;div v-for="(label, status) in statusLabels" :key="status" class="col"&gt;
+                &lt;h3&gt;{{ label }} ({{ ordersByStatus[status]?.length || 0 }})&lt;/h3&gt;
+                &lt;div v-for="order in ordersByStatus[status]" :key="order.id" class="order-card"&gt;
+                    &lt;div&gt;{{ order.orderNo }}&lt;/div&gt;
+                    &lt;div&gt;¥{{ order.payAmount }}&lt;/div&gt;
+                    &lt;n-button v-if="status === 20"
+                               size="small" type="primary"
+                               @click="handleAdvance(order.id)"&gt;
+                        出餐
+                    &lt;/n-button&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/template&gt;
+
+&lt;script lang="ts"&gt;
+const statusLabels: Record&lt;number, string&gt; = {
+    10: '待支付',
+    20: '已支付',
+    40: '出餐中',
+    50: '已完成',
+}
+&lt;/script&gt;</code></pre>
+
+<h3>验证清单</h3>
+<div class="step">
+  <span class="step-num">1</span><b>后端编译</b>：<code class="inline">cd diancan-admin &amp;&amp; mvn clean compile</code> 不报错
+</div>
+<div class="step">
+  <span class="step-num">2</span><b>启动后端</b>：<code class="inline">mvn spring-boot:run</code>，浏览器打开 <code class="inline">http://localhost:8080/api/admin/dashboard/orders-by-status</code> 看返回数据
+</div>
+<div class="step">
+  <span class="step-num">3</span><b>前端集成</b>：在 <code class="inline">diancan-admin-web/src/service/api/dashboard.ts</code> 添加 API 定义
+</div>
+<div class="step">
+  <span class="step-num">4</span><b>前端运行</b>：<code class="inline">pnpm dev</code>，访问 <code class="inline">http://localhost:9527/dashboard</code> 看到 4 列订单
+</div>
+<div class="step">
+  <span class="step-num">5</span><b>手动测试</b>：在数据库里手动改一条订单 status=20，看前端 5 秒后是否出现，点击"出餐"是否变 40
+</div>
+
+</section>
+
+</main>
+
+<footer>
+<div class="container">
+<p>📘 代码练习册 · 配套 <b>diancan-system-tutorial.html</b> 使用</p>
+<p>8 道填空 + 1 个 mini-project · 做完你就掌握了真实项目的核心模式</p>
+<p>浏览器 → 打印 → 保存为 PDF，可离线练习</p>
+</div>
+</footer>
+
+</body>
+</html>

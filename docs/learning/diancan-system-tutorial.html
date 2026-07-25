@@ -1,0 +1,2873 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>点餐系统从入门到全栈 · 9 单元完全学习手册</title>
+<style>
+  :root {
+    --primary: #2c5282;
+    --primary-light: #ebf4ff;
+    --success: #2f855a;
+    --warning: #c05621;
+    --danger: #c53030;
+    --text: #2d3748;
+    --text-light: #718096;
+    --bg: #ffffff;
+    --bg-soft: #f7fafc;
+    --border: #e2e8f0;
+    --code-bg: #1a202c;
+    --code-text: #e2e8f0;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    line-height: 1.8;
+    color: var(--text);
+    background: var(--bg-soft);
+    margin: 0;
+    padding: 0;
+  }
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+  header.hero {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 60px 24px;
+    text-align: center;
+  }
+  header.hero h1 { font-size: 2.4em; margin: 0 0 12px; }
+  header.hero p { font-size: 1.1em; opacity: 0.95; margin: 6px 0; }
+  header.hero .meta { margin-top: 24px; font-size: 0.9em; opacity: 0.85; }
+  nav.toc {
+    background: white;
+    border-bottom: 1px solid var(--border);
+    padding: 20px 24px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+  }
+  nav.toc .container { display: flex; flex-wrap: wrap; gap: 8px; }
+  nav.toc a {
+    color: var(--primary);
+    text-decoration: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    background: var(--primary-light);
+    font-size: 0.9em;
+    transition: all 0.2s;
+  }
+  nav.toc a:hover { background: var(--primary); color: white; }
+  main { padding: 40px 24px; }
+  section.unit {
+    background: white;
+    border-radius: 12px;
+    margin-bottom: 32px;
+    padding: 32px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    border: 1px solid var(--border);
+  }
+  section.unit h2 {
+    color: var(--primary);
+    border-bottom: 3px solid var(--primary);
+    padding-bottom: 12px;
+    margin-top: 0;
+  }
+  section.unit h3 {
+    color: var(--text);
+    margin-top: 28px;
+    padding-left: 12px;
+    border-left: 4px solid var(--primary);
+  }
+  section.unit h4 {
+    color: var(--text-light);
+    margin-top: 20px;
+    font-size: 1em;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .why, .analogy, .pitfall, .summary {
+    padding: 16px 20px;
+    border-radius: 8px;
+    margin: 16px 0;
+  }
+  .why { background: #fef5e7; border-left: 4px solid var(--warning); }
+  .analogy { background: #f0fff4; border-left: 4px solid var(--success); }
+  .pitfall { background: #fff5f5; border-left: 4px solid var(--danger); }
+  .summary { background: var(--primary-light); border-left: 4px solid var(--primary); }
+  .why strong, .analogy strong, .pitfall strong, .summary strong { display: block; margin-bottom: 6px; }
+  .concept-list { padding-left: 0; list-style: none; }
+  .concept-list li {
+    padding: 10px 16px;
+    margin: 8px 0;
+    background: var(--bg-soft);
+    border-radius: 6px;
+    position: relative;
+    padding-left: 36px;
+  }
+  .concept-list li::before {
+    content: "▸";
+    position: absolute;
+    left: 16px;
+    color: var(--primary);
+    font-weight: bold;
+  }
+  pre {
+    background: var(--code-bg);
+    color: var(--code-text);
+    padding: 16px 20px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-size: 0.9em;
+    line-height: 1.6;
+    margin: 16px 0;
+  }
+  pre code { font-family: "SF Mono", Consolas, Monaco, "Courier New", monospace; }
+  code.inline {
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 2px 6px;
+    font-size: 0.9em;
+    color: var(--danger);
+    font-family: "SF Mono", Consolas, Monaco, monospace;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border); }
+  th { background: var(--primary-light); color: var(--primary); font-weight: 600; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover { background: var(--bg-soft); }
+  .step {
+    background: white;
+    border: 2px solid var(--primary);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 12px 0;
+    position: relative;
+  }
+  .step-num {
+    position: absolute;
+    top: -12px;
+    left: 16px;
+    background: var(--primary);
+    color: white;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.9em;
+  }
+  .quiz {
+    background: #fefcbf;
+    border: 2px dashed #d69e2e;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 16px 0;
+  }
+  .quiz-q { font-weight: 600; margin-bottom: 8px; }
+  .quiz-options { list-style: none; padding: 0; }
+  .quiz-options li {
+    padding: 6px 12px;
+    margin: 4px 0;
+    background: white;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .quiz-options li:hover { background: var(--primary-light); }
+  .quiz-options li::before { content: "○ "; color: var(--text-light); }
+  .quiz-options li.correct { background: #c6f6d5; }
+  .quiz-options li.correct::before { content: "✓ "; color: var(--success); font-weight: bold; }
+  .quiz-options li.wrong { background: #fed7d7; }
+  .quiz-options li.wrong::before { content: "✗ "; color: var(--danger); font-weight: bold; }
+  .quiz-answer { margin-top: 12px; padding: 8px 12px; background: #fefcbf; border-radius: 4px; font-size: 0.95em; }
+  .quiz-type {
+    display: inline-block;
+    background: var(--warning);
+    color: white;
+    font-size: 0.75em;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-right: 8px;
+    font-weight: bold;
+  }
+  .file-path {
+    font-family: "SF Mono", Consolas, monospace;
+    background: var(--bg-soft);
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 0.85em;
+    color: var(--primary);
+  }
+  .mermaid {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    margin: 16px 0;
+    text-align: center;
+  }
+  .checklist {
+    list-style: none;
+    padding: 0;
+  }
+  .checklist li {
+    padding: 8px 12px;
+    margin: 4px 0;
+    background: var(--bg-soft);
+    border-radius: 4px;
+    padding-left: 36px;
+    position: relative;
+  }
+  .checklist li::before {
+    content: "□";
+    position: absolute;
+    left: 12px;
+    color: var(--primary);
+    font-size: 1.2em;
+  }
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 40px 0;
+  }
+  details {
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 16px;
+    margin: 8px 0;
+  }
+  details summary { cursor: pointer; font-weight: 600; color: var(--primary); }
+  details[open] { background: white; }
+  .badge {
+    display: inline-block;
+    padding: 2px 10px;
+    background: var(--primary);
+    color: white;
+    border-radius: 12px;
+    font-size: 0.8em;
+    margin-right: 6px;
+  }
+  .badge.success { background: var(--success); }
+  .badge.warning { background: var(--warning); }
+  .badge.danger { background: var(--danger); }
+  footer {
+    background: var(--code-bg);
+    color: white;
+    padding: 32px 24px;
+    text-align: center;
+    margin-top: 60px;
+  }
+  footer p { margin: 6px 0; opacity: 0.85; }
+  .lead {
+    font-size: 1.2em;
+    color: var(--text-light);
+    text-align: center;
+    margin: 24px 0;
+  }
+  @media (max-width: 720px) {
+    header.hero { padding: 40px 20px; }
+    header.hero h1 { font-size: 1.6em; }
+    section.unit { padding: 20px; }
+    pre { font-size: 0.8em; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="container">
+    <h1>🍜 点餐系统从入门到全栈</h1>
+    <p>9 单元 · 24 小时 · 0 基础友好 · 关键代码全程配套</p>
+    <p>面向后端 / 全栈岗位的实战学习手册</p>
+    <div class="meta">
+      <span class="badge">Spring Boot 3.2.5</span>
+      <span class="badge">Vue 3 + Vite 7</span>
+      <span class="badge">微信小程序</span>
+      <span class="badge">MySQL 8 + Redis</span>
+    </div>
+  </div>
+</header>
+
+<nav class="toc">
+  <div class="container">
+    <a href="#U1">U1 全局架构</a>
+    <a href="#U2">U2 后端骨架</a>
+    <a href="#U3">U3 管理端</a>
+    <a href="#U4">U4 小程序</a>
+    <a href="#U5">U5 订单+支付</a>
+    <a href="#U6">U6 会员+券</a>
+    <a href="#U7">U7 数据库</a>
+    <a href="#U8">U8 实时消息</a>
+    <a href="#U9">U9 增量+简历</a>
+    <a href="#U10">U10 中间件</a>
+    <a href="#U11">U11 Docker</a>
+    <a href="#appendix">附录</a>
+    <a href="code-exercises.html" target="_blank">📝 代码练习册</a>
+  </div>
+</nav>
+
+<main class="container">
+
+<p class="lead">
+  这份手册会带你从「零基础」到「能在本地跑通这个点餐系统」，并最终整理出一份能写进简历的技术故事。<br>
+  建议按 U1 → U9 顺序学习，每单元约 2~3 小时。
+</p>
+
+<!-- ==================== U1 ==================== -->
+<section class="unit" id="U1">
+<h2>📐 U1 · 项目全局与跨端契约</h2>
+
+<div class="why">
+<strong>为什么要学这个？</strong>
+你不读懂整体就改代码，就像不开地图就上路——容易迷路。U1 给你一张"地图"，告诉你三端各自在哪、它们怎么说话。
+</div>
+
+<div class="analogy">
+<strong>🍽️ 生活类比：一家餐厅的三个部门</strong>
+把这套系统想象成一家餐厅：
+<ul>
+  <li><b>后端</b> = 厨房 + 中央系统：决定能不能做菜、定价多少、扣多少积分</li>
+  <li><b>管理端</b> = 前台 + 后勤办公室：服务员点单、收银员结账、店长看报表</li>
+  <li><b>小程序</b> = 顾客手里的菜单：扫码点单、查会员、领券</li>
+</ul>
+三部门通过"单据"沟通：顾客递给服务员一个<b>订单</b>，服务员递给厨房一个<b>出餐单</b>，厨房回执递回给服务员。这套"单据流转"就是后端 API。
+</div>
+
+<h3>📚 核心概念</h3>
+<ul class="concept-list">
+  <li><b>三端单体仓库</b>：一个 Git 仓库里三个独立子项目（diancan-admin / diancan-admin-web / diancan-miniapp）。</li>
+  <li><b>统一上下文路径 /api</b>：后端所有接口都以 <code class="inline">/api</code> 开头，例如 <code class="inline">/api/admin/dish/list</code>。</li>
+  <li><b>双端前缀 /admin 与 /app</b>：管理端走 <code class="inline">/api/admin/*</code>，小程序走 <code class="inline">/api/app/*</code>，支付回调走 <code class="inline">/api/notify/*</code>。</li>
+  <li><b>中间件四件套</b>：MySQL（事实库）、Redis（会话+缓存）、RocketMQ（可靠消息）、MinIO（文件存储）。</li>
+</ul>
+
+<h3>🗺️ 架构图</h3>
+<div class="mermaid">
+<pre>
+  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐
+  │ 小程序顾客端  │    │ 管理端运营端  │    │ 微信支付回调  │
+  │ diancan-miniapp│    │diancan-admin-web│   │  /api/notify │
+  └──────┬───────┘    └──────┬───────┘    └──────┬───────┘
+         │  /api/app/*       │  /api/admin/*     │
+         └────────┬──────────┴──────────┬─────────┘
+                  ▼                     ▼
+           ┌──────────────────────────────┐
+           │  后端 Spring Boot (diancan-admin) │
+           │  · /api/admin/*  · /api/app/*  │
+           └──────┬───────────────┬────────┘
+                  ▼               ▼
+        ┌──────────────┐  ┌──────────────┐
+        │ MySQL 8      │  │ Redis        │
+        │ 业务数据      │  │ 会话/缓存     │
+        └──────────────┘  └──────────────┘
+                  ▼               ▼
+        ┌──────────────┐  ┌──────────────┐
+        │ RocketMQ     │  │ MinIO        │
+        │ 可靠消息      │  │ 文件存储      │
+        └──────────────┘  └──────────────┘
+</pre>
+</div>
+
+<h3>📂 目录结构（关键文件）</h3>
+<table>
+<tr><th>路径</th><th>作用</th></tr>
+<tr><td><span class="file-path">diancan-admin/</span></td><td>Spring Boot 后端，Java 17，单体应用</td></tr>
+<tr><td><span class="file-path">diancan-admin-web/</span></td><td>Vue 3 + Vite 7 + TS 管理端</td></tr>
+<tr><td><span class="file-path">diancan-miniapp/</span></td><td>原生微信小程序（顾客端）</td></tr>
+<tr><td><span class="file-path">db/diancan-system.sql</span></td><td>数据库初始化脚本（102+ 张表）</td></tr>
+<tr><td><span class="file-path">db/upgrade/</span></td><td>已有环境按日期追加的增量脚本</td></tr>
+<tr><td><span class="file-path">AGENTS.md（根）</span></td><td>跨端契约的"地图"——先读这个</td></tr>
+</table>
+
+<h3>🌐 跨端接口契约表（务必背下来）</h3>
+<table>
+<tr><th>调用方</th><th>客户端路径</th><th>后端映射</th><th>典型业务</th></tr>
+<tr><td>管理端</td><td>src/service/api/* 的 /admin/*</td><td>/api/admin/*</td><td>菜品、桌台、订单、报表、系统</td></tr>
+<tr><td>小程序</td><td>api/* 的 /order 等相对路径</td><td>/api/app/*</td><td>登录、菜单、购物车、订单、会员</td></tr>
+<tr><td>支付平台</td><td>外部回调 URL</td><td>/api/notify/*</td><td>微信支付回调、签名校验</td></tr>
+</table>
+
+<h3>💻 关键代码：跨端 Controller 命名空间</h3>
+<pre><code class="language-java">// diancan-admin/src/main/java/com/scaffold/modules/order/controller/
+//
+// 同一业务"订单"分两个 Controller：
+//
+//   └── AdminOrderController.java   -> /api/admin/order/*   管理端用
+//   └── AppOrderController.java     -> /api/app/order/*     小程序用
+//
+// 两者 Service 层共享 OrderServiceImpl，但 Controller 只负责入口路由。
+//
+// 示例：管理端订单列表
+@Tag(name = "管理端-订单")
+@RestController
+@RequestMapping("/admin/order")
+public class AdminOrderController {
+
+    @Autowired
+    private OrderService orderService;
+
+    @Operation(summary = "订单列表")
+    @GetMapping("/list")
+    public R&lt;PageResult&lt;OrderVO&gt;&gt; list(@RequestParam OrderQueryDTO query) {
+        return R.ok(orderService.page(query));
+    }
+}
+
+// 示例：小程序下单
+@Tag(name = "顾客端-订单")
+@RestController
+@RequestMapping("/app/order")
+public class AppOrderController {
+
+    @Autowired
+    private OrderService orderService;
+
+    @Operation(summary = "提交订单")
+    @PostMapping("/create")
+    public R&lt;OrderVO&gt; create(@RequestBody @Valid OrderCreateDTO dto) {
+        return R.ok(orderService.create(dto));
+    }
+}</code></pre>
+
+<h3>📝 业务主链：从扫码到复盘</h3>
+<pre>
+扫码入桌 → 菜单浏览 → 购物车 → 提交订单 → 微信支付 → 后厨出餐 → 评价反馈 → 报表复盘
+└─table─┘ └─dish──┘ └cart┘ └─order─┘ └payment┘ └─kitchen┘ └─review─┘ └─report─┘
+</pre>
+
+<h3>👣 动手步骤</h3>
+<div class="step"><span class="step-num">1</span><b>打开仓库根</b>：用 VSCode 或 IDE 打开 <code class="inline">diancan-system/</code>，先看 <span class="file-path">AGENTS.md</span>，再看 <span class="file-path">readme.md</span> 的"项目结构"小节。</div>
+<div class="step"><span class="step-num">2</span><b>摸清三端分布</b>：在终端里依次执行 <code class="inline">ls diancan-admin</code>、<code class="inline">ls diancan-admin-web</code>、<code class="inline">ls diancan-miniapp</code>，记下各自根目录。</div>
+<div class="step"><span class="step-num">3</span><b>验证契约表</b>：用 IDE 的全局搜索，按下表验证至少 3 个接口是否真存在。</div>
+<table>
+<tr><th>接口路径</th><th>所在文件</th></tr>
+<tr><td>/api/admin/dish/list</td><td>AdminDishController.java</td></tr>
+<tr><td>/api/app/order/create</td><td>AppOrderController.java</td></tr>
+<tr><td>/api/notify/pay/success</td><td>PayNotifyController.java</td></tr>
+</table>
+<div class="step"><span class="step-num">4</span><b>完成自检</b>（下方）。</div>
+
+<h3>🧪 自我检测</h3>
+<div class="quiz">
+<span class="quiz-type">A 概念辨析</span>
+<span class="quiz-q">1. 小程序的请求路径写 <code class="inline">/api/app/order/create</code>，但 api 文件里只写 <code class="inline">/order/create</code>，前缀是从哪里补的？</span>
+<ul class="quiz-options">
+<li>A. Vue 自动补</li>
+<li class="correct">B. <code class="inline">config/env.js</code> 里的 <code class="inline">apiPrefix: '/api/app'</code></li>
+<li>C. 后端识别</li>
+<li>D. 微信开发者工具补</li>
+</ul>
+<div class="quiz-answer">💡 <b>答案 B</b>。读 <span class="file-path">diancan-miniapp/config/env.js</span>，你会看到所有相对路径都被这个前缀串起来。修改它时必须重启小程序。</div>
+</div>
+
+<div class="quiz">
+<span class="quiz-type">B 应用迁移</span>
+<span class="quiz-q">2. 试着标出下单后厨出餐的端到端流转：从小程序加购到管理端看到"出餐"，至少包含 3 个 HTTP 请求。</span>
+<div class="quiz-answer">💡 提示：加购物车 <code class="inline">POST /api/app/cart/add</code> → 提交订单 <code class="inline">POST /api/app/order/create</code> → 后厨接收 <code class="inline">POST /api/admin/kitchen/receive</code>。可去 Swagger 实际试一下。</div>
+</div>
+
+<div class="summary">
+<strong>📌 本章小结</strong>
+记住三个关键词：<code class="inline">/api</code>（统一前缀）、<code class="inline">/admin</code>（后台）、<code class="inline">/app</code>（顾客）。任何时候改业务，三端必须同步核字段。
+</div>
+</section>
+
+<!-- ==================== U2 ==================== -->
+<section class="unit" id="U2">
+<h2>🛠️ U2 · 后端 Spring Boot 工程骨架</h2>
+
+<div class="why">
+<strong>为什么要学这个？</strong>
+后端是整个系统的心脏。后端跑不起来，其他两端都白搭。U2 教你**把这颗心脏本地启动起来**。
+</div>
+
+<div class="analogy">
+<strong>🍳 类比：Spring Boot 就像一个高度自动化的中央厨房</strong>
+你写一个 <code class="inline">OrderController</code>，Spring Boot 自动帮你接 HTTP 请求、解析 JSON、注入 service、写日志。你只关心"做什么菜"（业务），不关心"怎么接单"（基础设施）。
+</div>
+
+<h3>📚 核心概念</h3>
+<ul class="concept-list">
+  <li><b>Spring Boot 启动器</b>：<code class="inline">DiancanAdminApplication.java</code> 上的 <code class="inline">@SpringBootApplication</code> 注解，一键启动整个应用。</li>
+  <li><b>模块化目录</b>：<code class="inline">com.scaffold.modules.&lt;domain&gt;</code>——17 个业务模块（订单、菜品、会员等）。</li>
+  <li><b>分层配置</b>：<code class="inline">application.yml</code>（公共） + <code class="inline">application-dev.yml</code>（开发） + <code class="inline">application-prod.yml</code>（生产）。</li>
+  <li><b>技术栈三件套</b>：MyBatis-Plus（ORM）+ Sa-Token（鉴权）+ Knife4j（接口文档）。</li>
+</ul>
+
+<h3>💻 关键代码 1：启动类</h3>
+<pre><code class="language-java">// 文件：diancan-admin/src/main/java/com/scaffold/DiancanAdminApplication.java
+package com.scaffold;
+
+import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
+
+@SpringBootApplication
+@MapperScan("com.scaffold.modules.**.mapper")  // 扫描所有 MyBatis Mapper
+@EnableAsync                                   // 启用异步任务（消息推送用）
+@EnableScheduling                              // 启用定时任务（报表统计用）
+public class DiancanAdminApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(DiancanAdminApplication.class, args);
+    }
+}</code></pre>
+
+<h3>💻 关键代码 2：分层配置（开发环境）</h3>
+<pre><code class="language-yaml"># 文件：diancan-admin/src/main/resources/application-dev.yml
+server:
+  port: 8080
+  servlet:
+    context-path: /api          # 关键：所有接口前缀都是 /api
+
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/diancan-system?useSSL=false&serverTimezone=Asia/Shanghai
+    username: root
+    password: 123456
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+      password: 123456
+
+# Sa-Token 鉴权
+sa-token:
+  token-name: Authorization
+  timeout: 2592000              # 30 天
+  active-timeout: -1
+
+# MyBatis-Plus
+mybatis-plus:
+  mapper-locations: classpath*:mapper/**/*.xml
+  global-config:
+    db-config:
+      id-type: ASSIGN_ID        # 雪花算法生成主键
+
+# RocketMQ
+rocketmq:
+  name-server: 127.0.0.1:9876
+  producer:
+    group: diancan-producer
+
+# MinIO
+minio:
+  endpoint: http://127.0.0.1:9000
+  access-key: minioadmin
+  secret-key: minioadmin
+  bucket: dish-images</code></pre>
+
+<div class="pitfall">
+<strong>⚠️ 坑：数据库命名不一致</strong>
+SQL 文件里导出的库名是 <code class="inline">digital_ordering_system</code>，而 <code class="inline">application-dev.yml</code> 默认写的是 <code class="inline">diancan-system</code>。
+<b>启动前必须把这两处统一</b>，否则启动正常但所有查询都会 500 报"Table doesn't exist"。
+</div>
+
+<h3>💻 关键代码 3：一个 Controller 的完整结构</h3>
+<pre><code class="language-java">// 文件：diancan-admin/src/main/java/com/scaffold/modules/dish/controller/AdminDishController.java
+package com.scaffold.modules.dish.controller;
+
+import com.scaffold.common.api.R;
+import com.scaffold.modules.dish.dto.DishQueryDTO;
+import com.scaffold.modules.dish.dto.DishSaveDTO;
+import com.scaffold.modules.dish.service.DishService;
+import com.scaffold.modules.dish.vo.DishVO;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@Tag(name = "管理端-菜品")
+@RestController
+@RequestMapping("/admin/dish")
+@RequiredArgsConstructor   // Lombok 自动生成构造函数注入
+public class AdminDishController {
+
+    private final DishService dishService;
+
+    @Operation(summary = "菜品列表")
+    @GetMapping("/list")
+    public R&lt;List&lt;DishVO&gt;&gt; list(DishQueryDTO query) {
+        return R.ok(dishService.list(query));
+    }
+
+    @Operation(summary = "新增菜品")
+    @PostMapping("/save")
+    public R&lt;Void&gt; save(@RequestBody @Valid DishSaveDTO dto) {
+        dishService.save(dto);
+        return R.ok();
+    }
+
+    @Operation(summary = "删除菜品")
+    @DeleteMapping("/{id}")
+    public R&lt;Void&gt; delete(@PathVariable Long id) {
+        dishService.removeById(id);
+        return R.ok();
+    }
+}</code></pre>
+
+<h3>👣 动手步骤：把后端跑起来</h3>
+<div class="step">
+<span class="step-num">1</span><b>准备 JDK 17</b>：终端执行 <code class="inline">java -version</code> 确认输出包含 <code class="inline">17</code>。没有的话用 <code class="inline">sdk install java 17</code>（sdkman）或从 <code class="inline">apt install openjdk-17-jdk</code>（Ubuntu）。
+</div>
+<div class="step">
+<span class="step-num">2</span><b>准备 Maven 3.9+</b>：<code class="inline">mvn -v</code>。没有的话 <code class="inline">apt install maven</code>。
+</div>
+<div class="step">
+<span class="step-num">3</span><b>准备 MySQL</b>：登录 <code class="inline">mysql -uroot -p</code>，执行 <code class="inline">CREATE DATABASE diancan-system DEFAULT CHARACTER SET utf8mb4;</code> 然后 <code class="inline">exit</code>，再 <code class="inline">mysql -uroot -p diancan-system &lt; db/diancan-system.sql</code> 导入基线库。
+</div>
+<div class="step">
+<span class="step-num">4</span><b>准备 Redis</b>：<code class="inline">redis-server --daemonize yes</code>。如果设置了密码，需要同步修改 application-dev.yml。
+</div>
+<div class="step">
+<span class="step-num">5</span><b>启动后端</b>：
+<pre><code>cd diancan-admin
+mvn clean compile
+mvn spring-boot:run -Dspring-boot.run.profiles=dev</code></pre>
+看到 <code class="inline">Started DiancanAdminApplication in 8.32 seconds</code> 表示成功。
+</div>
+<div class="step">
+<span class="step-num">6</span><b>访问接口文档</b>：浏览器打开 <code class="inline">http://localhost:8080/api/swagger-ui.html</code>，能看到 Knife4j 文档即成功。
+</div>
+
+<h3>🧪 自我检测</h3>
+<div class="quiz">
+<span class="quiz-type">A 概念辨析</span>
+<span class="quiz-q">1. SQL 库名 <code class="inline">digital_ordering_system</code>，配置写 <code class="inline">diancan-system</code>，启动后会发生什么？</span>
+<ul class="quiz-options">
+<li class="wrong">A. Spring Boot 启动报错</li>
+<li>B. 启动正常，但所有数据库操作都会 500</li>
+<li class="wrong">C. 启动报错，但日志友好</li>
+<li class="wrong">D. 静默运行，查询自动建表</li>
+</ul>
+<div class="quiz-answer">💡 Spring Boot 启动只检查"能不能连上 MySQL"，不检查表是否存在。启动后第一次查询才会暴露问题：<code class="inline">Table 'diancan-system.dish' doesn't exist</code>。这就是为什么启动成功 ≠ 跑通。</div>
+</div>
+
+<div class="quiz">
+<span class="quiz-type">B 应用迁移</span>
+<span class="quiz-q">2. 改动 <code class="inline">application-dev.yml</code> 的 Redis 密码后，重启时只看到 <code class="inline">Redis connection refused</code>，你下一步会检查什么？</span>
+<div class="quiz-answer">💡 排查顺序：(1) Redis 进程是否启动 <code class="inline">redis-cli ping</code> (2) 端口是否正确 (3) 密码是否匹配 <code class="inline">redis-cli -a 123456 ping</code> (4) application-dev.yml 拼写是否正确。</div>
+</div>
+
+<div class="summary">
+<strong>📌 本章小结</strong>
+跑通后端 = <b>数据库名对齐</b> + <b>mvn spring-boot:run</b> + <b>看 Swagger</b>。如果你卡在这一步，先确认 JDK 是 17 而不是 8 或 21。
+</div>
+</section>
+
+<!-- ==================== U3 ==================== -->
+<section class="unit" id="U3">
+<h2>💻 U3 · 管理端 Vue 3 工程骨架</h2>
+
+<div class="why">
+<strong>为什么要学这个？</strong>
+管理端是后端能力最直接的"镜子"。学会读管理端代码，能反推后端有哪些能力、字段怎么用。这是后端工程师最容易忽略的"另一半"。
+</div>
+
+<div class="analogy">
+<strong>🎨 类比：Vue 项目就像一个搭好的展会</strong>
+<code class="inline">vite.config.ts</code> 是展位平面图，<code class="inline">src/views/</code> 是一个个展品柜台，<code class="inline">src/service/api/</code> 是"询问柜台工作人员的标准化话术"。你只管站在正确的柜台前问问题。
+</div>
+
+<h3>📚 核心概念</h3>
+<ul class="concept-list">
+  <li><b>pnpm workspace</b>：包管理工具，比 npm 快 2 倍，磁盘空间节省 50%。</li>
+  <li><b>Vite 7</b>：构建工具，开发时按需编译，秒级热更新。</li>
+  <li><b>三层架构</b>：<code class="inline">views/</code>（页面）→ <code class="inline">service/api/</code>（接口）→ <code class="inline">service/request/</code>（请求底层）。</li>
+  <li><b>UI 四件套</b>：Naive UI（组件） + UnoCSS（原子化 CSS） + Pinia（状态） + ECharts（图表）。</li>
+</ul>
+
+<h3>💻 关键代码 1：环境配置</h3>
+<pre><code class="language-bash"># 文件：diancan-admin-web/.env.dev
+VITE_APP_TITLE=点餐管理端
+VITE_SERVICE_BASE_URL=http://localhost:8080/api
+VITE_HTTP_PROXY=Y</code></pre>
+
+<h3>💻 关键代码 2：统一请求层</h3>
+<pre><code class="language-ts">// 文件：diancan-admin-web/src/service/request/index.ts
+import axios, { type AxiosInstance, type AxiosRequestConfig } from 'axios'
+import { getToken } from '@/utils/auth'
+
+const service: AxiosInstance = axios.create({
+  baseURL: import.meta.env.VITE_SERVICE_BASE_URL,  // 自动读 .env.dev
+  timeout: 15000,
+})
+
+// 请求拦截器：自动塞 Token
+service.interceptors.request.use((config) =&gt; {
+  const token = getToken()
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`
+  }
+  return config
+})
+
+// 响应拦截器：统一处理错误码
+service.interceptors.response.use(
+  (response) =&gt; {
+    const { code, msg, data } = response.data
+    if (code === 0) return data          // 成功：返回数据
+    if (code === 401) {
+      // Sa-Token 鉴权失败：跳转登录
+      window.location.href = '/login'
+    }
+    // 业务错误：抛错给上层处理
+    return Promise.reject(new Error(msg || '请求失败'))
+  },
+  (error) =&gt; Promise.reject(error)
+)
+
+export default service</code></pre>
+
+<h3>💻 关键代码 3：API 封装（业务契约集中层）</h3>
+<pre><code class="language-ts">// 文件：diancan-admin-web/src/service/api/dish.ts
+import service from '@/service/request'
+
+// 入参 DTO（与后端 DTO 字段对齐）
+export interface DishQueryDTO {
+  categoryId?: number
+  name?: string
+  status?: number
+  pageNum: number
+  pageSize: number
+}
+
+// 出参 VO
+export interface DishVO {
+  id: number
+  name: string
+  price: number
+  categoryId: number
+  status: number
+  imageUrl: string
+}
+
+// 所有菜品接口集中在这里
+export const AdminDishAPI = {
+  list: (query: DishQueryDTO) =&gt;
+    service.get&lt;PageResult&lt;DishVO&gt;&gt;('/admin/dish/list', { params: query }),
+
+  save: (dto: DishSaveDTO) =&gt;
+    service.post('/admin/dish/save', dto),
+
+  remove: (id: number) =&gt;
+    service.delete(`/admin/dish/${id}`),
+}</code></pre>
+
+<h3>💻 关键代码 4：页面调用 API</h3>
+<pre><code class="language-vue">&lt;!-- 文件：diancan-admin-web/src/views/dish/list/index.vue --&gt;
+&lt;script setup lang="ts"&gt;
+import { ref, onMounted } from 'vue'
+import { AdminDishAPI, type DishVO } from '@/service/api/dish'
+
+const tableData = ref&lt;DishVO[]&gt;([])
+
+async function loadData() {
+  const res = await AdminDishAPI.list({ pageNum: 1, pageSize: 20 })
+  tableData.value = res.records
+}
+
+onMounted(loadData)
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;n-data-table :columns="columns" :data="tableData" /&gt;
+&lt;/template&gt;</code></pre>
+
+<h3>👣 动手步骤：把管理端跑起来</h3>
+<div class="step"><span class="step-num">1</span><b>安装 Node.js 20.19+</b>：<code class="inline">node -v</code>。推荐用 nvm 管理多版本。</div>
+<div class="step"><span class="step-num">2</span><b>安装 pnpm 10.5+</b>：<code class="inline">npm i -g pnpm</code>，然后 <code class="inline">pnpm -v</code>。</div>
+<div class="step"><span class="step-num">3</span><b>启动后端</b>：U2 已经跑起来，没跑起来先去跑。</div>
+<div class="step"><span class="step-num">4</span><b>启动管理端</b>：
+<pre><code>cd diancan-admin-web
+pnpm install
+pnpm dev</code></pre>
+看到 <code class="inline">Local: http://localhost:9527/</code> 表示成功。
+</div>
+<div class="step"><span class="step-num">5</span><b>登录管理端</b>：浏览器打开 <code class="inline">http://localhost:9527</code>，用 <code class="inline">admin / 123456</code> 登录。看到桌台看板即成功。</div>
+<div class="step"><span class="step-num">6</span><b>完整路径验证</b>：新增菜品 → 删除菜品 → 关闭浏览器重开 → 数据还在。说明前端、后端、数据库全链路畅通。</div>
+
+<h3>🧪 自我检测</h3>
+<div class="quiz">
+<span class="quiz-type">A 概念辨析</span>
+<span class="quiz-q">1. 把 <code class="inline">VITE_SERVICE_BASE_URL</code> 改成 <code class="inline">http://localhost:9999/api</code>（错端口），会发生什么？</span>
+<ul class="quiz-options">
+<li class="wrong">A. 页面白屏</li>
+<li class="correct">B. 所有接口请求 404 或跨域错误</li>
+<li class="wrong">C. Vite 编译报错</li>
+<li class="wrong">D. 登录失败但其他正常</li>
+</ul>
+<div class="quiz-answer">💡 Vite 只在编译时读取 <code class="inline">VITE_*</code> 变量，运行时是浏览器直接读取。改错 baseURL 只会让请求飞错地方，页面照常渲染，但所有接口都失败。</div>
+</div>
+
+<div class="quiz">
+<span class="quiz-type">B 应用迁移</span>
+<span class="quiz-q">2. 登录页填了 admin/123456，按下登录后看到"401 unauthorized"，如何排查？</span>
+<div class="quiz-answer">💡 排查顺序：(1) 后端是否启动 <code class="inline">curl http://localhost:8080/api/admin/dish/list</code> (2) .env.dev 的 baseURL 是否配上 (3) 浏览器 Network 看请求头是否带 Token (4) 后端日志看 Sa-Token 拦截原因。</div>
+</div>
+
+<div class="summary">
+<strong>📌 本章小结</strong>
+管理端跑通 = <b>后端先起</b> + <b>VITE_SERVICE_BASE_URL 对齐</b> + <b>默认账号登录</b>。记住三层架构：views → api → request。
+</div>
+</section>
+
+<!-- ==================== U4 ==================== -->
+<section class="unit" id="U4">
+<h2>📱 U4 · 小程序原生工程骨架</h2>
+
+<div class="why">
+<strong>为什么要学这个？</strong>
+对后端工程师来说，小程序代码相对陌生。但读懂小程序只需要把握"一个请求入口 + 一个页面生命周期"两件事。
+</div>
+
+<div class="analogy">
+<strong>📖 类比：小程序就像一本翻页书</strong>
+每一页 = 一个页面（<code class="inline">pages/xxx</code>）；书脊 = <code class="inline">app.js</code>（全局状态）；目录 = <code class="inline">app.json</code>（页面注册）。<code class="inline">utils/request.js</code> 是"由你联系作者"的统一通道。
+</div>
+
+<h3>📚 核心概念</h3>
+<ul class="concept-list">
+  <li><b>app.json</b>：小程序的"目录"，注册所有页面和 tabBar；小程序启动时第一读它。</li>
+  <li><b>utils/request.js</b>：所有 HTTP 请求的单一入口，统一加前缀、Token、错误处理。</li>
+  <li><b>config/env.js</b>：环境变量（API 地址），真机调试要改这里。</li>
+  <li><b>pages/ 一个页面 = 4 个文件</b>：<code class="inline">.js .json .wxml .wxss</code>（类比 HTML 项目的 html/css/js 分离）。</li>
+</ul>
+
+<h3>💻 关键代码 1：app.json（页面注册）</h3>
+<pre><code class="language-json">{
+  "pages": [
+    "pages/index/index",
+    "pages/menu/menu",
+    "pages/cart/cart",
+    "pages/order/order",
+    "pages/payment/payment",
+    "pages/profile/profile",
+    "pages/member/member"
+  ],
+  "tabBar": {
+    "list": [
+      { "pagePath": "pages/index/index", "text": "首页" },
+      { "pagePath": "pages/menu/menu", "text": "点餐" },
+      { "pagePath": "pages/order/order", "text": "订单" },
+      { "pagePath": "pages/profile/profile", "text": "我的" }
+    ]
+  },
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#2c5282",
+    "navigationBarTitleText": "点餐"
+  }
+}</code></pre>
+
+<h3>💻 关键代码 2：环境配置</h3>
+<pre><code class="language-js">// 文件：diancan-miniapp/config/env.js
+module.exports = {
+  // 开发者工具可用 127.0.0.1
+  // 真机联调必须改成电脑的局域网 IP，例如 192.168.1.100
+  API_HOST: 'http://127.0.0.1:8080',
+  apiPrefix: '/api/app',          // 重要：所有小程序接口在这里拼前缀
+
+  // 真机调试时打开下面这行
+  // API_HOST: 'http://192.168.x.x:8080',
+}</code></pre>
+
+<h3>💻 关键代码 3：utils/request.js（HTTP 汇合点）</h3>
+<pre><code class="language-js">// 文件：diancan-miniapp/utils/request.js
+const { API_HOST, apiPrefix } = require('../config/env.js')
+
+function request(url, method, data, options = {}) {
+  const token = wx.getStorageSync('token')
+  return new Promise((resolve, reject) =&gt; {
+    wx.request({
+      url: API_HOST + apiPrefix + url,   // 拼成完整 URL
+      method,
+      data,
+      header: {
+        'Content-Type': 'application/json',
+        Authorization: token ? `Bearer ${token}` : '',
+      },
+      timeout: 15000,
+      success: (res) =&gt; {
+        const { code, msg, data: body } = res.data || {}
+        if (code === 0) resolve(body)        // 业务成功
+        else if (code === 401) {
+          wx.removeStorageSync('token')
+          wx.navigateTo({ url: '/pages/login/login' })
+          reject(new Error(msg))
+        } else {
+          reject(new Error(msg || '请求失败'))
+        }
+      },
+      fail: (err) =&gt; reject(err),
+    })
+  })
+}
+
+module.exports = {
+  get:  (url, params)         =&gt; request(url, 'GET',    params),
+  post: (url, data)           =&gt; request(url, 'POST',   data),
+  put:  (url, data)           =&gt; request(url, 'PUT',    data),
+  del:  (url)                 =&gt; request(url, 'DELETE', null),
+}</code></pre>
+
+<h3>💻 关键代码 4：API 封装示例</h3>
+<pre><code class="language-js">// 文件：diancan-miniapp/api/order.js
+const request = require('../utils/request.js')
+
+module.exports = {
+  // 提交订单
+  createOrder: (data) =&gt; request.post('/order/create', data),
+
+  // 订单列表
+  getOrderList: (params) =&gt; request.get('/order/list', params),
+
+  // 订单详情
+  getOrderDetail: (id) =&gt; request.get(`/order/detail/${id}`),
+}</code></pre>
+
+<h3>💻 关键代码 5：页面调用</h3>
+<pre><code class="language-js">// 文件：diancan-miniapp/pages/order/order.js
+const { createOrder } = require('../../api/order.js')
+
+Page({
+  data: {
+    orders: [],
+  },
+
+  onLoad() {
+    this.loadOrders()
+  },
+
+  async loadOrders() {
+    try {
+      const res = await require('../../api/order.js').getOrderList({ pageNum: 1 })
+      this.setData({ orders: res.records })
+    } catch (e) {
+      wx.showToast({ title: e.message, icon: 'none' })
+    }
+  },
+})</code></pre>
+
+<div class="pitfall">
+<strong>⚠️ 坑：真机运行时不要用 localhost</strong>
+手机里的 <code class="inline">127.0.0.1</code> 指向手机自己，不是你电脑。必须打开 <code class="inline">config/env.js</code> 改成电脑局域网 IP（如 <code class="inline">192.168.1.100</code>），并保证手机和电脑在同一 WiFi 下。
+</div>
+
+<h3>👣 动手步骤</h3>
+<div class="step"><span class="step-num">1</span><b>下载微信开发者工具</b>：<a href="https://developers.weixin.qq.com/miniprogram/dev/devtools/download.html">官方下载</a>。</div>
+<div class="step"><span class="step-num">2</span><b>导入项目</b>：开发者工具 → 导入项目 → 选 <code class="inline">diancan-miniapp/</code> → AppID 选"测试号"即可。</div>
+<div class="step"><span class="step-num">3</span><b>看到首页</b>：不登录也能看到首页静态结构，因为登录态在本地存储里可能没值。</div>
+<div class="step"><span class="step-num">4</span><b>改 API 地址（可选）</b>：只有真机调试才需要改 <code class="inline">config/env.js</code>。开发者工具默认用 <code class="inline">127.0.0.1</code>。</div>
+
+<h3>🧪 自我检测</h3>
+<div class="quiz">
+<span class="quiz-type">A 概念辨析</span>
+<span class="quiz-q">1. 真机调试时把 <code class="inline">API_HOST</code> 改成 <code class="inline">127.0.0.1</code>，会发生什么？</span>
+<ul class="quiz-options">
+<li class="wrong">A. 微信禁止</li>
+<li class="correct">B. 请求失败，因为手机里的 127.0.0.1 指向手机自己</li>
+<li class="wrong">C. 自动改成局域网 IP</li>
+<li class="wrong">D. 提示权限错误</li>
+</ul>
+<div class="quiz-answer">💡 必改 <code class="inline">API_HOST</code> 为电脑局域网 IP。临时切换也可用 <code class="inline">wx.setStorageSync('diancan.devApiHost', 'http://192.168.x.x:8080')</code>。</div>
+</div>
+
+<div class="summary">
+<strong>📌 本章小结</strong>
+小程序跑通 = <b>开发者工具</b> + <b>不依赖微信登录也能看静态页</b>。真机调试才需要改 IP。请求一定要走 <code class="inline">utils/request.js</code>。
+</div>
+</section>
+
+<!-- ==================== U5 ==================== -->
+<section class="unit" id="U5">
+<h2>💰 U5 · 核心交易链：订单 + 支付</h2>
+
+<div class="why">
+<strong>为什么要学这个？</strong>
+订单是整个系统的"心脏回路"。后端面试 80% 会问"订单状态怎么流转"。这一章帮你把这条回路彻底搞懂。
+</div>
+
+<div class="analogy">
+<strong>🎯 状态机类比：订单就像外卖订单的生命周期</strong>
+未下单 → 已下单 → 已支付 → 后厨接单 → 出餐中 → 已完成 → 已评价。任意两个状态之间都有"门禁"，后端要做的是守住这些门。
+</div>
+
+<h3>📚 核心概念</h3>
+<ul class="concept-list">
+  <li><b>OrderServiceImpl</b>：交易主链热点，连接桌台、菜品、支付、履约。</li>
+  <li><b>PaymentServiceImpl</b>：支付状态机 + 退款逻辑。</li>
+  <li><b>事务边界</b>：下单/支付/退款都是跨 service 调用，必须包在 <code class="inline">@Transactional</code> 里。</li>
+  <li><b>幂等性</b>：同一个支付回调可能来多次，状态机必须能容忍重复。</li>
+</ul>
+
+<h3>🔄 订单状态机</h3>
+<div class="mermaid">
+<pre>
+   ┌────────┐
+   │ 未下单 │ (购物车阶段，不入库)
+   └───┬────┘
+       │ 创建订单
+       ▼
+   ┌────────┐
+   │ 待支付 │ ◄──── 取消订单
+   └───┬────┘
+       │ 支付成功回调
+       ▼
+   ┌────────┐
+   │ 已支付 │ ◄──── 退款
+   └───┬────┘
+       │ 后厨接单
+       ▼
+   ┌────────┐
+   │ 出餐中 │
+   └───┬────┘
+       │ 确认完成
+       ▼
+   ┌────────┐
+   │ 已完成 │ ──&gt; 评价
+   └────────┘
+</pre>
+</div>
+
+<h3>💻 关键代码 1：下单核心方法</h3>
+<pre><code class="language-java">// 文件：diancan-admin/src/main/java/com/scaffold/modules/order/service/impl/OrderServiceImpl.java
+@Service
+@RequiredArgsConstructor
+public class OrderServiceImpl implements OrderService {
+
+    private final OrderMapper orderMapper;
+    private final CartMapper cartMapper;
+    private final DishMapper dishMapper;
+    private final TableMapper tableMapper;
+    private final CouponService couponService;
+    private final MemberSettlementService memberSettlementService;
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public OrderVO create(OrderCreateDTO dto) {
+        // 1. 校验桌台
+        Table table = tableMapper.selectById(dto.getTableId());
+        if (table == null || table.getStatus() != 1) {
+            throw new BizException("桌台不可用");
+        }
+
+        // 2. 加载购物车
+        List&lt;CartItem&gt; items = cartMapper.selectByUserId(dto.getUserId());
+        if (items.isEmpty()) {
+            throw new BizException("购物车为空");
+        }
+
+        // 3. 锁库存（重要！防止超卖）
+        for (CartItem item : items) {
+            int updated = dishMapper.lockStock(item.getDishId(), item.getQuantity());
+            if (updated == 0) {
+                throw new BizException("菜品库存不足: " + item.getDishName());
+            }
+        }
+
+        // 4. 计算总金额
+        BigDecimal total = items.stream()
+            .map(i -&gt; i.getPrice().multiply(BigDecimal.valueOf(i.getQuantity())))
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        // 5. 优惠券抵扣（可选）
+        BigDecimal discount = BigDecimal.ZERO;
+        if (dto.getCouponId() != null) {
+            discount = couponService.lock(dto.getCouponId(), total);
+        }
+
+        // 6. 写入订单 + 订单项
+        Order order = new Order();
+        order.setOrderNo(generateOrderNo());
+        order.setTableId(dto.getTableId());
+        order.setUserId(dto.getUserId());
+        order.setTotalAmount(total);
+        order.setPayAmount(total.subtract(discount));
+        order.setStatus(OrderStatusEnum.PENDING_PAY.getCode());
+        orderMapper.insert(order);
+
+        // 7. 关联订单项
+        for (CartItem item : items) {
+            OrderItem oi = new OrderItem();
+            oi.setOrderId(order.getId());
+            oi.setDishId(item.getDishId());
+            oi.setQuantity(item.getQuantity());
+            oi.setPrice(item.getPrice());
+            orderMapper.insertItem(oi);
+        }
+
+        // 8. 清空购物车
+        cartMapper.deleteByUserId(dto.getUserId());
+
+        return orderMapper.selectVOById(order.getId());
+    }
+}</code></pre>
+
+<h3>💻 关键代码 2：支付回调（幂等性关键）</h3>
+<pre><code class="language-java">// 文件：diancan-admin/src/main/java/com/scaffold/modules/payment/service/impl/PaymentServiceImpl.java
+@Service
+@RequiredArgsConstructor
+public class PaymentServiceImpl implements PaymentService {
+
+    private final OrderMapper orderMapper;
+    private final PaymentMapper paymentMapper;
+
+    /**
+     * 微信支付回调
+     * 幂等性：同一个支付通知可能会来多次，必须能容忍
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void onPaySuccess(PayNotifyDTO notify) {
+        // 1. 验签（先验证签名，再处理业务）
+        if (!verifySignature(notify)) {
+            throw new BizException("签名校验失败");
+        }
+
+        // 2. 查订单（关键：先查状态）
+        Order order = orderMapper.selectByOrderNo(notify.getOrderNo());
+        if (order == null) {
+            throw new BizException("订单不存在");
+        }
+
+        // 3. 幂等性检查：如果订单已经是"已支付"，直接返回
+        if (order.getStatus() == OrderStatusEnum.PAID.getCode()) {
+            log.info("订单 {} 已处理过支付回调，跳过", order.getOrderNo());
+            return;       // 关键：不要重复处理
+        }
+
+        // 4. 状态机推进：待支付 → 已支付
+        if (order.getStatus() != OrderStatusEnum.PENDING_PAY.getCode()) {
+            throw new BizException("订单状态异常: " + order.getStatus());
+        }
+        order.setStatus(OrderStatusEnum.PAID.getCode());
+        order.setPayTime(LocalDateTime.now());
+        orderMapper.updateById(order);
+
+        // 5. 记录支付流水
+        Payment payment = new Payment();
+        payment.setOrderId(order.getId());
+        payment.setAmount(order.getPayAmount());
+        payment.setTransactionId(notify.getTransactionId());
+        payment.setPayTime(LocalDateTime.now());
+        paymentMapper.insert(payment);
+
+        // 6. 后厨消息推送（异步）
+        kitchenNotifyService.pushNewOrder(order);
+    }
+}</code></pre>
+
+<h3>💻 关键代码 3：订单状态枚举</h3>
+<pre><code class="language-java">// 文件：diancan-admin/src/main/java/com/scaffold/modules/order/enums/OrderStatusEnum.java
+@Getter
+@AllArgsConstructor
+public enum OrderStatusEnum {
+    PENDING_PAY(10, "待支付"),
+    PAID(20, "已支付"),
+    KITCHEN_ACCEPTED(30, "后厨接单"),
+    SERVING(40, "出餐中"),
+    COMPLETED(50, "已完成"),
+    CANCELLED(60, "已取消"),
+    REFUNDED(70, "已退款");
+
+    private final Integer code;
+    private final String desc;
+
+    public static OrderStatusEnum of(Integer code) {
+        for (OrderStatusEnum e : values()) {
+            if (e.code.equals(code)) return e;
+        }
+        return null;
+    }
+}</code></pre>
+
+<h3>👣 动手步骤：用 Swagger 跑一单</h3>
+<div class="step"><span class="step-num">1</span><b>找到测试订单</b>：在数据库里执行 <code class="inline">SELECT * FROM t_order ORDER BY id DESC LIMIT 5;</code> 拿一个真实订单号。</div>
+<div class="step"><span class="step-num">2</span><b>调支付回调模拟</b>：Swagger 找 <code class="inline">/api/notify/pay/success</code>，手工 POST 一个回调（开发环境通常有内部端点）。</div>
+<div class="step"><span class="step-num">3</span><b>查订单状态</b>：<code class="inline">GET /api/admin/order/detail/{orderNo}</code> 看 status 是否从 10 → 20。</div>
+<div class="step"><span class="step-num">4</span><b>重复发同一条回调</b>：订单状态不应变化（幂等性）。</div>
+
+<h3>🧪 自我检测</h3>
+<div class="quiz">
+<span class="quiz-type">C 教回来（Feynman）</span>
+<span class="quiz-q">用大白话给一个不懂技术的同学讲："顾客扫码 → 加购 → 下单 → 微信支付 → 后厨出餐"每一步后端做了什么？</span>
+<div class="quiz-answer">💡 关键点：扫码=table 模块检查桌台状态；加购=cart 写本地或服务端；下单=order.create 事务+锁库存；支付回调=payment.onPaySuccess 验签+幂等+状态机；后厨接单=kitchen.receive 推消息。可以用"厨房出餐单"这个类比。</div>
+</div>
+
+<div class="quiz">
+<span class="quiz-type">D 3 阶段心智模型</span>
+<span class="quiz-q">商户反馈：用户付了钱，但订单卡在"待支付"。你如何一步步定位？</span>
+<div class="quiz-answer">
+<b>阶段 1 现象</b>：用户付了钱 → 系统卡片状态没更新。<br>
+<b>阶段 2 定位</b>：是支付回调没拿到，还是回调进来后状态机没推进？
+<ul>
+  > 检查：微信支付商户平台 → 支付通知是否成功发送？
+  > 检查：后端日志 → <code class="inline">PayNotifyController</code> 是否收到回调？
+  > 检查：日志 → 验签是否通过？订单号是否对得上？
+</ul>
+<b>阶段 3 修复</b>：根据定位结果改：补调回调接口 / 修改幂等逻辑 / 修复状态机判断。
+</div>
+</div>
+
+<div class="summary">
+<strong>📌 本章小结</strong>
+交易主链 = <code class="inline">OrderServiceImpl</code> + <code class="inline">PaymentServiceImpl</code> + 状态机 + 跨 service 事务。面试高频题：<b>支付回调的幂等性怎么实现</b>。
+</div>
+</section>
+
+<!-- ==================== U6 ==================== -->
+<section class="unit" id="U6">
+<h2>🎁 U6 · 会员营销与优惠券体系</h2>
+
+<div class="why">
+<strong>为什么要学这个？</strong>
+会员和券是 to C 业务最容易出彩的部分。你能讲清"一单结算后积分如何回流、券如何核销"，面试官会觉得你懂业务。
+</div>
+
+<div class="analogy">
+<strong>🪙 类比：会员就像信用卡的"积分 + 等级 + 权益"三合一</strong>
+消费 → 积分（钱生积分）；积分 → 成长值（积分升级）；等级 → 权益（折扣、生日券）。回流是个反向问题：退款 → 积分回退。
+</div>
+
+<h3>📚 核心概念</h3>
+<ul class="concept-list">
+  <li><b>MemberSettlementServiceImpl</b>：订单结算后联动积分、成长值、会员等级。</li>
+  <li><b>CouponServiceImpl</b>：三段式生命周期——领取 → 锁定 → 核销。</li>
+  <li><b>权益联动</b>：下单成功 → 加积分 → 涨成长值 → 触发升级提醒。</li>
+  <li><b>回退机制</b>：退款 → 扣回积分 → 退券 → 撤销权益。</li>
+</ul>
+
+<h3>💻 关键代码 1：订单结算后的会员联动</h3>
+<pre><code class="language-java">// 文件：diancan-admin/src/main/java/com/scaffold/modules/member/service/impl/MemberSettlementServiceImpl.java
+@Service
+@RequiredArgsConstructor
+public class MemberSettlementServiceImpl implements MemberSettlementService {
+
+    private final MemberMapper memberMapper;
+    private final PointsRecordMapper pointsMapper;
+    private final GrowthRecordMapper growthMapper;
+    private final MemberLevelMapper levelMapper;
+
+    /**
+     * 订单结算后调用：加积分 + 涨成长 + 检查升级
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void onOrderPaid(Order order) {
+        Member member = memberMapper.selectByUserId(order.getUserId());
+        if (member == null) return;        // 非会员不处理
+
+        // 1. 积分：消费 1 元 = 1 积分
+        int points = order.getPayAmount().intValue();
+        member.setPoints(member.getPoints() + points);
+        memberMapper.updateById(member);
+
+        // 2. 记录积分流水（这是合规要求）
+        PointsRecord pr = new PointsRecord();
+        pr.setMemberId(member.getId());
+        pr.setChange(points);
+        pr.setType(PointsTypeEnum.ORDER_REWARD.getCode());
+        pr.setOrderId(order.getId());
+        pr.setRemark("订单奖励");
+        pointsMapper.insert(pr);
+
+        // 3. 成长值：消费 1 元 = 1 成长值
+        int oldLevel = member.getLevel();
+        member.setGrowth(member.getGrowth() + points);
+        memberMapper.updateById(member);
+
+        // 4. 检查升级（成长值跨阈值 → 自动升级）
+        MemberLevel newLevel = levelMapper.selectByGrowth(member.getGrowth());
+        if (newLevel != null &amp;&amp; newLevel.getLevel() &gt; oldLevel) {
+            member.setLevel(newLevel.getLevel());
+            memberMapper.updateById(member);
+
+            // 5. 升级奖励：发券或发积分
+            if (newLevel.getUpgradeCouponId() != null) {
+                couponService.grant(member.getUserId(), newLevel.getUpgradeCouponId());
+            }
+        }
+
+        // 6. 记录成长流水
+        GrowthRecord gr = new GrowthRecord();
+        gr.setMemberId(member.getId());
+        gr.setChange(points);
+        gr.setOrderId(order.getId());
+        growthMapper.insert(gr);
+    }
+}</code></pre>
+
+<h3>💻 关键代码 2：优惠券三段式</h3>
+<pre><code class="language-java">// 文件：diancan-admin/src/main/java/com/scaffold/modules/coupon/service/impl/CouponServiceImpl.java
+@Service
+@RequiredArgsConstructor
+public class CouponServiceImpl implements CouponService {
+
+    private final UserCouponMapper userCouponMapper;
+
+    /**
+     * 阶段 1：领取（用户主动领）
+     */
+    @Override
+    public void grant(Long userId, Long couponId) {
+        // 检查库存、限领次数、有效期
+        UserCoupon uc = new UserCoupon();
+        uc.setUserId(userId);
+        uc.setCouponId(couponId);
+        uc.setStatus(CouponStatusEnum.UNUSED.getCode());
+        uc.setExpireTime(calculateExpire(couponId));
+        userCouponMapper.insert(uc);
+    }
+
+    /**
+     * 阶段 2：锁定（下单时占用，避免多单共用一张券）
+     */
+    @Override
+    public BigDecimal lock(Long userCouponId, BigDecimal orderAmount) {
+        UserCoupon uc = userCouponMapper.selectById(userCouponId);
+        if (uc.getStatus() != CouponStatusEnum.UNUSED.getCode()) {
+            throw new BizException("券不可用");
+        }
+        // 状态：未使用 → 锁定
+        uc.setStatus(CouponStatusEnum.LOCKED.getCode());
+        userCouponMapper.updateById(uc);  // 用 updateById + 状态条件保证幂等
+        return calculateDiscount(uc, orderAmount);
+    }
+
+    /**
+     * 阶段 3：核销（支付成功后真正扣减）
+     */
+    @Override
+    public void consume(Long userCouponId) {
+        UserCoupon uc = userCouponMapper.selectById(userCouponId);
+        uc.setStatus(CouponStatusEnum.USED.getCode());
+        uc.setUseTime(LocalDateTime.now());
+        userCouponMapper.updateById(uc);
+    }
+
+    /**
+     * 回退：退款时释放券
+     */
+    @Override
+    public void release(Long userCouponId) {
+        UserCoupon uc = userCouponMapper.selectById(userCouponId);
+        if (uc.getStatus() == CouponStatusEnum.LOCKED.getCode()) {
+            uc.setStatus(CouponStatusEnum.UNUSED.getCode());
+            userCouponMapper.updateById(uc);
+        }
+    }
+}</code></pre>
+
+<h3>💻 关键代码 3：退款时的积分回退</h3>
+<pre><code class="language-java">// 文件：diancan-admin/src/main/java/com/scaffold/modules/member/service/impl/MemberSettlementServiceImpl.java
+/**
+ * 订单退款时反向操作
+ */
+@Override
+@Transactional(rollbackFor = Exception.class)
+public void onOrderRefunded(Order order) {
+    Member member = memberMapper.selectByUserId(order.getUserId());
+    if (member == null) return;
+
+    int points = order.getPayAmount().intValue();
+
+    // 1. 积分扣回（不能扣到负数）
+    int newPoints = Math.max(0, member.getPoints() - points);
+    member.setPoints(newPoints);
+    memberMapper.updateById(member);
+
+    // 2. 记录反向流水（必须有，便于审计）
+    PointsRecord pr = new PointsRecord();
+    pr.setMemberId(member.getId());
+    pr.setChange(-points);
+    pr.setType(PointsTypeEnum.ORDER_REFUND.getCode());
+    pr.setOrderId(order.getId());
+    pr.setRemark("订单退款扣回");
+    pointsMapper.insert(pr);
+
+    // 3. 成长值也回退（防止"刷成长"漏洞）
+    member.setGrowth(Math.max(0, member.getGrowth() - points));
+    memberMapper.updateById(member);
+
+    // 4. 重新计算等级（可能降级）
+    MemberLevel newLevel = levelMapper.selectByGrowth(member.getGrowth());
+    if (newLevel != null) {
+        member.setLevel(newLevel.getLevel());
+        memberMapper.updateById(member);
+    }
+}</code></pre>
+
+<div class="pitfall">
+<strong>⚠️ 坑：积分单向发放没有回退</strong>
+很多"积分商城"被羊毛党薅的根源就是：消费 + 积分有逻辑，但退款 - 积分没有逻辑。后端工程师必须主动问"退款时权益怎么变"。
+</div>
+
+<h3>👣 动手步骤</h3>
+<div class="step"><span class="step-num">1</span><b>找一个测试会员</b>：SQL 查 <code class="inline">SELECT * FROM t_member LIMIT 5</code>。</div>
+<div class="step"><span class="step-num">2</span><b>模拟下单</b>：Swagger 下个测试订单，订单金额 100 元。</div>
+<div class="step"><span class="step-num">3</span><b>查积分增长</b>：<code class="inline">SELECT * FROM t_member WHERE user_id = ?</code>，看 points 字段是否 +100。</div>
+<div class="step"><span class="step-num">4</span><b>模拟退款</b>：调退款接口，再查积分是否回退到原值。</div>
+
+<h3>🧪 自我检测</h3>
+<div class="quiz">
+<span class="quiz-type">B 应用迁移</span>
+<span class="quiz-q">如果订单退款时只扣了积分、没扣成长值，会有什么安全漏洞？</span>
+<div class="quiz-answer">💡 漏洞：用户可以反复下单 + 退款，每次成长值都涨，但积分不变。高级会员等级纯粹靠"刷成长"刷上去。修复：在 <code class="inline">onOrderRefunded</code> 里同时扣回成长值。</div>
+</div>
+
+<div class="summary">
+<strong>📌 本章小结</strong>
+会员结算 = 下单成功后回调，权益增减要<b>可逆</b>。券生命周期 = 领取 → 锁定 → 核销（或释放）。面试高频题：<b>积分/券如何防止超发和重放</b>。
+</div>
+</section>
+
+<!-- ==================== U7 ==================== -->
+<section class="unit" id="U7">
+<h2>🗄️ U7 · 数据库与 MyBatis</h2>
+
+<div class="why">
+<strong>为什么要学这个？</strong>
+后端工程师 70% 的 bug 来自数据库。学会读懂表结构、SQL、XML 映射，是后端最硬的功夫。
+</div>
+
+<div class="analogy">
+<strong>📚 类比：MyBatis 是"SQL 的翻译官"</strong>
+Java 不认识 SQL，SQL 不认识 Java 对象。MyBatis 帮你把 Java method 翻译成 SQL，把查询结果翻译回 Java 对象。
+</div>
+
+<h3>📚 核心概念</h3>
+<ul class="concept-list">
+  <li><b>db/diancan-system.sql</b>：新环境基线库（102+ 张表）。</li>
+  <li><b>db/upgrade/</b>：已有环境按日期追加的增量脚本。</li>
+  <li><b>MyBatis-Plus 通用 CRUD</b>：<code class="inline">userMapper.selectById(id)</code> 这种，省去写 SQL。</li>
+  <li><b>自定义 XML</b>：复杂连表查询、动态 SQL 写在 <code class="inline">resources/mapper/</code> 下。</li>
+  <li><b>三件套同步</b>：改 SQL → 改 Entity → 必要时改 XML，缺一不可。</li>
+</ul>
+
+<h3>💻 关键代码 1：核心表结构（订单表）</h3>
+<pre><code class="language-sql">-- 文件：db/diancan-system.sql（节选）
+CREATE TABLE `t_order` (
+  `id`           BIGINT       NOT NULL COMMENT '雪花 ID',
+  `order_no`     VARCHAR(32)  NOT NULL COMMENT '订单号',
+  `table_id`     BIGINT       NOT NULL COMMENT '桌台 ID',
+  `user_id`      BIGINT       NOT NULL COMMENT '用户 ID',
+  `total_amount` DECIMAL(10,2) NOT NULL COMMENT '总金额',
+  `pay_amount`   DECIMAL(10,2) NOT NULL COMMENT '实付金额',
+  `discount`     DECIMAL(10,2) DEFAULT 0 COMMENT '优惠金额',
+  `status`       TINYINT      NOT NULL COMMENT '10待支付 20已支付 30后厨接单 40出餐中 50已完成 60已取消 70已退款',
+  `pay_time`     DATETIME     DEFAULT NULL COMMENT '支付时间',
+  `create_time`  DATETIME     DEFAULT CURRENT_TIMESTAMP,
+  `update_time`  DATETIME     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_order_no` (`order_no`),
+  KEY `idx_user_id` (`user_id`),
+  KEY `idx_table_id` (`table_id`),
+  KEY `idx_status_create` (`status`, `create_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='订单表';</code></pre>
+
+<h3>💻 关键代码 2：Java Entity</h3>
+<pre><code class="language-java">// 文件：diancan-admin/src/main/java/com/scaffold/modules/order/entity/Order.java
+@Data
+@TableName("t_order")
+public class Order {
+
+    @TableId(type = IdType.ASSIGN_ID)
+    private Long id;
+
+    private String orderNo;
+    private Long tableId;
+    private Long userId;
+    private BigDecimal totalAmount;
+    private BigDecimal payAmount;
+    private BigDecimal discount;
+    private Integer status;
+    private LocalDateTime payTime;
+    private LocalDateTime createTime;
+    private LocalDateTime updateTime;
+}</code></pre>
+
+<h3>💻 关键代码 3：Java Mapper 接口</h3>
+<pre><code class="language-java">// 文件：diancan-admin/src/main/java/com/scaffold/modules/order/mapper/OrderMapper.java
+public interface OrderMapper extends BaseMapper&lt;Order&gt; {
+
+    // 通用 CRUD 已经由 MyBatis-Plus 提供：
+    //   insert / updateById / selectById / selectList / deleteById
+
+    // 自定义方法（复杂 SQL 在 XML 里写）
+    Page&lt;OrderVO&gt; selectPageVO(IPage&lt;OrderVO&gt; page, @Param("query") OrderQueryDTO query);
+
+    OrderVO selectVOByOrderNo(@Param("orderNo") String orderNo);
+
+    int updateStatus(@Param("id") Long id, @Param("status") Integer status);
+}</code></pre>
+
+<h3>💻 关键代码 4：MyBatis XML 自定义 SQL</h3>
+<pre><code class="language-xml">&lt;!-- 文件：diancan-admin/src/main/resources/mapper/order/OrderMapper.xml --&gt;
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd"&gt;
+&lt;mapper namespace="com.scaffold.modules.order.mapper.OrderMapper"&gt;
+
+    &lt;!-- 通用结果映射 --&gt;
+    &lt;resultMap id="orderVOMap" type="com.scaffold.modules.order.vo.OrderVO"&gt;
+        &lt;id     property="id"          column="id" /&gt;
+        &lt;result property="orderNo"     column="order_no" /&gt;
+        &lt;result property="tableName"   column="table_name" /&gt;
+        &lt;result property="userName"    column="user_name" /&gt;
+        &lt;result property="totalAmount" column="total_amount" /&gt;
+        &lt;result property="payAmount"   column="pay_amount" /&gt;
+        &lt;result property="status"      column="status" /&gt;
+        &lt;result property="statusDesc"  column="status_desc" /&gt;
+        &lt;result property="payTime"     column="pay_time" /&gt;
+    &lt;/resultMap&gt;
+
+    &lt;!-- 动态 SQL：后台订单列表（带筛选条件） --&gt;
+    &lt;select id="selectPageVO" resultMap="orderVOMap"&gt;
+        SELECT
+            o.id, o.order_no,
+            t.name AS table_name,
+            u.nickname AS user_name,
+            o.total_amount, o.pay_amount,
+            o.status,
+            CASE o.status
+                WHEN 10 THEN '待支付'
+                WHEN 20 THEN '已支付'
+                WHEN 50 THEN '已完成'
+                ELSE '其他'
+            END AS status_desc,
+            o.pay_time
+        FROM t_order o
+        LEFT JOIN t_table t ON o.table_id = t.id
+        LEFT JOIN t_user  u ON o.user_id  = u.id
+        &lt;where&gt;
+            &lt;if test="query.status != null"&gt;
+                AND o.status = #{query.status}
+            &lt;/if&gt;
+            &lt;if test="query.orderNo != null and query.orderNo != ''"&gt;
+                AND o.order_no LIKE CONCAT('%', #{query.orderNo}, '%')
+            &lt;/if&gt;
+            &lt;if test="query.tableId != null"&gt;
+                AND o.table_id = #{query.tableId}
+            &lt;/if&gt;
+            &lt;if test="query.startDate != null"&gt;
+                AND o.create_time &gt;= #{query.startDate}
+            &lt;/if&gt;
+        &lt;/where&gt;
+        ORDER BY o.create_time DESC
+    &lt;/select&gt;
+&lt;/mapper&gt;</code></pre>
+
+<div class="analogy">
+<strong>💡 三件套记忆法</strong>
+数据库改动像"三角凳"，缺一条腿就倒：
+<ol>
+  <li><b>SQL</b>：<code class="inline">db/diancan-system.sql</code> 或 <code class="inline">db/upgrade/20260724_xxx.sql</code></li>
+  <li><b>Entity</b>：<code class="inline">module/.../entity/Xxx.java</code> 字段对齐表</li>
+  <li><b>XML</b>：<code class="inline">resources/mapper/.../XxxMapper.xml</code> 复杂查询</li>
+</ol>
+</div>
+
+<h3>👣 动手步骤</h3>
+<div class="step"><span class="step-num">1</span><b>打开 SQL 文件</b>：<code class="inline">code db/diancan-system.sql</code> 或 DBeaver 打开数据库，浏览前 50 张表。</div>
+<div class="step"><span class="step-num">2</span><b>看 Order 模块</b>：从 <code class="inline">t_order</code> 表反推 Java Entity，再看 <code class="inline">OrderMapper.xml</code> 的动态 SQL。</div>
+<div class="step"><span class="step-num">3</span><b>做一次手工查询</b>：<code class="inline">SELECT * FROM t_order WHERE status = 20 LIMIT 10;</code></div>
+<div class="step"><span class="step-num">4</span><b>尝试加字段</b>：给 <code class="inline">t_order</code> 加 <code class="inline">remark VARCHAR(255)</code>，同步加 Entity 字段，重新 <code class="inline">mvn compile</code> 验证不报错。</div>
+
+<h3>🧪 自我检测</h3>
+<div class="quiz">
+<span class="quiz-type">A 概念辨析</span>
+<span class="quiz-q">1. 为什么不把所有 SQL 都写在 Java 里？</span>
+<ul class="quiz-options">
+<li class="wrong">A. Java 不会写 SQL</li>
+<li class="correct">B. 复杂连表和动态 SQL 在 XML 里更直观，更好维护</li>
+<li class="wrong">C. MyBatis-Plus 强制要求</li>
+<li class="wrong">D. 性能更好</li>
+</ul>
+<div class="quiz-answer">💡 MyBatis-Plus 通用 CRUD 写在 Java 里即可，复杂联表、动态条件（<code class="inline">&lt;if&gt;</code>、<code class="inline">&lt;where&gt;</code>）写在 XML 里更易读。两者互补。</div>
+</div>
+
+<div class="quiz">
+<span class="quiz-type">B 应用迁移</span>
+<span class="quiz-q">2. 改了 SQL 加了字段，运行时报 <code class="inline">Unknown column 'remark'</code>，你下一步做什么？</span>
+<div class="quiz-answer">💡 排查：(1) SQL 文件是否真的导入到数据库（<code class="inline">DESCRIBE t_order</code> 看字段） (2) Entity 是否有对应字段 (3) XML 是否引用了新字段 (4) MyBatis-Plus 缓存是否需要清（重启应用）。</div>
+</div>
+
+<div class="summary">
+<strong>📌 本章小结</strong>
+DB 改动 = <b>SQL + Entity + XML</b> 三件套同步。读业务代码，先看表结构，再看 Entity，最后看 XML。
+</div>
+</section>
+
+<!-- ==================== U8 ==================== -->
+<section class="unit" id="U8">
+<h2>📡 U8 · 实时消息（STOMP）与打印</h2>
+
+<div class="why">
+<strong>为什么要学这个？</strong>
+后厨出餐的实时性是这个系统的最大亮点之一。懂得 STOMP 的工作方式，能让你在面试时讲一个"完整链路"的故事。
+</div>
+
+<div class="analogy">
+<strong>📻 类比：STOMP 就像餐厅的对讲机</strong>
+管理端订阅一个频道（"后厨频道"），后端推送消息到这个频道，所有订阅者都能实时收到。区别于 HTTP 轮询（每 5 秒问一次"有新单吗？"），对讲机是"有新单了自动播"。
+</div>
+
+<h3>📚 核心概念</h3>
+<ul class="concept-list">
+  <li><b>WebSocket</b>：浏览器和服务器之间的"长连接"，双向通信。</li>
+  <li><b>STOMP</b>：基于 WebSocket 的"消息协议"，类似消息队列的 topic/pubsub 模型。</li>
+  <li><b>SockJS</b>：WebSocket 的兼容层，老浏览器降级到轮询。</li>
+  <li><b>小程序默认关闭</b>：微信 <code class="inline">wx.connectSocket</code> 不支持 STOMP 协议，需要自实现或用 SSE/轮询替代。</li>
+  <li><b>RocketMQ 可靠消息</b>：跨服务的异步消息，保证至少一次投递。</li>
+</ul>
+
+<h3>💻 关键代码 1：STOMP 配置</h3>
+<pre><code class="language-java">// 文件：diancan-admin/src/main/java/com/scaffold/config/WebSocketConfig.java
+@Configuration
+@EnableWebSocketMessageBroker
+public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+
+    @Override
+    public void configureMessageBroker(MessageBrokerRegistry config) {
+        // 客户端订阅这个前缀
+        config.enableSimpleBroker("/topic", "/queue");
+        // 客户端发消息用这个前缀
+        config.setApplicationDestinationPrefixes("/app");
+    }
+
+    @Override
+    public void registerStompEndpoints(StompEndpointRegistry registry) {
+        // 注册端点，SockJS 兼容
+        registry.addEndpoint("/api/ws")
+                .setAllowedOriginPatterns("*")
+                .withSockJS();
+    }
+}</code></pre>
+
+<h3>💻 关键代码 2：后端推送实时消息</h3>
+<pre><code class="language-java">// 文件：diancan-admin/src/main/java/com/scaffold/modules/kitchen/service/impl/KitchenServiceImpl.java
+@Service
+@RequiredArgsConstructor
+public class KitchenServiceImpl implements KitchenService {
+
+    private final SimpMessagingTemplate messagingTemplate;  // Spring 提供的 STOMP 模板
+
+    /**
+     * 订单支付成功后，通知所有订阅了"后厨频道"的管理端
+     */
+    @Override
+    public void pushNewOrder(Order order) {
+        KitchenMessage msg = new KitchenMessage();
+        msg.setOrderId(order.getId());
+        msg.setOrderNo(order.getOrderNo());
+        msg.setTableName(order.getTableName());
+        msg.setItems(order.getItems());
+        msg.setCreateTime(order.getCreateTime());
+
+        // 推送到 /topic/kitchen 这个频道
+        messagingTemplate.convertAndSend("/topic/kitchen", msg);
+    }
+}</code></pre>
+
+<h3>💻 关键代码 3：管理端订阅（Vue）</h3>
+<pre><code class="language-ts">// 文件：diancan-admin-web/src/service/socket/index.ts
+import SockJS from 'sockjs-client'
+import { Client } from '@stomp/stompjs'
+
+let stompClient: Client | null = null
+
+export function connectKitchen(onMessage: (msg: any) =&gt; void) {
+  const socket = new SockJS('http://localhost:8080/api/ws')
+  stompClient = new Client({
+    webSocketFactory: () =&gt; socket as any,
+    onConnect: () =&gt; {
+      // 订阅后厨频道
+      stompClient!.subscribe('/topic/kitchen', (frame) =&gt; {
+        const msg = JSON.parse(frame.body)
+        onMessage(msg)
+      })
+    },
+  })
+  stompClient.activate()
+}</code></pre>
+
+<h3>💻 关键代码 4：RocketMQ 可靠消息</h3>
+<pre><code class="language-java">// 文件：diancan-admin/src/main/java/com/scaffold/modules/mq/service/impl/ReliableMessageServiceImpl.java
+@Service
+@RequiredArgsConstructor
+public class ReliableMessageServiceImpl {
+
+    private final RocketMQTemplate rocketMQTemplate;
+
+    /**
+     * 发送可靠消息（带本地消息表）
+     */
+    @Transactional
+    public void sendReliableMessage(String topic, Object payload) {
+        // 1. 写本地消息表（状态：待发送）
+        LocalMessage msg = new LocalMessage();
+        msg.setTopic(topic);
+        msg.setPayload(JSON.toJSONString(payload));
+        msg.setStatus(MessageStatusEnum.PENDING.getCode());
+        localMessageMapper.insert(msg);
+
+        // 2. 发到 MQ
+        try {
+            rocketMQTemplate.syncSend(topic, payload);
+            msg.setStatus(MessageStatusEnum.SENT.getCode());
+            localMessageMapper.updateById(msg);
+        } catch (Exception e) {
+            // 3. 失败等定时任务重试
+            log.error("MQ 发送失败", e);
+        }
+    }
+}</code></pre>
+
+<div class="pitfall">
+<strong>⚠️ 坑：小程序为什么不直接用 STOMP？</strong>
+微信小程序原生 <code class="inline">wx.connectSocket</code> 是 WebSocket 协议但<b>不支持 STOMP 帧格式</b>。常见替代方案：
+<ul>
+  <li>轮询：<code class="inline">setInterval</code> 每 5 秒请求一次（够用但费电）</li>
+  <li>SSE：服务端单向推送（仅适用"通知顾客"场景）</li>
+  <li>自实现 STOMP 客户端：用 <code class="inline">wx.sendSocketMessage</code> 手写帧解析（成本高）</li>
+</ul>
+本项目选择关闭小程序 Socket，是务实的取舍。
+</div>
+
+<h3>🧪 自我检测</h3>
+<div class="quiz">
+<span class="quiz-type">A 概念辨析</span>
+<span class="quiz-q">1. 小程序为什么不直接用 STOMP？</span>
+<ul class="quiz-options">
+<li class="wrong">A. 微信禁止 WebSocket</li>
+<li class="correct">B. wx.connectSocket 是 WebSocket 协议但不支持 STOMP 帧格式</li>
+<li class="wrong">C. 小程序没法装依赖</li>
+<li class="wrong">D. STOMP 收费</li>
+</ul>
+<div class="quiz-answer">💡 STOMP 是基于 WebSocket 的"消息协议"，包含特有的帧格式（CONNECT/SUBSCRIBE/SEND 等）。微信原生 API 只能发原始文本，需要自己实现 STOMP 帧解析或换方案。</div>
+</div>
+
+<div class="quiz">
+<span class="quiz-type">D 3 阶段心智模型</span>
+<span class="quiz-q">2. 后厨反馈："新订单来得不及时，平均延迟 30 秒"。如何定位？</span>
+<div class="quiz-answer">
+<b>阶段 1 现象</b>：管理端后厨页面收到新订单慢。<br>
+<b>阶段 2 定位</b>：是 MQ 慢、STOMP 慢，还是前端订阅断线？
+<ul>
+  > 检查：MQ 控制台是否有消息堆积？
+  > 检查：管理端是否成功订阅（看 console 日志）？
+  > 检查：WebSocket 连接是否断开（看 Network）？
+</ul>
+<b>阶段 3 修复</b>：根据定位：(1) MQ 扩容消费者 (2) 增加重连机制 (3) 客户端加心跳。
+</div>
+</div>
+
+<div class="summary">
+<strong>📌 本章小结</strong>
+实时链路 = 后端 STOMP + 管理端订阅；小程序走轮询或自实现 socket 适配层。<b>面试能讲 STOMP、RocketMQ、WebSocket 三选一就够亮眼</b>。
+</div>
+</section>
+
+<!-- ==================== U9 ==================== -->
+<section class="unit" id="U9">
+<h2>🚀 U9 · 补充功能设计 + 简历包装</h2>
+
+<div class="why">
+<strong>为什么要学这个？</strong>
+学完前 8 单元已经能"用"这个项目，但还没法"讲"这个项目。U9 教你把项目技术变成简历话术，**目标岗位：后端 &gt; 全栈 &gt; 运维**。
+</div>
+
+<div class="analogy">
+<strong>📖 类比：简历 bullet 就像电影预告片</strong>
+预告片不会讲完整剧情，但要在 3 分钟内让观众想看。把功能、技术、数据三件事压成 1~2 句话。
+</div>
+
+<h3>📚 核心概念</h3>
+<ul class="concept-list">
+  <li><b>好功能 = 三端都有体感</b>：管理端配置 + 小程序体验 + 后端事务，缺一不可。</li>
+  <li><b>简历 bullet = 业务 + 技术 + 数据</b>：做了什么、用什么技术、达到什么效果。</li>
+  <li><b>优先级</b>：后端 &gt; 全栈 &gt; 运维——优先体现 Spring Boot / MyBatis / 事务 / 调优。</li>
+</ul>
+
+<h3>🎯 4 个候选补充功能</h3>
+<table>
+<tr><th>功能</th><th>三端改动量</th><th>简历亮点</th></tr>
+<tr><td><b>外卖配送</b></td><td>后端新增 delivery 模块 + 管理端配送看板 + 小程序外卖入口</td><td>⭐⭐⭐⭐ 业务丰富、状态机复杂</td></tr>
+<tr><td><b>桌台预定</b></td><td>扫桌码改为预约时段 + 管理端预定日历</td><td>⭐⭐⭐ 业务清晰、改动量小</td></tr>
+<tr><td><b>实时看板</b></td><td>管理端新增实时数据看板（ECharts + STOMP 推送）</td><td>⭐⭐⭐⭐⭐ 亮点功能、技术含量高</td></tr>
+<tr><td><b>AI 推荐</b></td><td>小程序加购后基于标签推荐菜品</td><td>⭐⭐⭐⭐ 简历加分项，但需外部 API</td></tr>
+</table>
+
+<h3>💻 示例：实时看板的功能设计（推荐）</h3>
+
+<h4>1. 业务定义</h4>
+<pre>
+- 看板显示：当前在台订单数、待支付订单数、营业额、菜品实时 TOP5
+- 实时性：每 5 秒更新一次（前端轮询）或 STOMP 推送
+- 角色：店长、运营
+</pre>
+
+<h4>2. 后端接口</h4>
+<pre><code class="language-java">// 文件：diancan-admin/src/main/java/com/scaffold/modules/dashboard/controller/DashboardController.java
+@Tag(name = "管理端-实时看板")
+@RestController
+@RequestMapping("/admin/dashboard")
+@RequiredArgsConstructor
+public class DashboardController {
+
+    private final DashboardService dashboardService;
+
+    @GetMapping("/overview")
+    public R&lt;DashboardOverviewVO&gt; overview() {
+        return R.ok(dashboardService.getOverview());
+    }
+
+    @GetMapping("/realtime")
+    public R&lt;DashboardRealtimeVO&gt; realtime() {
+        return R.ok(dashboardService.getRealtime());
+    }
+
+    @GetMapping("/top-dishes")
+    public R&lt;List&lt;DishRankVO&gt;&gt; topDishes(@RequestParam(defaultValue = "5") Integer limit) {
+        return R.ok(dashboardService.getTopDishes(limit));
+    }
+}</code></pre>
+
+<h4>3. Vue 页面（ECharts + 定时刷新）</h4>
+<pre><code class="language-vue">&lt;script setup lang="ts"&gt;
+import { ref, onMounted, onUnmounted } from 'vue'
+import * as echarts from 'echarts'
+import { DashboardAPI } from '@/service/api/dashboard'
+
+const overview = ref({ orderCount: 0, revenue: 0, pendingPay: 0 })
+let timer: number | null = null
+
+async function loadData() {
+  overview.value = await DashboardAPI.overview()
+  const chart = echarts.init(document.getElementById('chart')!)
+  chart.setOption({
+    xAxis: { type: 'category', data: ['待支付', '已支付', '后厨', '出餐中', '已完成'] },
+    yAxis: { type: 'value' },
+    series: [{ type: 'bar', data: [12, 28, 15, 8, 42] }],
+  })
+}
+
+onMounted(() =&gt; {
+  loadData()
+  timer = window.setInterval(loadData, 5000)  // 每 5 秒刷新
+})
+
+onUnmounted(() =&gt; {
+  if (timer) clearInterval(timer)
+})
+&lt;/script&gt;</code></pre>
+
+<h3>📝 简历 bullet 模板（按"后端 &gt; 全栈"优先级）</h3>
+
+<h4>❌ 写得差</h4>
+<pre>
+"参与了点餐系统开发，使用了 Spring Boot 和 Vue 技术。"
+</pre>
+
+<h4>✅ 写得好（后端岗）</h4>
+<pre>
+<b>点餐系统（Spring Boot 3 + Vue 3 + 微信小程序）</b>
+
+· 设计并实现订单交易主链，17 个业务模块按领域拆分，订单状态机覆盖 7 个状态；
+  引入幂等性设计，支持支付回调重复通知不重复入账，<b>支付成功率 99.7%</b>。
+
+· 集成 Sa-Token + Redis 实现后台 / 顾客端双端鉴权，权限粒度到按钮级；
+  公共请求层统—6 个项目的鉴权、错误兜底、Token 刷新，<b>砍掉 800 行重复代码</b>。
+
+· 设计会员积分成长体系，订单结算联动积分回流、退款反向扣减；
+  引入本地消息表 + RocketMQ 实现可靠消息，<b>关键链路零丢失</b>。
+
+· 压力测试：订单创建 TPS 320，支付回调 P99 120ms，<b>无超时</b>。
+</pre>
+
+<h4>✅ 写得好（全栈岗）</h4>
+<pre>
+<b>点餐系统（Spring Boot 3 + Vue 3 + 微信小程序）</b>
+
+· 独立完成三端协同系统：Spring Boot 后端按 17 个业务域模块化；Vue 3 + Naive UI 管理端；
+  微信小程序顾客端覆盖扫码点餐、订单、会员全流程。
+
+· 管理端封装 30+ 业务接口，前端动态表单 + 状态机可视化，<b>配置一个菜品从 10 分钟缩到 2 分钟</b>。
+
+· 集成 WebSocket + STOMP 实现后厨实时订单推送，订单从支付到出餐响应时间 <b>从 30 秒降到 1 秒</b>。
+
+· ECharts 实时看板叠加 5 秒轮询，<b>店长运营响应速度提升 60%</b>。
+</pre>
+
+<h3>📊 软技能面试讲解稿（30 分钟）</h3>
+<table>
+<tr><th>时长</th><th>讲什么</th></tr>
+<tr><td>0-3 分钟</td><td>项目背景：为什么做这个、目标用户、解决了什么问题</td></tr>
+<tr><td>3-8 分钟</td><td>架构图：后端 + 管理端 + 小程序三端协作 + 数据库/中间件</td></tr>
+<tr><td>8-18 分钟</td><td>核心链：订单状态机 + 支付幂等 + 库存锁定（最值钱的 10 分钟）</td></tr>
+<tr><td>18-23 分钟</td><td>亮点：会员积分回流 + STOMP 实时推送</td></tr>
+<tr><td>23-28 分钟</td><td>经验教训：数据库命名不一致的坑、读 AOP 源码的体会</td></tr>
+<tr><td>28-30 分钟</td><td>补充功能：实时看板 / 后续规划</td></tr>
+</table>
+
+<h3>👣 行动清单</h3>
+<ul class="checklist">
+  <li>挑 1 个补充功能（推荐实时看板）</li>
+  <li>按 U5 的事务规范走 TDD：先写测试用例，再写实现</li>
+  <li>PR 完成后，写 3 条简历 bullet</li>
+  <li>对镜子讲一遍 30 分钟介绍，录屏给自己看</li>
+  <li>找朋友当面试官，模拟问 5 个深挖问题</li>
+</ul>
+
+<h3>🧪 自我检测</h3>
+<div class="quiz">
+<span class="quiz-type">C 教回来</span>
+<span class="quiz-q">用 5 分钟给面试官讲清楚"支付回调的幂等性"。利用本单元的代码例子。</span>
+<div class="quiz-answer">💡 关键点：(1) 为什么会有重复回调（网络重试） (2) 解决方案：先查订单状态再处理 (3) 状态机：未支付 → 已支付；已支付就直接 return (4) 实践：日志打印"已处理过支付回调"便于排查。</div>
+</div>
+
+<div class="quiz">
+<span class="quiz-type">B 应用迁移</span>
+<span class="quiz-q">为"实时看板"功能写一条简历 bullet：业务痛点 + 技术动作 + 数据指标。</span>
+<div class="quiz-answer">💡 模板：<b>为店长运营设计实时看板</b>，集成 ECharts + STOMP + 5 秒轮询，覆盖订单 / 营收 / 菜品 TOP5 实时指标，<b>运营响应速度提升 60%</b>。数据指标要"具体"：不要"提升很快"，要"提升 60%"。</div>
+</div>
+
+<div class="summary">
+<strong>📌 本章小结</strong>
+简历故事 = <b>三端架构</b> + <b>1 个增量功能</b> + <b>1 个数据指标</b>。面试不是背讲稿，是讲故事——按"业务 → 技术 → 数据"三段式答题。
+</div>
+</section>
+
+<!-- ==================== 附录 ==================== -->
+<section class="unit" id="appendix">
+<h2>📋 附录 · 教学契约（teacher-skill renderer-neutral data）</h2>
+
+<p>这部分是给 Renderer / 其它教学工具看的标准化数据契约。普通同学可以跳过。</p>
+
+<h3>教学契约 YAML</h3>
+<pre><code class="language-yaml">data-level: weak
+data-delivery-mode: single-file-html-doc
+target-renderer: omo-frontend
+
+phases:
+  - phase_0_intake:
+      id: intake
+      materials:
+        - "diancan-system 三项目仓库根 AGENTS.md"
+        - "readme.md"
+        - "db/diancan-system.sql"
+        - "diancan-admin/src/main/java/com/scaffold/modules/**"
+        - "diancan-admin-web/src/views/**"
+        - "diancan-miniapp/pages/**"
+      target: "全面学习 + 补充功能 + 本地跑通 + 简历包装"
+
+  - phase_1_diagnosis:
+      id: diagnosis
+      level: weak
+      rationale: "编程能力弱，需要每个概念给生活类比 + 完整代码 + 动手步骤"
+      learning_strategy:
+        concept_first: true
+        over_explanation: true   # 弱学习者需要详细解释
+
+  - phase_2_path:
+      id: path
+      estimated_total_hours: 24
+      units:
+        - { id: U1, name: "项目全局与跨端契约", prereq: [] }
+        - { id: U2, name: "后端 Spring Boot 工程骨架", prereq: [U1] }
+        - { id: U3, name: "管理端 Vue 工程骨架", prereq: [U1, U2] }
+        - { id: U4, name: "小程序原生工程骨架", prereq: [U1, U2] }
+        - { id: U5, name: "核心交易链：订单 + 支付", prereq: [U2] }
+        - { id: U6, name: "会员营销与优惠券体系", prereq: [U2, U5] }
+        - { id: U7, name: "数据库与 MyBatis", prereq: [U2] }
+        - { id: U8, name: "实时消息（STOMP）与打印", prereq: [U2] }
+        - { id: U9, name: "补充功能设计 + 简历包装", prereq: [U5, U6, U7] }
+
+  - phase_4_periodic_review:
+      every_n_units: 2
+      checkpoints:
+        after_U2:  ["独立起后端", "讲清 17 个模块边界"]
+        after_U4:  ["三端都能打开", "背下跨端契约表"]
+        after_U6:  ["讲清会员权益联动", "看懂退款反向补偿"]
+        after_U8:  ["讲清实时消息链路", "思考小程序 socket 替代方案"]
+        after_U9:  ["落定补充功能", "简历 bullet 成稿"]
+
+  - phase_5_summary:
+      knowledge_map: "三端架构 → 工程骨架 → 业务主链 → 营销/数据 → 实时/扩展 → 产出"
+      self_assessment:
+        - "能在不查文档前提下讲清三端架构与跨端契约？"
+        - "能在本地跑通后端 + 管理端 + 小程序开发者工具？"
+        - "能解释一单从下单到退款的状态机？"
+        - "能列出 17 个后端模块的核心职责？"
+        - "能写出 3 条可上简历的 bullet？"
+      final_verification:
+        deliverable_1: "本地跑通后端 + 管理端的操作截图"
+        deliverable_2: "1 个补充功能的 PR（含 commit + 截图 + 简历话术）"
+        deliverable_3: "1 份 30 分钟面试讲解稿"
+
+quiz_types:
+  A: "概念辨析（单选 4 选 1）"
+  B: "应用迁移（动手）"
+  C: "教回来（Feynman）"
+  D: "3 阶段心智模型探测"
+
+job_priority:
+  primary: "后端"
+  secondary: "全栈"
+  tertiary: "运维等其他"
+
+mock_data_for_weak_learners:
+  - "U1: 用餐厅三部门协作类比"
+  - "U2: 用中央厨房类比 Spring Boot"
+  - "U5: 用外卖订单状态机类比"
+  - "U8: 用餐厅对讲机类比 STOMP"
+  - "U10-A: 用图书馆类比 MySQL"
+  - "U10-B: 用便签纸类比 Redis"
+  - "U10-C: 用内部信箱类比 RocketMQ"
+  - "U10-D: 用仓库货架类比 MinIO"
+
+midware_practice_commands:
+  mysql: "docker exec -it diancan-mysql mysql -uroot -p123456 diancan-system"
+  redis: "docker exec -it diancan-redis redis-cli -a 123456"
+  rocketmq_broker: "docker exec -it diancan-rocketmq-broker /opt/rocketmq/bin/mqadmin topicList -n rocketmq-namesrv:9876"
+  minio_console: "http://localhost:9001  (minioadmin / minioadmin)"</code></pre>
+
+<h3>📂 文件位置</h3>
+<table>
+<tr><th>路径</th><th>作用</th></tr>
+<tr><td>本教程</td><td><span class="file-path">docs/learning/diancan-system-tutorial.html</span></td></tr>
+<tr><td><b>代码练习册</b></td><td><span class="file-path">docs/learning/code-exercises.html</span>（8 道填空 + 1 个 mini-project）</td></tr>
+<tr><td>Docker 速查</td><td><span class="file-path">docs/learning/docker-guide.md</span></td></tr>
+<tr><td>项目根 AGENTS.md</td><td><span class="file-path">/AGENTS.md</span></td></tr>
+<tr><td>项目根 README</td><td><span class="file-path">/readme.md</span></td></tr>
+<tr><td>数据库基线</td><td><span class="file-path">db/diancan-system.sql</span></td></tr>
+</table>
+
+<h3>🎯 学习路径建议</h3>
+<ol>
+  <li><b>第 1 周</b>：U1 + U2 + U3，跑通后端 + 管理端</li>
+  <li><b>第 2 周</b>：U4 + U5 + U7，理解核心交易链</li>
+  <li><b>第 3 周</b>：U6 + U8，理解会员营销和实时消息</li>
+  <li><b>第 3.5 周</b>：<b>U10 中间件工具箱</b>，单独练习 MySQL/Redis/RocketMQ/MinIO 的 CLI 操作</li>
+  <li><b>第 4 周</b>：U9 + 补充功能实施 + 简历包装</li>
+</ol>
+
+</section>
+
+<!-- ==================== U10 ==================== -->
+<section class="unit" id="U10">
+<h2>🧰 U10 · 中间件实战工具箱</h2>
+
+<div class="why">
+<strong>为什么要学这个？</strong>
+后端跑起来≠后端懂了。U10 把项目依赖的 <b>MySQL / Redis / RocketMQ / MinIO</b> 四个中间件拆开讲——每个都给出生活类比、CLI 命令、Java 集成代码、排错清单。学完这一章你才算真正"看见"了数据在系统里怎么流。
+</div>
+
+<div class="analogy">
+<strong>🗄️ 类比：中间件就是餐厅的四个后勤部门</strong>
+<ul>
+  <li><b>MySQL</b> = 仓库：所有"事实"都存在这里，是唯一可信来源</li>
+  <li><b>Redis</b> = 收银台旁的便签：速度快、容易丢（重启就没了），用来"临时记住"</li>
+  <li><b>RocketMQ</b> = 内部信件系统：厨房要通知服务员"出餐了"时，写一封信投到信箱，对方有空再读</li>
+  <li><b>MinIO</b> = 菜品照片仓库：图片、视频、Excel 报表这些"大件"放这里，MySQL 只存"这个菜在哪张照片"</li>
+</ul>
+四个部门各管一摊，通过"单据"配合。U10 帮你逐一认识它们。
+</div>
+
+<!-- ========== U10-A MySQL ========== -->
+<h3>📦 U10-A · MySQL（业务数据库）</h3>
+
+<div class="analogy">
+<strong>🍱 类比：MySQL 就像图书馆</strong>
+每张表 = 一个书架；每行 = 一本书；主键 = 书的索引号；外键 = 引用关系。SQL = 你对图书管理员说的话（"找 2023 年出版的所有 Java 书"）。
+</div>
+
+<h4>🔌 连接方式</h4>
+<pre><code class="language-bash"># 容器内直接连接（最常用）
+docker exec -it diancan-mysql mysql -uroot -p123456 diancan-system
+
+# 容器外连接（任意 MySQL 客户端）
+mysql -h127.0.0.1 -P3306 -uroot -p123456 diancan-system
+
+# 用 DBeaver / Navicat 等 GUI 工具连接
+# Host: 127.0.0.1
+# Port: 3306
+# User: root
+# Password: 123456
+# Database: diancan-system</code></pre>
+
+<h4>🔧 常用命令（精选 12 条）</h4>
+<pre><code class="language-sql">-- 1. 看所有数据库
+SHOW DATABASES;
+
+-- 2. 看当前库的所有表
+SHOW TABLES;
+
+-- 3. 看表结构
+DESC t_order;
+-- 或
+SHOW CREATE TABLE t_order\G
+
+-- 4. 看索引
+SHOW INDEX FROM t_order;
+
+-- 5. 查数据（最常用）
+SELECT * FROM t_order WHERE status = 20 LIMIT 10;
+
+-- 6. 统计行数（注意：COUNT(*) 走全表，COUNT(id) 走索引）
+SELECT COUNT(*) FROM t_order;
+
+-- 7. 查执行计划（找慢查询必备）
+EXPLAIN SELECT * FROM t_order WHERE user_id = 123;
+-- 看 type 列：ALL=全表扫描（差），ref/range=走了索引（好）
+
+-- 8. 看当前连接（排查"连接池耗尽"）
+SHOW PROCESSLIST;
+
+-- 9. 杀慢查询
+KILL 12345;  -- 12345 是 SHOW PROCESSLIST 输出的 Id
+
+-- 10. 实时看慢 SQL
+SHOW VARIABLES LIKE 'slow_query_log%';
+SET GLOBAL slow_query_log = 'ON';
+SET GLOBAL long_query_time = 1;   -- 1 秒算慢
+
+-- 11. 备份整个库
+mysqldump -uroot -p123456 diancan-system &gt; backup.sql
+
+-- 12. 从备份恢复
+mysql -uroot -p123456 diancan-system &lt; backup.sql</code></pre>
+
+<h4>🔗 与本项目集成（Spring Boot 配置）</h4>
+<pre><code class="language-yaml"># application-dev.yml 的 MySQL 块
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/diancan-system?useUnicode=true&amp;characterEncoding=utf8&amp;serverTimezone=Asia/Shanghai&amp;useSSL=false
+    username: root
+    password: 123456
+    hikari:                       # HikariCP 连接池
+      maximum-pool-size: 20       # 最大连接数（默认 10）
+      minimum-idle: 5
+      connection-timeout: 30000   # 30 秒拿不到连接就报错</code></pre>
+
+<h4>⚠️ 常见坑</h4>
+<div class="pitfall">
+<strong>坑 1：库名不一致</strong><br>
+SQL 导出库名是 <code class="inline">digital_ordering_system</code>，application-dev.yml 是 <code class="inline">diancan-system</code>。<b>本项目 docker-up.sh 已自动处理</b>。
+</div>
+<div class="pitfall">
+<strong>坑 2：emoji 不显示</strong><br>
+所有 VARCHAR 字段必须用 <code class="inline">utf8mb4</code> 字符集，否则用户昵称里的 emoji 存不进去。
+</div>
+<div class="pitfall">
+<strong>坑 3：时区错乱</strong><br>
+JDBC URL 必加 <code class="inline">serverTimezone=Asia/Shanghai</code>，否则 create_time 差 8 小时。
+</div>
+
+<h4>👣 动手步骤</h4>
+<div class="step"><span class="step-num">1</span><b>进 MySQL</b>：<code class="inline">docker exec -it diancan-mysql mysql -uroot -p123456 diancan-system</code></div>
+<div class="step"><span class="step-num">2</span><b>看表数</b>：<code class="inline">SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='diancan-system';</code> 应输出 102+</div>
+<div class="step"><span class="step-num">3</span><b>查核心表</b>：<code class="inline">SELECT id, order_no, total_amount, status FROM t_order LIMIT 5;</code></div>
+<div class="step"><span class="step-num">4</span><b>看索引</b>：<code class="inline">SHOW INDEX FROM t_order;</code> 关注 <code class="inline">uk_order_no</code> 唯一索引</div>
+
+<h4>🧪 自我检测</h4>
+<div class="quiz">
+<span class="quiz-type">A 概念辨析</span>
+<span class="quiz-q">库名 <code class="inline">diancan-system</code> 在 MySQL 里是合法标识符吗？</span>
+<ul class="quiz-options">
+<li class="wrong">A. 不合法，含连字符</li>
+<li class="wrong">B. 合法，但需引号包裹</li>
+<li class="correct">C. 合法且无需引号，反引号包裹即可</li>
+<li class="wrong">D. MySQL 不允许带连字符的库名</li>
+</ul>
+<div class="quiz-answer">💡 MySQL 标识符允许 <code class="inline">a-z A-Z 0-9 _ $</code>，连字符需要反引号包裹：<code class="inline">`diancan-system`</code>。JDBC URL 里写 <code class="inline">diancan-system</code> 是没问题的，MySQL 自动识别。</div>
+</div>
+
+<!-- ========== U10-B Redis ========== -->
+<h3>⚡ U10-B · Redis（缓存 + 会话 + Pub/Sub）</h3>
+
+<div class="analogy">
+<strong>📝 类比：Redis 就像便签纸</strong>
+比数据库快 100 倍，但容量小、重启就丢。适合存"昨天点过什么菜"、"Token 还有多久过期"这类"临时但热"的数据。
+</div>
+
+<h4>🔌 连接方式</h4>
+<pre><code class="language-bash"># 容器内
+docker exec -it diancan-redis redis-cli -a 123456
+# 进去后先认证
+AUTH 123456
+# 或连接时带上密码
+docker exec -it diancan-redis redis-cli -a 123456 PING
+# 应输出 PONG</code></pre>
+
+<h4>🔧 常用命令（精选 15 条）</h4>
+<pre><code class="language-bash"># 1. 看所有 key（生产慎用！可能卡死）
+KEYS *
+
+# 2. 按模式查 key（比 KEYS 安全）
+SCAN 0 MATCH sa:token:* COUNT 100
+
+# 3. 看 key 类型
+TYPE sa:token:admin
+
+# 4. 看剩余过期时间（秒）
+TTL sa:token:admin
+
+# 5. String：存读删
+SET user:1 "张三"
+GET user:1
+DEL user:1
+
+# 6. Hash（类似 Java Map）
+HSET dish:1 name "宫保鸡丁" price 28
+HGETALL dish:1
+
+# 7. List（队列）
+LPUSH order:queue "order1" "order2"
+RPOP order:queue
+
+# 8. Set（去重）
+SADD tags:hot "宫保鸡丁" "麻婆豆腐"
+SMEMBERS tags:hot
+
+# 9. Sorted Set（排行榜）
+ZADD rank:dish 100 "宫保鸡丁" 80 "麻婆豆腐"
+ZREVRANGE rank:dish 0 9 WITHSCORES
+
+# 10. 发布订阅（WebSocket 中转用）
+PUBLISH ws:channel:kitchen '{"orderNo":"xxx"}'
+# 订阅方
+SUBSCRIBE ws:channel:kitchen
+
+# 11. 看内存占用
+INFO memory
+
+# 12. 看连接数
+INFO clients
+
+# 13. 看慢查询（类似 MySQL slow log）
+SLOWLOG GET 10
+
+# 14. 清空所有数据（小心！）
+FLUSHDB
+
+# 15. 看 key 数量
+DBSIZE</code></pre>
+
+<h4>🔗 与本项目集成</h4>
+<pre><code class="language-java">// 文件：com.scaffold.framework.redis.RedisUtils.java
+@Component
+public class RedisUtils {
+    @Autowired
+    private StringRedisTemplate redisTemplate;
+
+    public void set(String key, Object value, long timeoutSeconds) {
+        redisTemplate.opsForValue().set(key, JSON.toJSONString(value), timeoutSeconds, TimeUnit.SECONDS);
+    }
+
+    public &lt;T&gt; T get(String key, Class&lt;T&gt; clazz) {
+        String json = redisTemplate.opsForValue().get(key);
+        return json == null ? null : JSON.parseObject(json, clazz);
+    }
+}
+
+// 实际使用：菜品缓存（U3 管理端菜品列表接口会查这个）
+public List&lt;DishVO&gt; listDishes() {
+    String key = "dish:list:all";
+    List&lt;DishVO&gt; cached = redisUtils.get(key, List.class);
+    if (cached != null) return cached;                    // 命中缓存
+
+    List&lt;DishVO&gt; fresh = dishMapper.selectList(...);     // 查数据库
+    redisUtils.set(key, fresh, 600);                      // 缓存 10 分钟
+    return fresh;
+}</code></pre>
+
+<h4>⚠️ WebSocket 走 Redis Pub/Sub 中转（关键架构）</h4>
+<pre><code class="language-java">// 项目用 Redis Pub/Sub 实现多实例广播，而不是直连 STOMP
+// 关键类：com.scaffold.framework.websocket.WsService
+public class WsService {
+    @Autowired
+    private StringRedisTemplate redisTemplate;
+
+    public void publish(String channel, Object msg) {
+        redisTemplate.convertAndSend("ws:channel:" + channel, JSON.toJSONString(msg));
+    }
+}
+
+// 订阅方：RedisMessageSubscriber.java
+// 任何后端实例都能收到 → 所有实例的 WebSocket 客户端都被广播</code></pre>
+
+<h4>🧪 自我检测</h4>
+<div class="quiz">
+<span class="quiz-type">A 概念辨析</span>
+<span class="quiz-q">Redis 重启后数据会怎样？</span>
+<ul class="quiz-options">
+<li class="wrong">A. 数据完全保留</li>
+<li class="correct">B. 看持久化配置：AOF/RDB 开启就保留，否则全丢</li>
+<li class="wrong">C. 只保留 String 类型</li>
+<li class="wrong">D. 自动备份到 MySQL</li>
+</ul>
+<div class="quiz-answer">💡 默认配置下 Redis 是纯内存的，重启 = 数据全丢。本项目 <code class="inline">docker-compose.yml</code> 用 <code class="inline">--appendonly yes</code> 开启了 AOF 持久化，能恢复大部分数据。</div>
+</div>
+
+<!-- ========== U10-C RocketMQ ========== -->
+<h3>📨 U10-C · RocketMQ（可靠消息队列）</h3>
+
+<div class="analogy">
+<strong>📬 类比：RocketMQ 就像内部信箱</strong>
+厨房做完菜往信箱投一封信："5 号桌糖醋里脊出餐了"。服务员有空去信箱看一眼。这种"异步通知"模式比"每隔 5 秒问一次"省事得多。
+</div>
+
+<h4>🔌 连接方式</h4>
+<pre><code class="language-bash"># 看 NameServer 状态
+docker logs diancan-rocketmq-namesrv | grep -i started
+
+# 看 Broker 状态
+docker logs diancan-rocketmq-broker | tail -20
+
+# 用 mqadmin 工具（在 broker 容器内）
+docker exec -it diancan-rocketmq-broker sh
+cd /opt/rocketmq/bin
+./mqadmin clusterList -n rocketmq-namesrv:9876
+./mqadmin topicList -n rocketmq-namesrv:9876
+./mqadmin consumerProgress -g coupon-grant-dispatch-group -n rocketmq-namesrv:9876</code></pre>
+
+<h4>🔑 关键概念（必须理解）</h4>
+<table>
+<tr><th>概念</th><th>类比</th><th>项目中的例子</th></tr>
+<tr><td><b>NameServer</b></td><td>邮局总台</td><td>负责告诉发信人"哪个 broker 在哪"</td></tr>
+<tr><td><b>Broker</b></td><td>邮局分拣中心</td><td>实际存消息的地方</td></tr>
+<tr><td><b>Topic</b></td><td>信箱分类</td><td><code class="inline">coupon-grant-topic</code>（发券专题）</td></tr>
+<tr><td><b>Tag</b></td><td>信箱标签</td><td><code class="inline">TASK_DISPATCH</code> / <code class="inline">TASK_BATCH</code></td></tr>
+<tr><td><b>Producer Group</b></td><td>发信人单位</td><td><code class="inline">coupon-grant-producer-group</code></td></tr>
+<tr><td><b>Consumer Group</b></td><td>收信人单位</td><td><code class="inline">coupon-grant-dispatch-group</code></td></tr>
+</table>
+
+<h4>🔗 与本项目集成（U6 优惠券发放）</h4>
+<pre><code class="language-java">// 文件：com.scaffold.modules.coupon.service.impl.CouponServiceImpl.java
+
+// 1. 生产者：发送发券消息
+@Autowired
+private RocketMQTemplate rocketMQTemplate;
+
+public void sendGrantTask(GrantTask task) {
+    Message&lt;GrantTask&gt; msg = MessageBuilder.withPayload(task)
+        .setHeader("KEYS", task.getUserId().toString())
+        .build();
+    rocketMQTemplate.syncSend("coupon-grant-topic:TASK_DISPATCH", msg);
+    log.info("已发送发券消息 userId={}", task.getUserId());
+}
+
+// 2. 消费者：处理发券
+@RocketMQMessageListener(
+    topic = "coupon-grant-topic",
+    selectorExpression = "TASK_DISPATCH",
+    consumerGroup = "coupon-grant-dispatch-group"
+)
+public class GrantDispatchListener implements RocketMQListener&lt;GrantTask&gt; {
+
+    @Override
+    public void onMessage(GrantTask task) {
+        log.info("收到发券任务 userId={}", task.getUserId());
+        couponMapper.grantToUser(task.getUserId(), task.getCouponId());
+    }
+}</code></pre>
+
+<h4>⚠️ 排查清单</h4>
+<div class="pitfall">
+<strong>坑 1：消息堆积</strong><br>
+<b>现象</b>：消费速度跟不上生产速度。<br>
+<b>查</b>：<code class="inline">mqadmin consumerProgress</code> 看积压量。<br>
+<b>解决</b>：增加 consumer 实例数（横向扩展）或优化消费逻辑。
+</div>
+<div class="pitfall">
+<strong>坑 2：消息重复消费</strong><br>
+<b>原因</b>：RocketMQ 保证"至少一次"投递，consumer 必须自己实现幂等性。<br>
+<b>解决</b>：用本地消息表或业务唯一键去重。
+</div>
+<div class="pitfall">
+<strong>坑 3：消费者启动失败</strong><br>
+<b>现象</b>：后端日志报 <code class="inline">connect to namesrv failed</code>。<br>
+<b>查</b>：broker.conf 里的 <code class="inline">namesrvAddr</code> 是否指向 docker 内的 namesrv 服务名。
+</div>
+
+<h4>🧪 自我检测</h4>
+<div class="quiz">
+<span class="quiz-type">B 应用迁移</span>
+<span class="quiz-q">订单支付成功回调时，业务要求：(1) 立即给用户发回执 (2) 异步发券。哪部分应该用 RocketMQ？</span>
+<div class="quiz-answer">💡 (1) 走同步——用户在支付页等回执，必须立刻返回。(2) 走 RocketMQ——发券耗时长（可能 1 秒）且失败可重试，异步不阻塞主链路。</div>
+</div>
+
+<!-- ========== U10-D MinIO ========== -->
+<h3>🪣 U10-D · MinIO（文件存储）</h3>
+
+<div class="analogy">
+<strong>📦 类比：MinIO 就像仓库货架</strong>
+MySQL 存"这是宫保鸡丁"，MinIO 存"宫保鸡丁的照片"。MySQL 里只放一个照片的"地址"（URL），照片本身在 MinIO 里。
+</div>
+
+<h4>🔌 连接方式</h4>
+<pre><code class="language-bash"># Web 控制台（最直观）
+浏览器打开 http://localhost:9001
+# 用户名: minioadmin
+# 密码: minioadmin
+
+# 创建 bucket（第一次手动操作）
+# 左侧 "Buckets" → "Create Bucket" → 填 dish-images
+
+# 用 mc 客户端操作（可选）
+mc alias set local http://localhost:9000 minioadmin minioadmin
+mc ls local/
+mc mb local/dish-images
+mc cp ./photo.jpg local/dish-images/photo.jpg</code></pre>
+
+<h4>🔧 常用操作（Web 控制台）</h4>
+<table>
+<tr><th>操作</th><th>路径</th></tr>
+<tr><td>查看文件</td><td>左侧 Buckets → 选 bucket → 看 Object 列表</td></tr>
+<tr><td>上传文件</td><td>Object 列表右上角 Upload</td></tr>
+<tr><td>下载文件</td><td>点文件 → Download</td></tr>
+<tr><td>分享链接</td><td>点文件 → Share → 设置过期时间（默认 7 天）</td></tr>
+<tr><td>删除文件</td><td>点文件 → Delete</td></tr>
+</table>
+
+<h4>🔗 与本项目集成（Java SDK）</h4>
+<pre><code class="language-java">// 文件：com.scaffold.common.config.MinIOConfig.java
+@Configuration
+public class MinIOConfig {
+
+    @Value("${storage.minio.endpoint}")
+    private String endpoint;
+
+    @Value("${storage.minio.access-key}")
+    private String accessKey;
+
+    @Value("${storage.minio.secret-key}")
+    private String secretKey;
+
+    @Bean
+    public MinioClient minioClient() {
+        return MinioClient.builder()
+            .endpoint(endpoint)
+            .credentials(accessKey, secretKey)
+            .build();
+    }
+}
+
+// 文件上传示例
+@Service
+@RequiredArgsConstructor
+public class FileService {
+
+    private final MinioClient minioClient;
+
+    @Value("${storage.minio.bucket}")
+    private String bucket;
+
+    public String upload(MultipartFile file) throws Exception {
+        // 1. 确保 bucket 存在（后端启动时会自动建）
+        boolean found = minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucket).build());
+        if (!found) {
+            minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucket).build());
+        }
+
+        // 2. 上传
+        String filename = UUID.randomUUID() + "-" + file.getOriginalFilename();
+        minioClient.putObject(
+            PutObjectArgs.builder()
+                .bucket(bucket)
+                .object(filename)
+                .stream(file.getInputStream(), file.getSize(), -1)
+                .contentType(file.getContentType())
+                .build()
+        );
+
+        // 3. 返回可访问的 URL
+        return endpoint + "/" + bucket + "/" + filename;
+    }
+}</code></pre>
+
+<h4>⚠️ 常见坑</h4>
+<div class="pitfall">
+<strong>坑 1：上传后 403 Forbidden</strong><br>
+<b>原因</b>：<code class="inline">private-bucket: true</code> 表示 bucket 默认私有，URL 直接访问被拒。<br>
+<b>解决</b>：要么改 <code class="inline">private-bucket: false</code>（公开读），要么用预签名 URL。
+</div>
+<div class="pitfall">
+<strong>坑 2：图片上传后管理端看不到</strong><br>
+<b>查</b>：<code class="inline">storage.minio.public-url</code> 是否和 endpoint 一致；前端能否访问那个地址。
+</div>
+<div class="pitfall">
+<strong>坑 3：bucket 不存在</strong><br>
+本项目 <code class="inline">auto-create-bucket: true</code>，后端启动时会自动创建。如果用本项目以外的代码访问 MinIO，需手动 <code class="inline">mc mb local/dish-images</code>。
+</div>
+
+<h4>🧪 自我检测</h4>
+<div class="quiz">
+<span class="quiz-type">B 应用迁移</span>
+<span class="quiz-q">菜品管理页上传图片，前端拿到 URL 后图片 403。你如何排查？</span>
+<div class="quiz-answer">💡 排查顺序：(1) MinIO Web 控制台能否直接访问该 URL？ (2) 私桶配置检查 <code class="inline">application-dev.yml</code> 的 <code class="inline">private-bucket</code> (3) <code class="inline">presign-expire-seconds</code> 是否过期 (4) CORS 设置（管理端是浏览器访问）。</div>
+</div>
+
+<!-- ========== U10 总结 ========== -->
+<div class="summary">
+<strong>📌 本章小结：四个中间件速查表</strong>
+<table>
+<tr><th>中间件</th><th>端口</th><th>核心场景</th><th>学到这里就够</th></tr>
+<tr><td>MySQL</td><td>3306</td><td>业务事实数据</td><td>会 <code class="inline">SELECT/EXPLAIN</code> + 懂索引</td></tr>
+<tr><td>Redis</td><td>6379</td><td>缓存 + 会话 + Pub/Sub</td><td>会 5 种数据类型 + 懂 Pub/Sub</td></tr>
+<tr><td>RocketMQ</td><td>9876</td><td>可靠异步消息</td><td>懂 Topic/Tag/Consumer Group + 幂等</td></tr>
+<tr><td>MinIO</td><td>9000/9001</td><td>文件存储</td><td>会 Web 控制台 + 懂 Bucket 概念</td></tr>
+</table>
+</div>
+
+</section>
+
+<!-- ==================== U11 ==================== -->
+<section class="unit" id="U11">
+<h2>🐳 U11 · Docker 命令详解 + 脚本解析</h2>
+
+<div class="why">
+<strong>为什么要学这个？</strong>
+你现在的开发环境跑在 Docker 容器里。看不懂 Docker 命令 = 看不懂自己的环境。这一章从 <code class="inline">docker run</code> 开始讲，到你能独立排查"容器为什么挂了"。
+</div>
+
+<div class="analogy">
+<strong>🚚 类比：Docker 就像集装箱货运</strong>
+<ul>
+  <li><b>镜像（image）</b> = 集装箱模板（"mysql:8.0" 是 MySQL 8.0 的标准集装箱）</li>
+  <li><b>容器（container）</b> = 一辆跑起来的集装箱卡车（模板的运行实例）</li>
+  <li><b>卷（volume）</b> = 集装箱里装的货物（容器删了，货物还在）</li>
+  <li><b>网络（network）</b> = 卡车跑的高速公路（容器之间靠这条路通信）</li>
+</ul>
+一句话：<b>镜像定义"是什么"，容器是"运行中的实例"，卷管"数据持久化"</b>。
+</div>
+
+<h3>📚 核心命令（按使用频率）</h3>
+
+<h4>① 容器生命周期</h4>
+<pre><code class="language-bash"># 启动一个新容器（从镜像）
+docker run -d --name my-mysql -p 3306:3306 mysql:8.0
+#  -d        后台运行（detach）
+#  --name    给容器起个名字（不写就随机生成）
+#  -p 3306:3306   把宿主机的 3306 映射到容器的 3306（前者是宿主机，后者是容器）
+#  mysql:8.0  镜像名:tag
+
+# 启动本项目所有中间件
+docker compose up -d
+docker compose up -d mysql      # 只启动 mysql 一个服务
+docker compose up -d --build    # 重建镜像再启动（用于改 Dockerfile 后）
+
+# 停止 / 启动 / 重启
+docker stop diancan-mysql       # 优雅停止（先 SIGTERM，10秒后 SIGKILL）
+docker start diancan-mysql      # 启动已停止的容器（保留数据）
+docker restart diancan-mysql    # 相当于 stop + start
+
+# 删除容器
+docker rm diancan-mysql         # 删容器（必须先 stop）
+docker rm -f diancan-mysql      # 强制删除（运行中也能删，会丢数据）
+
+# 查看所有容器
+docker ps                       # 只看运行中的
+docker ps -a                    # 看所有（包括已停止的）
+docker ps -q                    # 只输出容器 ID
+docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"   # 自定义列</code></pre>
+
+<h4>② 查看日志和资源</h4>
+<pre><code class="language-bash"># 实时跟踪日志（最常用）
+docker logs -f diancan-mysql
+docker logs --tail 100 diancan-mysql          # 看最后 100 行
+docker logs --since "10m" diancan-mysql       # 看最近 10 分钟
+docker logs --until "2024-01-01" diancan-mysql  # 看截止某个时间
+
+# 看资源占用
+docker stats                       # 所有运行中容器的 CPU / 内存 / 网络
+docker stats diancan-mysql         # 只看一个
+
+# 看容器进程
+docker top diancan-mysql           # 容器内的进程列表（类似 ps）
+
+# 看容器详细信息（IP、挂载、环境变量）
+docker inspect diancan-mysql
+docker inspect diancan-mysql --format='{{.State.Status}}'           # 单字段
+docker inspect diancan-mysql --format='{{.NetworkSettings.IPAddress}}'  # 容器 IP
+docker inspect diancan-mysql --format='{{json .HostConfig.PortBindings}}'  # 端口映射</code></pre>
+
+<h4>③ 进入容器内部</h4>
+<pre><code class="language-bash"># 进入容器终端（开新 bash）
+docker exec -it diancan-mysql bash
+docker exec -it diancan-mysql sh       # 如果容器没 bash，用 sh
+
+# 在容器内单次执行命令（不开终端）
+docker exec diancan-mysql mysql -uroot -p123456 -e "SHOW DATABASES"
+docker exec diancan-redis redis-cli -a 123456 PING
+
+# 拷贝文件
+docker cp diancan-mysql:/tmp/broker.conf /host/path/    # 容器 → 宿主机
+docker cp /host/file.txt diancan-mysql:/tmp/             # 宿主机 → 容器</code></pre>
+
+<h4>④ 镜像管理</h4>
+<pre><code class="language-bash"># 拉镜像
+docker pull mysql:8.0
+docker pull apache/rocketmq:4.9.7
+
+# 看本地镜像
+docker images
+docker images | grep mysql
+
+# 删除镜像
+docker rmi mysql:8.0
+docker image prune                  # 删所有悬空镜像
+docker image prune -a               # 删所有未被使用的镜像（注意！）</code></pre>
+
+<h4>⑤ 网络管理</h4>
+<pre><code class="language-bash"># 看网络
+docker network ls
+
+# 看某个网络的详情（包含哪些容器）
+docker network inspect diancan-system_default
+
+# 创建自定义网络（让容器用名字互相访问）
+docker network create my-net
+
+# 让容器加入网络
+docker network connect my-net diancan-mysql
+
+# 删除网络
+docker network rm my-net</code></pre>
+
+<h4>⑥ 数据卷管理</h4>
+<pre><code class="language-bash"># 看卷
+docker volume ls
+
+# 看卷详情
+docker volume inspect diancan-system_mysql-data
+
+# 删未使用的卷
+docker volume prune
+
+# 删容器 + 卷（彻底清数据）
+docker compose down -v              # 注意：会删所有数据！</code></pre>
+
+<h4>⑦ Compose 命令</h4>
+<pre><code class="language-bash"># 启动所有服务
+docker compose up -d
+docker compose up -d mysql redis   # 只启动指定服务
+
+# 停止
+docker compose down                 # 停容器，保留卷
+docker compose down -v              # 停容器 + 删卷（清数据）
+
+# 查看
+docker compose ps                   # 服务状态
+docker compose logs -f mysql        # 日志
+docker compose logs --tail 50 redis # 最近 50 行
+
+# 在服务里执行命令
+docker compose exec mysql bash
+docker compose exec mysql mysql -uroot -p123456
+
+# 重启单个服务
+docker compose restart mysql
+
+# 验证配置文件（不执行，看是否有语法错）
+docker compose config
+
+# 拉镜像但不启动
+docker compose pull</code></pre>
+
+<h3>🛠️ 实战：常见排错命令组合</h3>
+<div class="step"><span class="step-num">1</span><b>"容器起不来"</b>：<code class="inline">docker logs diancan-mysql --tail 50</code> + <code class="inline">docker inspect diancan-mysql --format='{{.State.Status}} {{.State.Error}}'</code></div>
+<div class="step"><span class="step-num">2</span><b>"连不上数据库"</b>：<code class="inline">docker exec diancan-mysql mysql -uroot -p123456 -e "SELECT 1"</code>（先在容器内测，再用主机连）</div>
+<div class="step"><span class="step-num">3</span><b>"端口冲突"</b>：<code class="inline">docker ps --format "table {{.Names}}\t{{.Ports}}"</code> 看 host port 是否真映射了</div>
+<div class="step"><span class="step-num">4</span><b>"磁盘满了"</b>：<code class="inline">docker system df</code> 看各部分占用，<code class="inline">docker system prune</code> 清理</div>
+<div class="step"><span class="step-num">5</span><b>"容器之间连不上"</b>：<code class="inline">docker network inspect diancan-system_default</code> 看是否在同一网络</div>
+
+<h3>⚠️ SqlSession 警告不是错误（你的疑问解答）</h3>
+<pre><code class="language-bash">Creating a new SqlSession
+SqlSession [...] was not registered for synchronization because synchronization is not active
+JDBC Connection [...] will not be managed by Spring
+==>  Preparing: SELECT ... FROM mq_message ...
+<==      Total: 0</code></pre>
+<div class="analogy">
+<strong>💡 这是什么意思？</strong>Spring 看到你的 SQL 不在 <code class="inline">@Transactional</code> 里，就告诉 MyBatis："这次查询不需要事务，连接你自己管（用完归还 HikariCP）"。<b>这是正常日志，不是 bug</b>。
+</div>
+定时任务 <code class="inline">MqMessageDispatchTask</code> 每次只发一条消息派发，不需要"原子性"，所以不包事务。如果某个服务报"事务管理器不可用"才是 bug，这个不是。
+
+<h3>📜 我写的 4 个脚本逐行解析</h3>
+
+<h4>📄 scripts/docker-up.sh — 一键启动中间件</h4>
+<pre><code class="language-bash">#!/usr/bin/env bash
+# shebang：告诉系统用 bash 执行
+set -euo pipefail
+# -e 任意命令失败立即退出
+# -u 使用未定义变量报错
+# -o pipefail 管道命令中任意一段失败都报错
+# 作用：脚本出错就停，别继续往下跑出更糟的结果
+
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." &amp;&amp; pwd)"
+# BASH_SOURCE[0] 是当前脚本路径；dirname 取目录；../ 是上级；cd + pwd 取绝对路径
+# 作用：脚本不管从哪里调用，都定位到项目根
+
+# ---------- 颜色 ----------
+GREEN='\033[0;32m'  # ANSI 转义序列，控制台输出绿色
+info()  { echo -e "${GREEN}[INFO]${NC} $*"; }   # info 函数：打印绿色 [INFO] 前缀
+warn()  { echo -e "${YELLOW}[WARN]${NC} $*"; }  # 同上，黄色
+error() { echo -e "${RED}[ERROR]${NC} $*"; exit 1; }  # 红色 + 退出码 1
+
+# ---------- 1. 前置检查 ----------
+command -v docker  # 检查 docker 是否在 PATH 里
+docker info        # 验证 docker daemon 在跑（如果没跑会报错）
+
+# ---------- 2. 复制 .env ----------
+cp .env.docker.example .env   # 第一次跑时复制配置模板
+
+# ---------- 3. 预处理 SQL ----------
+# SQL 导出库名 digital_ordering_system → diancan-system
+# 项目 application-dev.yml 用的是 diancan-system，sed 改一下
+sed 's/digital_ordering_system/diancan-system/g' db/diancan-system.sql \
+  &gt; .docker/initdb/01-init.sql
+# 生成 .docker/initdb/01-init.sql
+# MySQL 容器首次启动时会自动执行 /docker-entrypoint-initdb.d/*.sql
+
+# ---------- 4. 启动容器 ----------
+docker compose up -d   # -d 后台启动；不带 -d 会阻塞在前台
+
+# ---------- 5. 等待 MySQL ----------
+# 用 retry loop + SELECT 1 验证库表已建好
+for i in $(seq 1 $RETRIES); do
+  if docker exec diancan-mysql mysql -uroot -p123456 \
+       -e "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='diancan-system'" 2&gt;/dev/null | grep -q '[0-9]'; then
+    # grep -q '[0-9]' 是因为 mysql 输出有表头，匹配任意数字说明有结果
+    echo "MySQL 就绪"
+    break
+  fi
+  sleep 3
+done
+
+# ---------- 6. 打印连接信息 ----------
+cat &lt;&lt;EOF
+${GREEN}MySQL       localhost:3307   root / 123456
+Redis       localhost:6379   密码: 123456
+...
+EOF</code></pre>
+<div class="summary">
+<strong>📌 这个脚本做 3 件事</strong>：(1) 修 SQL 库名 (2) 启动 docker 容器 (3) 等 MySQL 准备好再告诉你
+</div>
+
+<h4>📄 scripts/docker-down.sh — 停止中间件（保留数据）</h4>
+<pre><code class="language-bash">#!/usr/bin/env bash
+set -euo pipefail
+$COMPOSE_CMD down
+# docker compose down = 停所有容器 + 删容器，但保留数据卷
+# 数据卷里的 MySQL 数据、Redis 缓存、MinIO 文件下次启动还在
+# 如果想删数据：docker compose down -v（带 -v）</code></pre>
+
+<h4>📄 scripts/docker-reset.sh — 重置中间件（删数据）</h4>
+<pre><code class="language-bash">read -p "确认要重置吗？输入 YES 继续：" CONFIRM
+if [ "$CONFIRM" != "YES" ]; then
+  echo "已取消"
+  exit 0
+fi
+
+$COMPOSE_CMD down -v    # -v 删数据卷
+rm -rf .docker/initdb    # 删预处理目录，下次启动会重新生成
+# 必须打 YES 才执行，防止误删数据库</code></pre>
+
+<h4>📄 scripts/docker-logs.sh — 跟踪日志</h4>
+<pre><code class="language-bash">SERVICE="${1:-}"   # 第一个参数，没传就空
+if [ -n "$SERVICE" ]; then
+  $COMPOSE_CMD logs -f "$SERVICE"   # 跟踪某个服务
+else
+  $COMPOSE_CMD logs -f              # 跟踪所有服务
+fi
+# 用法：bash scripts/docker-logs.sh           # 看所有
+#      bash scripts/docker-logs.sh mysql     # 只看 mysql</code></pre>
+
+<h4>📄 scripts/start-backend.sh — 启动后端（带环境变量）</h4>
+<pre><code class="language-bash"># 关键：export SPRING_DATASOURCE_URL=...
+# Spring Boot 启动时会用环境变量覆盖 application-dev.yml 的 url
+# 原因：你的 Windows 主机有 MySQL 占 3306，docker 容器在 3307
+# 如果不覆盖，应用会连到 Windows 的 MySQL（找 diancan-system 库找不到）
+
+source /home/ljh2923/.sdkman/bin/sdkman-init.sh
+# 加载 SDKMAN（mvn 在这里），不然 mvn 命令找不到
+
+# 启动 mvn spring-boot:run
+exec mvn spring-boot:run -Dspring-boot.run.profiles=dev
+# exec 替换当前进程（信号处理更干净，Ctrl+C 能正常停止）
+# -Dspring-boot.run.profiles=dev  用 dev profile 的配置
+# -Dspring-boot.run.jvmArguments   之前的脚本里有但这里省略了</code></pre>
+
+<h4>📄 scripts/rocketmq/broker.conf — RocketMQ 配置</h4>
+<pre><code class="language-bash">brokerClusterName = DefaultCluster    # 集群名
+brokerName = diancan-broker          # broker 名
+brokerId = 0                          # 0 = 主节点
+namesrvAddr = rocketmq-namesrv:9876  # 关键：连 docker 内的 namesrv
+listenWhich = 0                       # 监听所有 IP
+brokerIP1 = rocketmq-broker           # 容器名（让 broker 告诉 namesrv 自己叫啥）
+brokerRole = ASYNC_MASTER             # 异步主节点（适合学习用）
+flushDiskType = ASYNC_FLUSH           # 异步刷盘（学习够用）
+# 真实生产用 SYNC_MASTER + SYNC_FLUSH，数据更安全但慢</code></pre>
+
+<h3>🧪 自我检测</h3>
+<div class="quiz">
+<span class="quiz-type">A 概念辨析</span>
+<span class="quiz-q"><code class="inline">docker compose down</code> 和 <code class="inline">docker compose down -v</code> 有什么区别？</span>
+<ul class="quiz-options">
+<li class="wrong">A. 没区别，都是停止容器</li>
+<li class="wrong">B. -v 是 verbose，会打印日志</li>
+<li class="correct">C. <code class="inline">down</code> 保留数据卷，<code class="inline">down -v</code> 同时删除数据卷（清数据）</li>
+<li class="wrong">D. -v 会保留容器只停进程</li>
+</ul>
+<div class="quiz-answer">💡 数据卷（volume）独立于容器生命周期。<code class="inline">down</code> 删容器但卷还在（数据安全）；<code class="inline">down -v</code> 删容器 + 卷（清零）。</div>
+</div>
+
+<div class="quiz">
+<span class="quiz-type">B 应用迁移</span>
+<span class="quiz-q">容器 <code class="inline">diancan-mysql</code> 启动失败，你想看错误根因。第一步执行什么？</span>
+<div class="quiz-answer">💡 <code class="inline">docker logs diancan-mysql --tail 50</code> 看启动日志 + <code class="inline">docker inspect diancan-mysql --format='{{.State.Error}}'</code> 看 docker daemon 报告的错误。如果还看不出原因，进容器：<code class="inline">docker exec -it diancan-mysql bash</code>。</div>
+</div>
+
+<div class="summary">
+<strong>📌 本章小结</strong>
+<ul>
+  <li><b>Docker 核心 5 类</b>：container / image / volume / network / compose</li>
+  <li><b>SqlSession 警告</b> = INFO 级别正常日志，不是 bug</li>
+  <li><b>4 个脚本</b>：up 启动、down 停止、reset 重置、logs 日志</li>
+  <li><b>要"完全清数据"</b>用 <code class="inline">bash scripts/docker-reset.sh</code></li>
+</ul>
+</div>
+
+</section>
+
+</main>
+
+<footer>
+<div class="container">
+<p>📘 点餐系统从入门到全栈 · <b>teacher-skill 渲染产物</b></p>
+<p>data-level: weak | 9 单元 + U10 中间件 + U11 Docker | 适合编程能力弱的同学</p>
+<p>浏览器 → 打印 → 保存为 PDF，可导出离线版</p>
+</div>
+</footer>
+
+</body>
+</html>

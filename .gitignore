@@ -41,3 +41,15 @@ pnpm-debug.log*
 
 # ===== Kiro =====
 .kiro/
+
+# ===== Docker 本地生成（密码等敏感信息）=====
+.docker/
+.env
+.env.local
+.env.*.local
+
+# ===== OpenCode 本地状态 =====
+.omo/
+
+# ===== Docker Compose 排除 =====
+.dockerignore

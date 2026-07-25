@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>diancan-system · 项目总览</title>
+<link rel="stylesheet" href="../../assets/fonts.css">
+<link rel="stylesheet" href="../../assets/base.css">
+<link rel="stylesheet" href="../../assets/animations/animations.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="tpl-diancan-overview">
+<div class="deck">
+
+  <!-- 1. Cover -->
+  <section class="slide" data-title="Cover">
+    <p class="kicker">项目总览 / 2026 · 简历作品</p>
+    <h1 class="h1 anim-fade-up" data-anim="fade-up">diancan-system<br><span style="background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent">扫码点餐全链路</span></h1>
+    <p class="lede mt-m">从顾客扫码到后厨履约的一套<span class="mono">生产级</span>餐饮 SaaS — Spring Boot 3.2 · Vue 3 · WeChat Mini Program</p>
+    <div class="kpi-row mt-l">
+      <div class="kpi"><span class="num">3</span><span class="lbl">子项目</span></div>
+      <div class="kpi"><span class="num">755</span><span class="lbl">源码文件</span></div>
+      <div class="kpi"><span class="num">42</span><span class="lbl">业务表</span></div>
+      <div class="kpi"><span class="num">16</span><span class="lbl">后端模块</span></div>
+    </div>
+    <div class="deck-footer"><span class="mono">backend · admin-web · miniapp</span><span class="slide-number" data-current="1" data-total="11"></span></div>
+    <div class="notes">
+大家好，今天我讲一个我做过的真实完整项目，叫 <b>diancan-system</b>，点餐系统。
+完整复刻了一个中型餐饮门店<b>从顾客扫码到后厨出餐</b>的全流程业务。
+整套系统包含<b>三个子项目</b>：Java 17 + Spring Boot 3.2 的后端、Vue 3 + Vite 7 的管理后台、以及原生微信小程序的顾客点餐端。
+后端代码量大概 755 个源文件，数据库有 42 张业务表，按领域分成了 16 个业务模块——包括交易主链、支付、会员、优惠券、后厨履约、报表这些常见 SaaS 域。
+技术上还集成了 <b>RocketMQ 可靠消息</b>、<b>Redis 多实例广播 WebSocket</b>、<b>微信支付回调验签</b>等一些生产级组件。
+这个项目最大的价值是<b>业务闭环</b>：任何一处入口下单，都能完整跑通支付、履约、结算、营销。
+接下来我会按 6 个维度讲清楚它：项目定位、技术栈、系统架构、后端模块地图、关键技术亮点、下一步扩展方向。
+每页大约 3 分钟，有问题随时打断我。
+    </div>
+  </section>
+
+  <!-- 2. Positioning -->
+  <section class="slide" data-title="Positioning">
+    <p class="kicker">// why · 01</p>
+    <h2 class="h2">为什么做这个项目？</h2>
+    <p class="lede mt-m">三个目标决定它值得作为简历作品——而不是课堂 demo。</p>
+    <div class="grid g3 mt-l">
+      <div class="card card-accent">
+        <h4><span class="bullet-icon">01</span> 业务闭环</h4>
+        <p class="dim">扫码入桌 → 点餐下单 → 支付结算 → 后厨打单 → 会员积分 → 报表导出，<span class="mono">一条链路</span>贯穿，不是单点演示。</p>
+      </div>
+      <div class="card card-accent">
+        <h4><span class="bullet-icon">02</span> 工程规范</h4>
+        <p class="dim">后端按 <span class="mono">com.scaffold.modules.&lt;domain&gt;</span> 分 16 模块，每模块内 controller / service / mapper / entity / dto / vo 五层。</p>
+      </div>
+      <div class="card card-accent">
+        <h4><span class="bullet-icon">03</span> 简历素材</h4>
+        <p class="dim">支付回调、商品规格组合、会员等级联动、可靠消息——这些都是<span class="mono">工程复杂度</span>，能讲出技术深度。</p>
+      </div>
+    </div>
+    <div class="footer-line mt-l"><span class="tag accent-tag">目标 01 · 闭环</span><span class="tag accent-tag">目标 02 · 规范</span><span class="tag accent-tag">目标 03 · 深度</span></div>
+    <div class="notes">
+为什么要做这个项目？三个目标。
+<b>第一，业务闭环</b>：不是 demo，是真的把餐饮门店<b>核心交易链路</b>打通了——扫码入桌、点餐下单、支付结算、后厨打单、会员积分、报表导出——一条链路贯穿，而不是单点展示。
+<b>第二，工程规范</b>：后端按 <b>com.scaffold.modules.&lt;domain&gt;</b> 分 16 个模块，每模块内分 controller、service、mapper、entity、dto、vo 五层；管理端和小程序 API 调用都集中在 src/service/api/ 和 api/——<b>改一处必同步改另外一处</b>。
+<b>第三，简历素材</b>：它是一套<b>生产级</b>的项目，不是教学 demo。
+代码里有真实的支付回调、商品规格组合、会员等级联动这些<b>工程复杂度</b>，能讲出技术深度。
+所以我后面会<b>逐项</b>展开。
+    </div>
+  </section>
+
+  <!-- 3. Tech Stack -->
+  <section class="slide" data-title="Tech Stack">
+    <p class="kicker">// tech-stack · 02</p>
+    <h2 class="h2">三层技术栈，<span style="background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent">没有奇技淫巧</span>。</h2>
+    <div class="stack-grid mt-l">
+      <div class="stack-col">
+        <div class="stack-head"><span class="layer-dot back"></span>Backend</div>
+        <ul class="stack-list">
+          <li><span class="mono">Java 17</span> + <span class="mono">Spring Boot 3.2.5</span></li>
+          <li><span class="mono">MyBatis-Plus 3.5.5</span> · ORM + 分页 + 逻辑删除</li>
+          <li><span class="mono">Sa-Token 1.37</span> · RBAC 鉴权 + Redis 会话</li>
+          <li><span class="mono">RocketMQ 2.3</span> · 可靠消息（优惠券发放）</li>
+          <li><span class="mono">Knife4j 4.4</span> · 接口文档</li>
+          <li><span class="mono">MinIO 8.5</span> · 菜品图片</li>
+          <li><span class="mono">EasyExcel</span> · 报表导出</li>
+        </ul>
+      </div>
+      <div class="stack-col">
+        <div class="stack-head"><span class="layer-dot web"></span>Admin Web</div>
+        <ul class="stack-list">
+          <li><span class="mono">Vue 3</span> + <span class="mono">Vite 7</span> + <span class="mono">TypeScript</span></li>
+          <li><span class="mono">Element Plus</span> · 中后台 UI</li>
+          <li><span class="mono">Pinia</span> · 状态管理</li>
+          <li><span class="mono">Vue Router</span> · 12 模块路由</li>
+          <li><span class="mono">ECharts</span> · 报表可视化</li>
+        </ul>
+      </div>
+      <div class="stack-col">
+        <div class="stack-head"><span class="layer-dot app"></span>Mini Program</div>
+        <ul class="stack-list">
+          <li><b>原生微信小程序</b>（无 uniapp / taro）</li>
+          <li><span class="mono">utils/request.js</span> · 请求统一入口</li>
+          <li><span class="mono">utils/storage.js</span> · 本地缓存</li>
+          <li><span class="mono">utils/table-binding.js</span> · 扫码绑桌</li>
+          <li><span class="mono">utils/socket.js</span> · WebSocket 封装</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-line mt-l"><span class="tag">选型原则</span><span class="dim ml-s">经典组合 &gt; 追新；封装税最小化；面试官一听就懂</span></div>
+    <div class="notes">
+技术栈分三层。
+<b>后端</b>用 Java 17 加 Spring Boot 3.2.5，ORM 选了 MyBatis-Plus，鉴权用 Sa-Token，消息队列用 Apache RocketMQ，对象存储用 MinIO，文档用 Knife4j。
+选 MyBatis-Plus 而不是 MyBatis，是为了减少手写 XML；用 Sa-Token 而不是 Spring Security，是因为它对<b>多终端、多角色</b>场景更友好。
+<b>管理端</b>用 Vue 3 加 Vite 7，TypeScript 是强制的——这点很多人懒省——状态用 Pinia，UI 用 Element Plus。
+<b>小程序端</b>没用 uniapp 或 taro，是<b>原生微信小程序</b>——原生 API 调用最直接，没有跨端框架的封装税。
+存储层：MySQL 做主库，Redis 缓存 Sa-Token 会话和热点菜品，RocketMQ 处理优惠券发放这种<b>异步可靠消息</b>，MinIO 存菜品图片。
+这套组合<b>没有奇技淫巧</b>，全是 Java 后端 SaaS 的经典组合——面试官一打听就知道是<b>生产实践</b>而不是<b>追新</b>。
+    </div>
+  </section>
+
+  <!-- 4. Architecture -->
+  <section class="slide" data-title="Architecture">
+    <p class="kicker">// architecture · 03</p>
+    <h2 class="h2">三端协作，<span class="mono">统一上下文</span>。</h2>
+    <p class="lede mt-s">后端 <span class="mono">server.servlet.context-path=/api</span>；Controller 再声明端侧前缀。</p>
+    <div class="arch mt-l">
+      <div class="arch-box admin">
+        <div class="arch-title">diancan-admin-web</div>
+        <div class="arch-meta">Vue 3 SPA · :9527</div>
+        <div class="arch-route">/admin/*</div>
+        <div class="arch-arrow">┄┄&gt;</div>
+      </div>
+      <div class="arch-be">
+        <div class="arch-title be-title">diancan-admin</div>
+        <div class="arch-meta">Spring Boot · :8080</div>
+        <div class="arch-routes">
+          <div><span class="mono clr-admin">Admin*Controller</span> → <span class="mono">/api/admin/*</span></div>
+          <div><span class="mono clr-app">App*Controller</span> → <span class="mono">/api/app/*</span></div>
+          <div><span class="mono clr-pay">PaymentCallback</span> → <span class="mono">/api/wx/pay/**</span></div>
+        </div>
+        <div class="arch-arrow left">┄┄&gt;</div>
+      </div>
+      <div class="arch-box app">
+        <div class="arch-title">diancan-miniapp</div>
+        <div class="arch-meta">原生小程序 · 顾客端</div>
+        <div class="arch-route">config/env.js · <span class="mono">apiPrefix:'/api/app'</span></div>
+        <div class="arch-arrow">┄┄&gt;</div>
+      </div>
+    </div>
+    <p class="footnote mt-l"><b>关键设计：</b>三端共用一套 Spring Boot 服务和事务管理，但独立打包。<span class="dim">无根 Docker Compose — 保留调试透明度。</span></p>
+    <div class="notes">
+架构图分三列。
+<b>最左边</b>是管理端，Vue 3 SPA，单端口 9527，前端 Nginx 静态化打包。
+<b>中间</b>是顾客端，原生微信小程序，没有 Web 框架。
+<b>最右边</b>是后端，Spring Boot 单体，端口 8080，统一上下文 /api。
+<b>关键设计</b>：后端在同一个服务里按域名分子路径——管理端走 /api/admin/*，顾客端走 /api/app/*，<b>支付回调走 /api/wx/pay/**</b>——这样三个客户端各自打包，却共用一套业务代码和事务管理。
+<b>反向问题：为什么没有根 Docker Compose？</b>因为这个仓库手工协调三个子项目，每个独立启动，没有根编排器。
+面试官如果问部署方案，我会说<b>生产用 Kubernetes + Helm</b>，但当前版本为了<b>调试透明度</b>保留了手工启动——<b>这是个 trade-off</b>。
+    </div>
+  </section>
+
+  <!-- 5. Backend Modules -->
+  <section class="slide" data-title="Modules">
+    <p class="kicker">// modules · 04</p>
+    <h2 class="h2">后端 <span style="color:var(--accent)">16</span> 个业务模块。</h2>
+    <p class="lede mt-s">四组核心 + 三个开发期产物，按 <span class="mono">com.scaffold.modules.&lt;domain&gt;</span> 划界。</p>
+    <div class="module-grid mt-l anim-stagger-list">
+      <div class="module-pill primary"><span class="m">order</span><span class="d">交易主链</span></div>
+      <div class="module-pill primary"><span class="m">payment</span><span class="d">支付</span></div>
+      <div class="module-pill primary"><span class="m">table</span><span class="d">桌台</span></div>
+      <div class="module-pill primary"><span class="m">kitchen</span><span class="d">后厨</span></div>
+      <div class="module-pill"><span class="m">dish</span><span class="d">菜品规格</span></div>
+      <div class="module-pill"><span class="m">cart</span><span class="d">购物车</span></div>
+      <div class="module-pill"><span class="m">coupon</span><span class="d">优惠券</span></div>
+      <div class="module-pill"><span class="m">member</span><span class="d">会员</span></div>
+      <div class="module-pill"><span class="m">review</span><span class="d">评价</span></div>
+      <div class="module-pill"><span class="m">banner</span><span class="d">轮播</span></div>
+      <div class="module-pill ops"><span class="m">system</span><span class="d">RBAC</span></div>
+      <div class="module-pill ops"><span class="m">mq</span><span class="d">可靠消息</span></div>
+      <div class="module-pill ops"><span class="m">audit</span><span class="d">审计</span></div>
+      <div class="module-pill ops"><span class="m">report</span><span class="d">报表</span></div>
+      <div class="module-pill ops"><span class="m">feedback</span><span class="d">反馈</span></div>
+      <div class="module-pill ops"><span class="m">print</span><span class="d">打印</span></div>
+    </div>
+    <p class="footnote mt-l"><span class="accent">→</span> <b>业务心脏：</b><span class="mono">OrderServiceImpl.java</span> — 串起桌台、菜品、支付、后厨四个模块的事务边界。</p>
+    <div class="notes">
+后端的核心是 <b>16 个业务模块</b>。
+按业务重要性分四组：
+<b>第一组：交易主链</b>——order、payment、table、kitchen，这四个是顾客下单到出餐的必经路径，<b>最值得深入读源码</b>。
+<b>第二组：商品基础</b>——dish 菜品、cart 购物车，dish 模块里有<b>规格组和规格选项</b>的设计，是组合 SKU 的常见模式。
+<b>第三组：营销留存</b>——coupon 优惠券、member 会员、review 评价、banner 轮播图，这块是 SaaS 增值核心。
+<b>第四组：运维侧</b>——system RBAC 鉴权、mq 可靠消息、audit 审计日志、report 报表导出、feedback 反馈、print 打印任务。
+<b>关键提示</b>：订单交易主链<b>只读一个文件</b>就能摸清——OrderServiceImpl.java，它串起桌台、菜品、支付、后厨四个模块的事务边界，是这个项目的<b>业务心脏</b>。
+    </div>
+  </section>
+
+  <!-- 6. Admin Web -->
+  <section class="slide" data-title="Admin">
+    <p class="kicker">// admin-web · 05</p>
+    <h2 class="h2">管理端：<span class="mono">12</span> 个业务视图，<span class="mono">18</span> 个 API 集中层。</h2>
+    <div class="grid g2 mt-l">
+      <div>
+        <h4 class="dim">业务视图（src/views/）</h4>
+        <div class="chip-grid">
+          <span class="chip">monitor</span><span class="chip">home</span>
+          <span class="chip">marketing</span><span class="chip">service</span>
+          <span class="chip">order</span><span class="chip">report</span>
+          <span class="chip">table</span><span class="chip">dish</span>
+          <span class="chip">device</span><span class="chip">system</span>
+          <span class="chip">log</span><span class="chip">manage</span>
+        </div>
+        <p class="dim mt-m" style="font-size:14px">★ service/ 内部：门店点单、结账、后厨看板、桌台看板 — 门店一日动作的全部</p>
+      </div>
+      <div>
+        <h4 class="dim">API 集中层（src/service/api/）</h4>
+        <div class="chip-grid">
+          <span class="chip mono">order.ts</span><span class="chip mono">payment-review.ts</span>
+          <span class="chip mono">table.ts</span><span class="chip mono">dish.ts</span>
+          <span class="chip mono">member.ts</span><span class="chip mono">coupon.ts</span>
+          <span class="chip mono">kitchen.ts</span><span class="chip mono">banner.ts</span>
+          <span class="chip mono">print.ts</span><span class="chip mono">audit.ts</span>
+          <span class="chip mono">report.ts</span><span class="chip mono">system.ts</span>
+          <span class="chip mono">feedback.ts</span><span class="chip mono">auth.ts</span>
+          <span class="chip mono">service-ops.ts</span>
+        </div>
+        <p class="dim mt-m" style="font-size:14px">★ 1 个 API 文件 ≈ 1 个后端 Controller — <b>改后端必同步改这里</b></p>
+      </div>
+    </div>
+    <div class="footer-line mt-l"><span class="tag">pnpm typecheck</span><span class="tag">pnpm lint</span><span class="tag">pnpm build</span><span class="dim ml-s">三个命令全过 → commit</span></div>
+    <div class="notes">
+管理端是基于 Vue 3 + Element Plus 写的中后台，<b>所有页面统一在 src/views/</b>。
+按业务大概 12 个模块：监控大盘、首页、营销、服务、订单、报表、桌台、菜品、系统等。
+每个模块下都有若干页面，比如 views/order/ 下有订单列表、订单详情、退款审核；views/service/ 下有<b>门店点单、结账、后厨看板、桌台看板</b>——这是管理端的核心业务流程。
+<b>调用规范</b>：<b>所有 HTTP 请求必须经过</b> src/service/api/ 这个集中层，<b>页面不直接拼 URL</b>。
+这样做的目的是<b>修改 API 时只需改一处</b>。API 文件名直接对后端 Controller：order.ts 对 OrderController，table.ts 对 TableController。
+后端做 CRUD 时，前端是<b>先 pnpm typecheck 再 pnpm lint 再 pnpm build</b>，<b>三个命令都过了才能 commit</b>——这是工程规范。
+    </div>
+  </section>
+
+  <!-- 7. Miniapp -->
+  <section class="slide" data-title="Miniapp">
+    <p class="kicker">// miniapp · 06</p>
+    <h2 class="h2">小程序端：<span class="mono">17</span> 个页面，原生 API。</h2>
+    <p class="lede mt-s">业务主链 <span style="color:var(--accent);font-family:monospace">扫码 → 菜单 → 购物车 → 下单 → 支付 → 评价</span>，这是顾客 <b>100% 会走</b> 的路径。</p>
+    <div class="flow mt-l">
+      <div class="flow-step"><span class="n">1</span><span class="l">table</span><span class="d">扫码绑桌</span></div>
+      <div class="flow-line"></div>
+      <div class="flow-step"><span class="n">2</span><span class="l">menu</span><span class="d">菜品</span></div>
+      <div class="flow-line"></div>
+      <div class="flow-step"><span class="n">3</span><span class="l">cart</span><span class="d">购物车</span></div>
+      <div class="flow-line"></div>
+      <div class="flow-step"><span class="n">4</span><span class="l">order</span><span class="d">下单</span></div>
+      <div class="flow-line"></div>
+      <div class="flow-step"><span class="n">5</span><span class="l">payment</span><span class="d">支付</span></div>
+      <div class="flow-line"></div>
+      <div class="flow-step"><span class="n">6</span><span class="l">review</span><span class="d">评价</span></div>
+    </div>
+    <div class="grid g3 mt-l">
+      <div class="card card-accent">
+        <h4>utils/request.js</h4>
+        <p class="dim">所有 HTTP 请求的唯一入口 · token 注入 · 错误归一化</p>
+      </div>
+      <div class="card card-accent">
+        <h4>utils/table-binding.js</h4>
+        <p class="dim">扫码绑桌 · 桌号持久化 · 跨页面共享</p>
+      </div>
+      <div class="card card-accent">
+        <h4>utils/socket.js</h4>
+        <p class="dim">WebSocket 封装 · 当前默认关闭（待接入）</p>
+      </div>
+    </div>
+    <div class="notes">
+小程序顾客端走的是<b>原生微信小程序</b>——没碰 uniapp、taro 这些跨端框架。
+代码集中在四个目录：api/ 封装请求、pages/ 17 个页面、utils/ 工具方法、config/ 环境配置。
+<b>关键设计</b>：utils/request.js 是<b>所有 HTTP 请求的唯一入口</b>，token、错误归一化、桌台绑定状态都集中在这。
+<b>17 个页面</b>按业务主链路排列：扫码 table → 菜单 menu → 购物车 cart → 下单 order → 支付 payment → 评价 review——这六步是顾客<b>100% 会走</b>的流程。
+其他还有会员中心、积分、成长值、优惠券、反馈——属于留存环节。
+<b>默认关闭 WebSocket</b>——后端提供了 Redis Pub/Sub 的 STOMP 端点，但原生微信 WebSocket 需要单独适配，<b>目前是 HTTP 轮询</b>——这是个<b>已知优化点</b>，我后面会做。
+    </div>
+  </section>
+
+  <!-- 8. Data Model -->
+  <section class="slide" data-title="Data Model">
+    <p class="kicker">// schema · 07</p>
+    <h2 class="h2">数据模型：<span style="color:var(--accent)">42</span> 张表 + <span class="mono">+2</span> 增量脚本。</h2>
+    <p class="lede mt-s">六大族覆盖餐饮 SaaS 全域。</p>
+    <div class="db-grid mt-l">
+      <div class="db-family">
+        <div class="db-head"><span class="db-tag">A</span>用户族</div>
+        <ul class="db-list">
+          <li>sys_user</li><li>sys_role</li><li>sys_menu</li>
+          <li class="dim">RBAC 三件套 + 鉴权</li>
+        </ul>
+      </div>
+      <div class="db-family">
+        <div class="db-head"><span class="db-tag">B</span>菜品族</div>
+        <ul class="db-list">
+          <li>dish_category</li><li>dish</li>
+          <li>dish_spec_group</li><li>dish_spec_option</li>
+        </ul>
+      </div>
+      <div class="db-family">
+        <div class="db-head"><span class="db-tag">C</span>订单族</div>
+        <ul class="db-list">
+          <li>order</li><li>order_item</li>
+          <li>order_status_log</li>
+        </ul>
+      </div>
+      <div class="db-family">
+        <div class="db-head"><span class="db-tag">D</span>支付族</div>
+        <ul class="db-list">
+          <li>payment</li><li>payment_refund</li>
+          <li>payment_reconciliation</li>
+        </ul>
+      </div>
+      <div class="db-family">
+        <div class="db-head"><span class="db-tag">E</span>营销族</div>
+        <ul class="db-list">
+          <li>coupon_template</li><li>user_coupon</li>
+          <li>member</li><li>member_points_log</li>
+        </ul>
+      </div>
+      <div class="db-family">
+        <div class="db-head"><span class="db-tag">F</span>运维族</div>
+        <ul class="db-list">
+          <li>audit_log</li><li>mq_reliable_message</li>
+          <li>banner</li><li>review</li>
+        </ul>
+      </div>
+    </div>
+    <p class="footnote mt-l"><b>设计哲学：</b><span class="mono">BaseEntity</span> 统一 <span class="mono">id (雪花) + createBy/Time + updateBy/Time + deleted</span>，业务代码<b>永远不会忘填审计字段</b>。</p>
+    <div class="notes">
+数据库设计是这个项目的<b>基础亮点</b>之一。
+<b>42 张业务表</b>，分六大族：
+<b>用户族</b>：sys_user、sys_role、sys_menu（RBAC 三件套）
+<b>菜品族</b>：dish_category、dish、dish_spec_group、dish_spec_option（菜品 + 规格组合）
+<b>订单族</b>：order、order_item、order_status_log
+<b>支付族</b>：payment、payment_refund、payment_reconciliation
+<b>营销族</b>：coupon_template、user_coupon、member、member_points_log
+<b>运维族</b>：audit_log、mq_reliable_message
+<b>设计哲学</b>：
+所有实体继承 BaseEntity，自动获得<b>雪花 ID</b>、审计字段、逻辑删除。
+所以业务代码里<b>完全没有主键冲突</b>和<b>审计字段忘了写</b>这类问题。
+<b>主键策略是 assign_id 雪花算法</b>——分库分表友好，比自增主键更适合 SaaS 多租户场景。
+    </div>
+  </section>
+
+  <!-- 9. Highlights -->
+  <section class="slide" data-title="Highlights">
+    <p class="kicker">// deep-dive · 08</p>
+    <h2 class="h2">四个关键技术亮点。</h2>
+    <div class="grid g2 mt-l">
+      <div class="hl">
+        <span class="hl-num">01</span>
+        <h4>RocketMQ 可靠消息</h4>
+        <p class="dim">本地消息表 + 定时重试 + 人工补偿队列。优惠券异步发放、过期回收都走这套。这是分布式事务的常见解法，叫<b>本地消息表</b>。</p>
+      </div>
+      <div class="hl">
+        <span class="hl-num">02</span>
+        <h4>WebSocket 多实例广播</h4>
+        <p class="dim"><span class="mono">WsService</span> 发到 <span class="mono">ws:channel:*</span>，<span class="mono">RedisMessageSubscriber</span> 广播到客户端——<b>多实例部署无粘性</b>。</p>
+      </div>
+      <div class="hl">
+        <span class="hl-num">03</span>
+        <h4>多支付集成</h4>
+        <p class="dim"><span class="mono">PaymentServiceImpl</span> 统一抽象<b>微信支付</b>、<b>支付宝</b>、<b>现金</b>、<b>AA 制</b>、<b>分账</b>五种通道 + BouncyCastle 验签。</p>
+      </div>
+      <div class="hl">
+        <span class="hl-num">04</span>
+        <h4>Sa-Token RBAC</h4>
+        <p class="dim"><span class="mono">StpInterfaceImpl</span> 加载权限，<span class="mono">RolePermissionDefaults</span> 默认映射。公开接口白名单走 <span class="mono">PUBLIC_PATHS</span>。</p>
+      </div>
+    </div>
+    <div class="footer-line mt-l"><span class="tag accent-tag">面试时直接甩这套</span></div>
+    <div class="notes">
+四个关键技术亮点，<b>每个都是面试的 hook</b>。
+<b>第一个</b>：RocketMQ 可靠消息。
+优惠券发放走异步消息——MqService 把消息先<b>持久化到本地数据库</b>，再投递到 RocketMQ。
+消息表里有 ack 字段，超过一段时间没 ack 就<b>重试</b>，重试多次失败进入<b>人工补偿队列</b>。
+这是分布式事务的常见解法，叫 <b>本地消息表</b>——面试官问分布式事务，直接甩这个。
+<b>第二个</b>：WebSocket 多实例广播。
+门店点单、后厨打单这类<b>实时消息</b>用 WebSocket。
+多个后端实例之间用 <b>Redis Pub/Sub</b> 中转，WsService 发到 ws:channel:*，RedisMessageSubscriber 广播给客户端——<b>避免粘性问题</b>。
+<b>第三个</b>：多支付集成。
+<b>微信支付、支付宝、现金、AA 制、分账</b>——五种支付方式在 PaymentServiceImpl 统一抽象。
+<b>第四个</b>：Sa-Token RBAC。
+<b>StpInterfaceImpl</b> 加载用户权限，RolePermissionDefaults<b>默认权限映射</b>——这是<b>生产级 SaaS 的标准模式</b>。
+    </div>
+  </section>
+
+  <!-- 10. Run & Deploy -->
+  <section class="slide" data-title="Run & Deploy">
+    <p class="kicker">// run · 09</p>
+    <h2 class="h2">启动顺序：<span class="mono">5</span> 步走，三端独立。</h2>
+    <ol class="run-list mt-l anim-stagger-list">
+      <li><span class="step">1</span><div><b>初始化数据库</b><div class="dim">新环境导入 <span class="mono">db/diancan-system.sql</span>；已有环境按日期顺序执行 <span class="mono">db/upgrade/*.sql</span>（当前有 2 份：<span class="mono">20260710-table-session</span>、<span class="mono">20260711-banner-scene</span>）。</div></div></li>
+      <li><span class="step">2</span><div><b>启动基础设施</b><div class="dim">MySQL + Redis 必需；RocketMQ + MinIO 完整联调再启。</div></div></li>
+      <li><span class="step">3</span><div><b>启动后端</b><div class="dim"><span class="mono">cd diancan-admin &amp;&amp; mvn spring-boot:run</span> — 验证 <span class="mono">http://localhost:8080/api/swagger-ui.html</span></div></div></li>
+      <li><span class="step">4</span><div><b>启动管理端</b><div class="dim"><span class="mono">cd diancan-admin-web &amp;&amp; pnpm dev</span> — 访问 <span class="mono">http://localhost:9527</span></div></div></li>
+      <li><span class="step">5</span><div><b>联调小程序</b><div class="dim">微信开发者工具导入 <span class="mono">diancan-miniapp</span>，真机扫码联调。</div></div></li>
+    </ol>
+    <div class="warn-grid mt-l">
+      <div class="warn-card"><b>坑 1</b>真机不要连 127.0.0.1 — 电脑可达地址</div>
+      <div class="warn-card"><b>坑 2</b>SQL 库名 vs <span class="mono">application-dev.yml</span> 必须一致</div>
+      <div class="warn-card"><b>坑 3</b>跨端字段一处改 → 同步另外两处</div>
+    </div>
+    <div class="notes">
+启动顺序<b>很关键</b>，搞错顺序会一上来就报错。
+<b>第一步</b>：导入 db/diancan-system.sql 数据库基线。
+<b>第二步</b>：启动 MySQL 和 Redis——这两个是后端依赖。联调再启 RocketMQ 和 MinIO。
+<b>第三步</b>：在 diancan-admin/ 跑 mvn spring-boot:run，看 http://localhost:8080/api/swagger-ui.html 起来没有。
+<b>第四步</b>：在 diancan-admin-web/ 跑 pnpm dev，访问 9527。
+<b>第五步</b>：用微信开发者工具导入 diancan-miniapp，做真机扫码联调。
+<b>三个坑</b>：
+真机不要连 127.0.0.1——要连电脑可达地址
+数据库名和 application-dev.yml 里要统一
+跨端字段改一处要<b>同步改另外两处</b>——这是<b>强约束</b>。
+所以这个项目<b>没有根编排器</b>是因为<b>故意保留调试透明度</b>——但 CI 串三端这个能力后面可以加。
+    </div>
+  </section>
+
+  <!-- 11. Resume + Extension -->
+  <section class="slide" data-title="Resume + Extension">
+    <p class="kicker">// resume · 10</p>
+    <h2 class="h2">简历亮点 + 下一步扩展方向。</h2>
+    <div class="grid g2 mt-l">
+      <div>
+        <h4 class="dim" style="margin-bottom:14px">简历 bullet points</h4>
+        <ul class="resume-list">
+          <li><span class="dot"></span>独立设计后端 <b>16 模块</b>的领域边界，解决<b>交易主链事务一致性</b>问题</li>
+          <li><span class="dot"></span>集成 <b>RocketMQ 本地消息表</b>实现优惠券的<b>可靠发放</b>，并用 Redis 延迟队列处理<b>过期回收</b></li>
+          <li><span class="dot"></span>自研 <b>WebSocket + Redis Pub/Sub</b> 多实例广播方案，支撑门店实时消息</li>
+          <li><span class="dot"></span>抽象<b>多支付通道</b>接口，对接微信支付回调验签、分账和退款流程</li>
+          <li><span class="dot"></span>设计 <b>42 表</b>的领域模型，<span class="mono">BaseEntity</span> + 雪花 ID 统一审计 & 逻辑删除</li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="dim" style="margin-bottom:14px">扩展方向（下一步）</h4>
+        <ul class="ext-list">
+          <li><b>① 根编排</b><div class="dim">Docker Compose 一键起三端 + Nginx 网关</div></li>
+          <li><b>② 可观测</b><div class="dim">后端接入 OpenTelemetry，链路追踪 + Prometheus 指标</div></li>
+          <li><b>③ 多租户</b><div class="dim">门店级数据隔离 — 给 SaaS 化铺路</div></li>
+          <li><b>④ WS 原生接入</b><div class="dim">小程序侧接上 wx.connectSocket，后厨实时打单</div></li>
+          <li><b>⑤ Jest + Vitest</b><div class="dim">补齐前后端单元测试覆盖率，从当前的 1 个集成测试扩到模块级</div></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-line mt-l tc">
+      <div class="mono" style="font-size:48px;color:var(--accent);font-weight:800;letter-spacing:-.04em">?</div>
+      <h2 class="h2">下一步 — 你想往哪个方向走？</h2>
+      <p class="dim mt-s">告诉我简历定位和兴趣点，我们挑 1-2 个方向深挖。</p>
+    </div>
+    <div class="notes">
+<b>最后</b>，讲讲这个项目怎么在简历上呈现。
+<b>简历 bullet points</b> 我会这么写：
+独立设计<b>后端 16 模块</b>的领域边界，解决<b>交易主链事务一致性</b>问题
+集成 <b>RocketMQ 本地消息表</b>实现优惠券的<b>可靠发放</b>，并用 Redis 延迟队列处理<b>过期回收</b>
+自研 <b>WebSocket + Redis Pub/Sub 多实例广播</b>方案，支撑门店实时消息
+抽象<b>多支付通道</b>接口，对接微信支付回调验签、分账和退款流程
+设计 <b>42 表</b>的领域模型，BaseEntity + 雪花 ID 统一审计 & 逻辑删除
+<b>扩展方向</b>：1）把根目录加 Docker Compose，三端一键起；2）后端加<b>链路追踪 OpenTelemetry</b>；3）加一个<b>多租户门店隔离</b>机制；4）把小程序 WebSocket 接上原生 API。
+这是我下一步要做的——也是<b>为面试准备的技术深度</b>。
+    </div>
+  </section>
+
+</div>
+<script src="../../assets/runtime.js"></script>
+</body></html>
