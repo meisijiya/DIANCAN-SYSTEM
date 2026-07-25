@@ -5,139 +5,197 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>点餐系统 · 学习中心</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    min-height: 100vh;
-    color: #2d3748;
-    padding: 40px 20px;
+    font-family: "Source Han Serif SC", "Noto Serif CJK SC", "Songti SC",
+                 "STSong", "SimSun", Charter, "Source Serif Pro",
+                 "Georgia", "Times New Roman", serif;
+    line-height: 1.85;
+    color: #1a1a1a;
+    background: #ffffff;
+    margin: 0; padding: 0;
+    font-size: 17px;
   }
-  .container { max-width: 1000px; margin: 0 auto; }
-  header {
-    text-align: center;
-    color: white;
-    margin-bottom: 40px;
+  code, pre {
+    font-family: "SF Mono", "JetBrains Mono", Consolas, Monaco,
+                 "Liberation Mono", monospace;
+    font-size: 0.88em;
   }
-  header h1 {
-    font-size: 2.5em;
-    margin-bottom: 12px;
-    text-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 32px;
   }
-  header p { font-size: 1.1em; opacity: 0.95; }
-  header .repo-link {
-    display: inline-block;
-    margin-top: 16px;
-    padding: 8px 20px;
-    background: rgba(255,255,255,0.15);
-    border: 1px solid rgba(255,255,255,0.3);
-    border-radius: 6px;
-    color: white;
+  header.masthead {
+    padding: 80px 0 60px;
+    text-align: left;
+    border-bottom: 1px solid #1a1a1a;
+  }
+  header.masthead .kicker {
+    font-size: 13px;
+    color: #888;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  header.masthead h1 {
+    font-size: 2.6em;
+    font-weight: 700;
+    margin: 0 0 12px;
+    line-height: 1.15;
+    letter-spacing: -0.5px;
+  }
+  header.masthead .subtitle {
+    font-size: 1.15em;
+    color: #555;
+    font-style: italic;
+    margin: 0;
+  }
+  main { padding: 60px 0; }
+  main h2 {
+    font-size: 1.6em;
+    font-weight: 700;
+    margin: 56px 0 20px;
+    border-bottom: 1px solid #1a1a1a;
+    padding-bottom: 8px;
+  }
+  main p {
+    margin: 0 0 24px;
+    text-align: justify;
+    color: #1a1a1a;
+  }
+  main ul { margin: 0 0 24px; padding-left: 24px; }
+  main ul li { margin: 8px 0; }
+  .resources {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .resources li {
+    padding: 20px 0;
+    border-bottom: 1px solid #e5e5e5;
+  }
+  .resources li:last-child { border-bottom: none; }
+  .resources a {
+    color: #1a1a1a;
     text-decoration: none;
-    font-size: 0.9em;
-  }
-  header .repo-link:hover { background: rgba(255,255,255,0.25); }
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 20px;
-    margin-top: 20px;
-  }
-  .card {
-    background: white;
-    border-radius: 12px;
-    padding: 28px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
-    transition: transform 0.2s, box-shadow 0.2s;
-    text-decoration: none;
-    color: inherit;
     display: block;
   }
-  .card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 32px rgba(0,0,0,0.18);
+  .resources a:hover { color: #1a4d8f; }
+  .resources .title {
+    font-size: 1.25em;
+    font-weight: 600;
+    margin-bottom: 4px;
   }
-  .card .icon {
-    font-size: 2.5em;
-    margin-bottom: 12px;
-  }
-  .card h3 {
-    color: #2c5282;
-    margin-bottom: 8px;
-    font-size: 1.2em;
-  }
-  .card p {
-    color: #718096;
-    font-size: 0.9em;
+  .resources .desc {
+    color: #555;
+    font-size: 0.95em;
     line-height: 1.6;
   }
-  .card .meta {
-    margin-top: 16px;
-    padding-top: 12px;
-    border-top: 1px solid #e2e8f0;
-    font-size: 0.8em;
-    color: #a0aec0;
+  .resources .meta {
+    color: #888;
+    font-size: 0.85em;
+    margin-top: 6px;
+    font-style: italic;
+  }
+  a { color: #1a4d8f; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  pre {
+    background: #f6f6f6;
+    color: #1a1a1a;
+    padding: 20px 24px;
+    border-left: 3px solid #1a1a1a;
+    overflow-x: auto;
+    line-height: 1.6;
+    margin: 24px 0;
+  }
+  code.inline {
+    background: #f0f0f0;
+    padding: 1px 6px;
+    font-size: 0.92em;
+    color: #1a1a1a;
   }
   footer {
+    border-top: 1px solid #e5e5e5;
+    padding: 32px 0;
     text-align: center;
-    color: rgba(255,255,255,0.85);
-    margin-top: 50px;
+    color: #888;
     font-size: 0.9em;
+    font-style: italic;
+  }
+  footer a { color: #1a4d8f; }
+  @media (max-width: 720px) {
+    body { font-size: 16px; }
+    header.masthead { padding: 50px 0 40px; }
+    header.masthead h1 { font-size: 1.9em; }
+    .container { padding: 0 20px; }
+    main { padding: 40px 0; }
   }
 </style>
 </head>
 <body>
-<div class="container">
 
-<header>
-  <h1>🍜 点餐系统 · 学习中心</h1>
-  <p>从 0 到跑通三端协同 · 配套实战教程</p>
-  <a href="https://github.com/meisijiya/DIANCAN-SYSTEM" class="repo-link" target="_blank">
-    ⭐ GitHub 仓库
-  </a>
+<header class="masthead">
+  <div class="container">
+    <div class="kicker">学习中心</div>
+    <h1>点餐系统从入门到全栈</h1>
+    <p class="subtitle">从零到本地跑通 Spring Boot + Vue 3 + 微信小程序的实战手册</p>
+  </div>
 </header>
 
-<div class="grid">
+<main>
+<div class="container">
 
-  <a href="learning/diancan-system-tutorial.html" class="card">
-    <div class="icon">📘</div>
-    <h3>主教程</h3>
-    <p>9 个学习单元 + U10 中间件实战 + U11 Docker 详解<br>
-       由浅入深讲透三端协同：Spring Boot / Vue 3 / 微信小程序</p>
-    <div class="meta">~ 2900 行 · 11 章节 · 含完整代码与案例</div>
-  </a>
+<h2>教程</h2>
 
-  <a href="learning/code-exercises.html" class="card">
-    <div class="icon">✍️</div>
-    <h3>代码练习册</h3>
-    <p>6 张语法速查表 + 8 道填空练习 + 1 个 mini-project<br>
-       亲手敲一遍，才能捡回语言基础</p>
-    <div class="meta">~ 1300 行 · 填空带 TODO · 含参考答案</div>
-  </a>
+<ul class="resources">
+  <li>
+    <a href="learning/diancan-system-tutorial.html">
+      <div class="title">主教程</div>
+      <div class="desc">从项目全局到三端协同的 11 个学习单元，含中间件实战、Docker 详解、GitHub Pages 部署。</div>
+      <div class="meta">11 章 · 适合编程弱基础的同学</div>
+    </a>
+  </li>
+  <li>
+    <a href="learning/code-exercises.html">
+      <div class="title">代码练习册</div>
+      <div class="desc">六张语法速查表、八道填空练习、一个 mini-project。手敲一遍才能捡回语言基础。</div>
+      <div class="meta">8 道填空 + 1 个端到端实战</div>
+    </a>
+  </li>
+  <li>
+    <a href="learning/docker-guide.html">
+      <div class="title">Docker 部署指南</div>
+      <div class="desc">WSL2 + Docker Desktop 完整流程。MySQL、Redis、RocketMQ、MinIO 中间件一键启动。</div>
+      <div class="meta">9 个常见排错清单 · 4 个脚本逐行解析</div>
+    </a>
+  </li>
+</ul>
 
-  <a href="learning/docker-guide.html" class="card">
-    <div class="icon">🐳</div>
-    <h3>Docker 部署指南</h3>
-    <p>WSL2 + Docker Desktop 完整流程<br>
-       MySQL / Redis / RocketMQ / MinIO 中间件一键启动</p>
-    <div class="meta">HTML · 9 个排错清单 + 4 个脚本解析</div>
-  </a>
+<h2>源码</h2>
 
-  <a href="https://github.com/meisijiya/DIANCAN-SYSTEM/tree/master" class="card">
-    <div class="icon">📦</div>
-    <h3>源码仓库</h3>
-    <p>完整三端项目源码<br>
-       后端 Java 17 / Spring Boot 3 · 管理端 Vue 3 · 小程序</p>
-    <div class="meta">17 个业务模块 · 102+ 张数据表</div>
-  </a>
+<ul class="resources">
+  <li>
+    <a href="https://github.com/meisijiya/DIANCAN-SYSTEM" target="_blank">
+      <div class="title">GitHub 仓库</div>
+      <div class="desc">完整三端项目源码。Spring Boot 后端、Vue 3 管理端、微信小程序。</div>
+      <div class="meta">17 个业务模块 · 102 张数据表</div>
+    </a>
+  </li>
+</ul>
+
+<p style="margin-top: 48px; color: #888; font-style: italic;">
+  这些页面由 <a href="https://github.com/meisijiya/DIANCAN-SYSTEM">GitHub</a> 自动部署，
+  每次 push 都会重新构建。
+</p>
 
 </div>
+</main>
 
 <footer>
-  <p>📘 配套学习 · 🛠️ 边学边练 · 🎯 端到端实战</p>
-  <p>部署于 GitHub Pages · 仓库开源 MIT</p>
+<div class="container">
+点餐系统学习中心 · 仓库开源 MIT
+</div>
 </footer>
 
-</div>
 </body>
 </html>

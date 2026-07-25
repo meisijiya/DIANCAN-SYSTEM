@@ -4,143 +4,258 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Docker 一键启动指南 · WSL2 / Ubuntu</title>
-<style>
-  :root {
-    --primary: #2c5282;
-    --primary-light: #ebf4ff;
-    --success: #2f855a;
-    --warning: #c05621;
-    --danger: #c53030;
-    --text: #2d3748;
-    --text-light: #718096;
-    --bg: #ffffff;
-    --bg-soft: #f7fafc;
-    --border: #e2e8f0;
-    --code-bg: #1a202c;
-    --code-text: #e2e8f0;
-  }
-  * { box-sizing: border-box; }
+<style>  /* === 字体：中文衬线 + 英文 Charter === */
   body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-    line-height: 1.8;
-    color: var(--text);
-    background: var(--bg-soft);
+    font-family: "Source Han Serif SC", "Noto Serif CJK SC", "Songti SC",
+                 "STSong", "SimSun", Charter, "Source Serif Pro",
+                 "Georgia", "Times New Roman", serif;
+    line-height: 1.85;
+    color: #1a1a1a;
+    background: #ffffff;
     margin: 0; padding: 0;
+    font-size: 17px;
   }
-  .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
-  header.hero {
-    background: linear-gradient(135deg, #0db7ed 0%, #0f4c81 100%);
-    color: white; padding: 50px 24px; text-align: center;
-  }
-  header.hero h1 { font-size: 2.2em; margin: 0 0 12px; }
-  header.hero p { font-size: 1.05em; opacity: 0.95; margin: 6px 0; }
-  header.hero .back-link {
-    display: inline-block; margin-top: 16px; padding: 8px 20px;
-    background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);
-    border-radius: 6px; color: white; text-decoration: none; font-size: 0.9em;
-  }
-  header.hero .back-link:hover { background: rgba(255,255,255,0.25); }
-  nav.toc {
-    background: white; border-bottom: 1px solid var(--border);
-    padding: 16px 24px; position: sticky; top: 0; z-index: 100;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.04);
-  }
-  nav.toc .container { display: flex; flex-wrap: wrap; gap: 8px; }
-  nav.toc a {
-    color: var(--primary); text-decoration: none; padding: 6px 12px;
-    border-radius: 6px; background: var(--primary-light);
+  code, pre {
+    font-family: "SF Mono", "JetBrains Mono", Consolas, Monaco,
+                 "Liberation Mono", monospace;
     font-size: 0.88em;
   }
-  nav.toc a:hover { background: var(--primary); color: white; }
-  nav.toc a.back-home {
-    background: linear-gradient(135deg, #f6ad55 0%, #ed8936 100%);
-    color: white !important;
-    font-weight: 600;
-    border: none;
+  /* === 顶部 hero（无渐变，纯白 + 黑线） === */
+  header.hero {
+    padding: 60px 0 40px;
+    border-bottom: 1px solid #1a1a1a;
   }
-  nav.toc a.back-home:hover {
-    background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
-    transform: translateY(-1px);
-    box-shadow: 0 2px 6px rgba(237, 137, 54, 0.4);
-  }
-  footer a.back-home {
-    display: inline-block;
-    padding: 8px 20px;
-    background: linear-gradient(135deg, #f6ad55 0%, #ed8936 100%);
-    color: white !important;
-    text-decoration: none;
-    border-radius: 6px;
-    font-weight: 600;
-    transition: transform 0.2s, box-shadow 0.2s;
-  }
-  footer a.back-home:hover {
-    background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(237, 137, 54, 0.4);
-  }
-  main { padding: 40px 24px; }
+  header.hero h1 { font-size: 2.4em; font-weight: 700; margin: 0 0 12px; }
+  header.hero p { font-size: 1.1em; color: #555; font-style: italic; margin: 4px 0; }
+  /* === 容器 === */
+  .container { max-width: 760px; margin: 0 auto; padding: 0 32px; }
+  /* === 章节 === */
   section.unit {
-    background: white; border-radius: 12px; margin-bottom: 32px;
-    padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-    border: 1px solid var(--border);
+    background: #ffffff;
+    margin: 48px 0;
+    padding: 0;
+    border: none;
+    box-shadow: none;
   }
   section.unit h2 {
-    color: var(--primary); border-bottom: 3px solid var(--primary);
-    padding-bottom: 12px; margin-top: 0;
+    font-size: 1.7em;
+    font-weight: 700;
+    margin: 56px 0 20px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #1a1a1a;
+    color: #1a1a1a;
   }
   section.unit h3 {
-    color: var(--text); margin-top: 28px; padding-left: 12px;
-    border-left: 4px solid var(--primary);
+    font-size: 1.3em;
+    font-weight: 700;
+    margin: 36px 0 14px;
+    padding-left: 0;
+    border-left: none;
+    color: #1a1a1a;
   }
+  section.unit h4 {
+    font-size: 1em;
+    font-weight: 700;
+    margin: 24px 0 8px;
+    color: #1a1a1a;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+  /* === 注释框（去饱和度：浅灰底 + 左侧细线） === */
   .why, .analogy, .pitfall, .summary, .note {
-    padding: 16px 20px; border-radius: 8px; margin: 16px 0;
+    padding: 16px 20px;
+    margin: 24px 0;
+    background: #f6f6f6;
+    border-left: 1px solid #888;
+    border-radius: 0;
+    color: #1a1a1a;
   }
-  .why { background: #fef5e7; border-left: 4px solid var(--warning); }
-  .analogy { background: #f0fff4; border-left: 4px solid var(--success); }
-  .pitfall { background: #fff5f5; border-left: 4px solid var(--danger); }
-  .note { background: var(--primary-light); border-left: 4px solid var(--primary); }
-  .summary { background: var(--primary-light); border-left: 4px solid var(--primary); }
   .why strong, .analogy strong, .pitfall strong, .summary strong, .note strong {
-    display: block; margin-bottom: 6px;
+    display: block;
+    margin-bottom: 6px;
+    color: #1a1a1a;
+    font-weight: 700;
   }
+  .analogy, .why { background: #f6f6f6; border-left: 1px solid #888; }
+  .pitfall { background: #faf5f5; border-left: 1px solid #888; }
+  .summary, .note { background: #f5f5f5; border-left: 1px solid #888; }
+  /* === 代码块（保留暗色：代码阅读体验） === */
   pre {
-    background: var(--code-bg); color: var(--code-text);
-    padding: 16px 20px; border-radius: 8px; overflow-x: auto;
-    font-size: 0.88em; line-height: 1.65; margin: 12px 0;
+    background: #1a1a1a;
+    color: #e8e8e8;
+    padding: 18px 22px;
+    border-radius: 0;
+    border-left: 3px solid #1a1a1a;
+    overflow-x: auto;
+    line-height: 1.65;
+    margin: 24px 0;
   }
-  pre code { font-family: "SF Mono", Consolas, Monaco, monospace; }
+  pre code { font-family: "SF Mono", "JetBrains Mono", Consolas, Monaco, monospace; }
   code.inline {
-    background: var(--bg-soft); border: 1px solid var(--border);
-    border-radius: 3px; padding: 2px 6px; font-size: 0.9em;
-    color: var(--danger);
+    background: #f0f0f0;
+    padding: 1px 6px;
+    border-radius: 0;
+    font-size: 0.92em;
+    color: #1a1a1a;
     font-family: "SF Mono", Consolas, Monaco, monospace;
+    border: 1px solid #e0e0e0;
   }
-  table { width: 100%; border-collapse: collapse; margin: 12px 0;
-    background: white; border-radius: 8px; overflow: hidden;
-    border: 1px solid var(--border); }
-  th, td { padding: 10px 14px; text-align: left;
-    border-bottom: 1px solid var(--border); }
-  th { background: var(--primary-light); color: var(--primary);
-    font-weight: 600; }
+  /* === 表格（简洁） === */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 24px 0;
+    background: #ffffff;
+    border: none;
+    border-radius: 0;
+    font-size: 0.95em;
+  }
+  th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid #e0e0e0; }
+  th { background: transparent; color: #1a1a1a; font-weight: 700;
+       border-bottom: 2px solid #1a1a1a; }
   tr:last-child td { border-bottom: none; }
+  tr:hover { background: transparent; }
+  /* === 链接 === */
+  a { color: #1a4d8f; text-decoration: none; border-bottom: 1px solid transparent; }
+  a:hover { text-decoration: underline; border-bottom: 1px solid #1a4d8f; }
+  /* === 步骤框（去饱和度） === */
   .step {
-    background: white; border: 2px solid var(--primary);
-    border-radius: 8px; padding: 16px 20px; margin: 12px 0;
+    background: #ffffff;
+    border: 1px solid #d0d0d0;
+    border-left: 3px solid #1a1a1a;
+    border-radius: 0;
+    padding: 16px 20px;
+    margin: 16px 0;
     position: relative;
   }
   .step-num {
-    position: absolute; top: -12px; left: 16px;
-    background: var(--primary); color: white;
-    width: 28px; height: 28px; border-radius: 50%;
+    position: absolute;
+    top: -10px; left: 16px;
+    background: #1a1a1a;
+    color: #ffffff;
+    width: 24px; height: 24px;
+    border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    font-weight: bold; font-size: 0.9em;
+    font-weight: 700; font-size: 0.85em;
   }
-  footer { background: var(--code-bg); color: white;
-    padding: 32px 24px; text-align: center; margin-top: 60px; }
-  footer p { margin: 6px 0; opacity: 0.85; }
-  ul, ol { padding-left: 24px; }
-  hr { border: none; border-top: 1px solid var(--border); margin: 32px 0; }
-</style>
+  /* === Quiz（去饱和度） === */
+  .quiz {
+    background: #f6f6f6;
+    border: 1px solid #d0d0d0;
+    border-left: 3px solid #888;
+    border-radius: 0;
+    padding: 18px 22px;
+    margin: 24px 0;
+  }
+  .quiz-q { font-weight: 700; margin-bottom: 10px; }
+  .quiz-options { list-style: none; padding: 0; margin: 0; }
+  .quiz-options li {
+    padding: 6px 12px; margin: 4px 0;
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 0;
+    cursor: pointer;
+  }
+  .quiz-options li:hover { background: #f0f0f0; }
+  .quiz-options li::before { content: "○ "; color: #888; }
+  .quiz-options li.correct { background: #f0f0f0; }
+  .quiz-options li.correct::before { content: "✓ "; color: #1a1a1a; font-weight: 700; }
+  .quiz-options li.wrong { background: #faf5f5; }
+  .quiz-options li.wrong::before { content: "✗ "; color: #888; font-weight: 700; }
+  .quiz-answer {
+    margin-top: 12px; padding: 10px 14px;
+    background: #f0f0f0;
+    border-left: 1px solid #888;
+    font-size: 0.95em;
+    color: #1a1a1a;
+  }
+  .quiz-type {
+    display: inline-block;
+    background: transparent;
+    color: #888;
+    font-size: 0.75em;
+    padding: 1px 8px;
+    border: 1px solid #888;
+    margin-right: 8px;
+    font-weight: 700;
+  }
+  /* === 顶部 nav.toc（去圆角、去阴影、改色） === */
+  nav.toc {
+    background: #ffffff;
+    border-bottom: 1px solid #1a1a1a;
+    padding: 16px 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: none;
+  }
+  nav.toc .container {
+    display: flex; flex-wrap: wrap; gap: 8px;
+  }
+  nav.toc a {
+    color: #1a1a1a;
+    padding: 4px 10px;
+    border-radius: 0;
+    background: transparent;
+    border: 1px solid #d0d0d0;
+    font-size: 0.85em;
+  }
+  nav.toc a:hover {
+    background: #1a1a1a;
+    color: #ffffff;
+    text-decoration: none;
+  }
+  nav.toc a.back-home {
+    background: #1a1a1a;
+    color: #ffffff !important;
+    font-weight: 700;
+    border: none;
+  }
+  nav.toc a.back-home:hover {
+    background: #000000;
+    transform: none;
+    box-shadow: none;
+  }
+  /* === Footer === */
+  footer {
+    background: #ffffff;
+    color: #888;
+    padding: 32px 0;
+    margin-top: 60px;
+    text-align: center;
+    border-top: 1px solid #1a1a1a;
+  }
+  footer p { margin: 6px 0; opacity: 1; font-style: italic; }
+  footer a.back-home {
+    display: inline-block;
+    padding: 8px 20px;
+    background: #1a1a1a;
+    color: #ffffff !important;
+    text-decoration: none;
+    border-radius: 0;
+    font-weight: 700;
+    transition: none;
+  }
+  footer a.back-home:hover {
+    background: #000000;
+    transform: none;
+    box-shadow: none;
+  }
+  footer a { color: #1a4d8f; }
+  /* === 文件路径 === */
+  .file-path {
+    font-family: "SF Mono", "JetBrains Mono", Consolas, Monaco, monospace;
+    background: #f0f0f0;
+    padding: 1px 6px;
+    font-size: 0.92em;
+    color: #1a1a1a;
+  }
+  /* === 响应式 === */
+  @media (max-width: 720px) {
+    body { font-size: 16px; }
+    .container { padding: 0 20px; }
+    section.unit h2 { font-size: 1.4em; }
+  }</style>
 </head>
 <body>
 
@@ -170,7 +285,7 @@
 
 <!-- ============ 你将学到什么 ============ -->
 <section class="unit" id="intro">
-<h2>📚 你将学到什么</h2>
+<h2></h2>
 <ol>
   <li>WSL2 上装 Docker Desktop 的两种方式</li>
   <li>理解 Docker Compose 的"一键启动"原理</li>
@@ -181,9 +296,9 @@
 
 <!-- ============ 步骤 0 ============ -->
 <section class="unit" id="step-0">
-<h2>🪜 步骤 0 · WSL2 装 Docker</h2>
+<h2></h2>
 
-<h3>方案 A · Docker Desktop（最省心，强烈推荐）</h3>
+<h3></h3>
 <div class="analogy">
 <strong>💡 适用场景</strong>
 Windows 用户首选，Docker Desktop for Windows 自带 WSL2 集成。
@@ -213,7 +328,7 @@ wsl
 docker --version
 docker run hello-world</code></pre>
 
-<h3>方案 B · 直接在 WSL2 里装 docker-ce（进阶用户）</h3>
+<h3></h3>
 
 <pre><code class="language-bash"># Ubuntu 24.04 (WSL2) 内执行
 sudo apt update
@@ -249,14 +364,14 @@ docker run hello-world</code></pre>
 
 <!-- ============ 步骤 1 ============ -->
 <section class="unit" id="step-1">
-<h2>🪜 步骤 1 · 启动中间件</h2>
+<h2></h2>
 
 <div class="step"><span class="step-num">1</span><b>进入项目根</b>
 <pre><code class="language-bash">cd /home/ljh2923/opencode-project/diancan-system
 bash scripts/docker-up.sh</code></pre>
 </div>
 
-<h3>📤 输出示例</h3>
+<h3></h3>
 <pre><code class="language-bash">[INFO] 检查 Docker 环境...
 [INFO] 使用命令: docker compose
 [INFO] 预处理 SQL 文件（库名修正）...
@@ -286,7 +401,7 @@ bash scripts/docker-up.sh</code></pre>
 
 <!-- ============ 步骤 1.5 ============ -->
 <section class="unit" id="step-15">
-<h2>🪜 步骤 1.5 · 启动后端（WSL2 Ubuntu）</h2>
+<h2></h2>
 
 <div class="analogy">
 <strong>💡 为什么需要专门的脚本？</strong>
@@ -310,7 +425,7 @@ bash scripts/start-backend.sh</code></pre>
 
 <!-- ============ 步骤 2 ============ -->
 <section class="unit" id="step-2">
-<h2>🪜 步骤 2 · 启动后端（命令行方式）</h2>
+<h2></h2>
 
 <pre><code class="language-bash">cd diancan-admin
 mvn spring-boot:run</code></pre>
@@ -320,7 +435,7 @@ mvn spring-boot:run</code></pre>
 
 <!-- ============ 步骤 3 ============ -->
 <section class="unit" id="step-3">
-<h2>🪜 步骤 3 · 启动管理端 + 小程序</h2>
+<h2></h2>
 
 <pre><code class="language-bash"># 另开终端
 cd diancan-admin-web
@@ -336,7 +451,7 @@ pnpm dev
 
 <!-- ============ 常用命令 ============ -->
 <section class="unit" id="commands">
-<h2>🔧 常用 Docker 命令（最小集合）</h2>
+<h2></h2>
 
 <pre><code class="language-bash"># 查看运行中的容器
 docker ps
@@ -373,9 +488,9 @@ docker system prune</code></pre>
 
 <!-- ============ 故障排查 ============ -->
 <section class="unit" id="troubleshoot">
-<h2>🔍 故障排查（9 个常见问题）</h2>
+<h2></h2>
 
-<h3 id="t-1">1. <code class="inline">docker compose</code> 命令找不到</h3>
+<h3> id="t-1"<code class="inline">docker compose</code> 命令找不到</h3>
 <p><b>原因</b>：Docker Desktop 没装 compose v2，或 docker-compose-plugin 没装。</p>
 <p><b>解决</b>：</p>
 <ul>
@@ -383,14 +498,14 @@ docker system prune</code></pre>
   <li>docker-ce 用户：<code class="inline">sudo apt install docker-compose-plugin</code></li>
 </ul>
 
-<h3 id="t-2">2. 端口被占用</h3>
+<h3> id="t-2"</h3>
 <pre><code class="language-bash"># 看谁占了 3306
 sudo lsof -i :3306
 # 或
 sudo ss -tlnp | grep 3306</code></pre>
 <p><b>解决</b>：停掉旧 MySQL 服务或修改 <code class="inline">.env</code> 里 <code class="inline">MYSQL_PORT=3307</code>。</p>
 
-<h3 id="t-3">3. MySQL 容器一直 restarting</h3>
+<h3> id="t-3"</h3>
 <pre><code class="language-bash">docker logs diancan-mysql | tail -50</code></pre>
 <p>常见原因：</p>
 <ul>
@@ -398,7 +513,7 @@ sudo ss -tlnp | grep 3306</code></pre>
   <li>内存不够：MySQL 至少需要 512MB，WSL2 默认 4GB 内存通常够</li>
 </ul>
 
-<h3 id="t-4">4. RocketMQ broker 起不来</h3>
+<h3> id="t-4"</h3>
 <pre><code class="language-bash">docker logs diancan-rocketmq-broker | tail -30</code></pre>
 <p>常见原因：</p>
 <ul>
@@ -406,13 +521,13 @@ sudo ss -tlnp | grep 3306</code></pre>
   <li>broker.conf 配置错：检查 <code class="inline">scripts/rocketmq/broker.conf</code> 路径</li>
 </ul>
 
-<h3 id="t-5">5. SQL 没自动导入</h3>
+<h3> id="t-5"</h3>
 <p><b>原因</b>：数据卷已存在但 SQL 没跑过（MySQL 只在 volume 首次创建时跑 init 脚本）。</p>
 <p><b>解决</b>：</p>
 <pre><code class="language-bash">bash scripts/docker-reset.sh   # 删掉数据卷
 bash scripts/docker-up.sh       # 重新跑</code></pre>
 
-<h3 id="t-6">6. 镜像拉取 429 Too Many Requests</h3>
+<h3> id="t-6"</h3>
 <div class="pitfall">
 <strong>症状</strong>
 <pre><code>Error response from daemon: unknown: failed to resolve reference "..."
@@ -433,7 +548,7 @@ sudo nano /etc/docker/daemon.json
   <li><b>本项目已规避</b>——<code class="inline">minio/mc</code> 是第三方工具已被移除，bucket 由后端自动创建</li>
 </ol>
 
-<h3 id="t-7">7. 后端连不上中间件</h3>
+<h3> id="t-7"</h3>
 <p><b>症状</b>：Spring Boot 启动报 <code class="inline">Unknown database 'diancan-system'</code>，但 <code class="inline">docker exec diancan-mysql mysql</code> 看库是存在的。</p>
 <p><b>根因</b>：本机（WSL2 / Windows）有另一个 MySQL 占用了 3306 端口，Docker Desktop 把容器端口 publish 到 3306 失败。你的应用连到的不是 docker 里的 MySQL，而是本机的"野 MySQL"。</p>
 <p><b>解决</b>：</p>
@@ -448,7 +563,7 @@ sudo nano /etc/docker/daemon.json
 [WSL2 Ubuntu] 应用 localhost:3306  → Windows 主机 MySQL 8.0.40（不是你 docker 那个） ❌</pre>
 </div>
 
-<h3 id="t-8">8. Windows 主机有 MySQL / Redis 占用了端口</h3>
+<h3> id="t-8"</h3>
 <p><b>检查清单</b>：</p>
 <ul style="list-style: none; padding-left: 0;">
   <li>☐ 容器都 running：<code class="inline">docker ps</code></li>
@@ -456,7 +571,7 @@ sudo nano /etc/docker/daemon.json
   <li>☐ MySQL 密码是 <code class="inline">123456</code>（和 <code class="inline">.env</code> 里一致）</li>
 </ul>
 
-<h3 id="t-9">9. RocketMQ broker 启动崩溃（5.x 版本 bug）</h3>
+<h3> id="t-9"</h3>
 <div class="pitfall">
 <strong>症状</strong>：<code class="inline">diancan-rocketmq-broker</code> 一直 <code class="inline">Restarting (255)</code>，日志里有 <code class="inline">java.lang.NullPointerException at ScheduleMessageService.configFilePath</code>。
 </div>
@@ -474,7 +589,7 @@ sudo nano /etc/docker/daemon.json
 
 <!-- ============ 文件位置 + 学习路径 ============ -->
 <section class="unit" id="files">
-<h2>📂 文件位置</h2>
+<h2></h2>
 <table>
 <tr><th>文件</th><th>说明</th></tr>
 <tr><td><code class="inline">docker-compose.yml</code></td><td>中间件编排（A 方案：仅中间件）</td></tr>
@@ -490,7 +605,7 @@ sudo nano /etc/docker/daemon.json
 </section>
 
 <section class="unit" id="path">
-<h2>🎯 学习路径建议</h2>
+<h2></h2>
 <p>配合主教程 <a href="diancan-system-tutorial.html">diancan-system-tutorial.html</a>：</p>
 <ol>
   <li>✅ <b>已完成</b> U2 后端骨架的环境准备</li>
