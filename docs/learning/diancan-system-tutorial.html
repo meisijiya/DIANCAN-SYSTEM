@@ -2056,7 +2056,7 @@ midware_practice_commands:
 <tr><th>路径</th><th>作用</th></tr>
 <tr><td>本教程</td><td><span class="file-path">docs/learning/diancan-system-tutorial.html</span></td></tr>
 <tr><td><b>代码练习册</b></td><td><span class="file-path">docs/learning/code-exercises.html</span>（8 道填空 + 1 个 mini-project）</td></tr>
-<tr><td>Docker 速查</td><td><span class="file-path">docs/learning/docker-guide.md</span></td></tr>
+<tr><td>Docker 速查</td><td><span class="file-path">docs/learning/docker-guide.html</span></td></tr>
 <tr><td>项目根 AGENTS.md</td><td><span class="file-path">/AGENTS.md</span></td></tr>
 <tr><td>项目根 README</td><td><span class="file-path">/readme.md</span></td></tr>
 <tr><td>数据库基线</td><td><span class="file-path">db/diancan-system.sql</span></td></tr>
@@ -2937,7 +2937,7 @@ diancan-system/
     └── learning/
         ├── diancan-system-tutorial.html  # 📘 主教程
         ├── code-exercises.html           # ✍️ 练习册
-        └── docker-guide.md               # 🐳 Docker 指南
+        └── docker-guide.html              # 🐳 Docker 指南
 
 # 入口页核心结构（docs/index.html）
 &lt;!-- 一段 HTML + CSS 跳转卡片就行 --&gt;
@@ -2982,7 +2982,7 @@ curl -sIL https://meisijiya.github.io/DIANCAN-SYSTEM/
 for path in "/" \
             "/learning/diancan-system-tutorial.html" \
             "/learning/code-exercises.html" \
-            "/learning/docker-guide.md"; do
+            "/learning/docker-guide.html"; do
   status=$(curl -sIL -o /dev/null -w "%{http_code}" \
     "https://meisijiya.github.io/DIANCAN-SYSTEM${path}")
   echo "$path → $status"

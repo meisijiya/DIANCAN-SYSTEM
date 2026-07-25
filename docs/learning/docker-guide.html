@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Docker 一键启动指南 · WSL2 / Ubuntu</title>
+<style>
+  :root {
+    --primary: #2c5282;
+    --primary-light: #ebf4ff;
+    --success: #2f855a;
+    --warning: #c05621;
+    --danger: #c53030;
+    --text: #2d3748;
+    --text-light: #718096;
+    --bg: #ffffff;
+    --bg-soft: #f7fafc;
+    --border: #e2e8f0;
+    --code-bg: #1a202c;
+    --code-text: #e2e8f0;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    line-height: 1.8;
+    color: var(--text);
+    background: var(--bg-soft);
+    margin: 0; padding: 0;
+  }
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+  header.hero {
+    background: linear-gradient(135deg, #0db7ed 0%, #0f4c81 100%);
+    color: white; padding: 50px 24px; text-align: center;
+  }
+  header.hero h1 { font-size: 2.2em; margin: 0 0 12px; }
+  header.hero p { font-size: 1.05em; opacity: 0.95; margin: 6px 0; }
+  header.hero .back-link {
+    display: inline-block; margin-top: 16px; padding: 8px 20px;
+    background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 6px; color: white; text-decoration: none; font-size: 0.9em;
+  }
+  header.hero .back-link:hover { background: rgba(255,255,255,0.25); }
+  nav.toc {
+    background: white; border-bottom: 1px solid var(--border);
+    padding: 16px 24px; position: sticky; top: 0; z-index: 100;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+  }
+  nav.toc .container { display: flex; flex-wrap: wrap; gap: 8px; }
+  nav.toc a {
+    color: var(--primary); text-decoration: none; padding: 6px 12px;
+    border-radius: 6px; background: var(--primary-light);
+    font-size: 0.88em;
+  }
+  nav.toc a:hover { background: var(--primary); color: white; }
+  main { padding: 40px 24px; }
+  section.unit {
+    background: white; border-radius: 12px; margin-bottom: 32px;
+    padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    border: 1px solid var(--border);
+  }
+  section.unit h2 {
+    color: var(--primary); border-bottom: 3px solid var(--primary);
+    padding-bottom: 12px; margin-top: 0;
+  }
+  section.unit h3 {
+    color: var(--text); margin-top: 28px; padding-left: 12px;
+    border-left: 4px solid var(--primary);
+  }
+  .why, .analogy, .pitfall, .summary, .note {
+    padding: 16px 20px; border-radius: 8px; margin: 16px 0;
+  }
+  .why { background: #fef5e7; border-left: 4px solid var(--warning); }
+  .analogy { background: #f0fff4; border-left: 4px solid var(--success); }
+  .pitfall { background: #fff5f5; border-left: 4px solid var(--danger); }
+  .note { background: var(--primary-light); border-left: 4px solid var(--primary); }
+  .summary { background: var(--primary-light); border-left: 4px solid var(--primary); }
+  .why strong, .analogy strong, .pitfall strong, .summary strong, .note strong {
+    display: block; margin-bottom: 6px;
+  }
+  pre {
+    background: var(--code-bg); color: var(--code-text);
+    padding: 16px 20px; border-radius: 8px; overflow-x: auto;
+    font-size: 0.88em; line-height: 1.65; margin: 12px 0;
+  }
+  pre code { font-family: "SF Mono", Consolas, Monaco, monospace; }
+  code.inline {
+    background: var(--bg-soft); border: 1px solid var(--border);
+    border-radius: 3px; padding: 2px 6px; font-size: 0.9em;
+    color: var(--danger);
+    font-family: "SF Mono", Consolas, Monaco, monospace;
+  }
+  table { width: 100%; border-collapse: collapse; margin: 12px 0;
+    background: white; border-radius: 8px; overflow: hidden;
+    border: 1px solid var(--border); }
+  th, td { padding: 10px 14px; text-align: left;
+    border-bottom: 1px solid var(--border); }
+  th { background: var(--primary-light); color: var(--primary);
+    font-weight: 600; }
+  tr:last-child td { border-bottom: none; }
+  .step {
+    background: white; border: 2px solid var(--primary);
+    border-radius: 8px; padding: 16px 20px; margin: 12px 0;
+    position: relative;
+  }
+  .step-num {
+    position: absolute; top: -12px; left: 16px;
+    background: var(--primary); color: white;
+    width: 28px; height: 28px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: bold; font-size: 0.9em;
+  }
+  footer { background: var(--code-bg); color: white;
+    padding: 32px 24px; text-align: center; margin-top: 60px; }
+  footer p { margin: 6px 0; opacity: 0.85; }
+  ul, ol { padding-left: 24px; }
+  hr { border: none; border-top: 1px solid var(--border); margin: 32px 0; }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="container">
+    <h1>🐳 Docker 一键启动指南</h1>
+    <p>WSL2 / Ubuntu · Docker Desktop · 容器编排实战</p>
+    <p>本指南教你：<b>WSL2 装 Docker → 一键拉起中间件 → 跑通后端</b></p>
+    <a href="../" class="back-link">← 返回学习中心</a>
+  </div>
+</header>
+
+<nav class="toc">
+  <div class="container">
+    <a href="#step-0">步骤 0 · 装 Docker</a>
+    <a href="#step-1">步骤 1 · 启动中间件</a>
+    <a href="#step-15">步骤 1.5 · 启动后端</a>
+    <a href="#step-2">步骤 2 · 启动后端</a>
+    <a href="#step-3">步骤 3 · 管理端+小程序</a>
+    <a href="#commands">常用命令</a>
+    <a href="#troubleshoot">故障排查</a>
+  </div>
+</nav>
+
+<main class="container">
+
+<!-- ============ 你将学到什么 ============ -->
+<section class="unit" id="intro">
+<h2>📚 你将学到什么</h2>
+<ol>
+  <li>WSL2 上装 Docker Desktop 的两种方式</li>
+  <li>理解 Docker Compose 的"一键启动"原理</li>
+  <li>学会 docker 命令的最小集合</li>
+  <li>排查容器启动失败的常见问题</li>
+</ol>
+</section>
+
+<!-- ============ 步骤 0 ============ -->
+<section class="unit" id="step-0">
+<h2>🪜 步骤 0 · WSL2 装 Docker</h2>
+
+<h3>方案 A · Docker Desktop（最省心，强烈推荐）</h3>
+<div class="analogy">
+<strong>💡 适用场景</strong>
+Windows 用户首选，Docker Desktop for Windows 自带 WSL2 集成。
+</div>
+
+<pre><code class="language-powershell"># Windows PowerShell（管理员）
+# 1. 开启 WSL2 功能
+dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
+dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart
+
+# 2. 重启电脑
+
+# 3. 设置 WSL2 为默认版本
+wsl --set-default-version 2
+
+# 4. 安装 Ubuntu 24.04（如果还没装）
+# Microsoft Store 搜索 Ubuntu 24.04 安装
+
+# 5. 下载 Docker Desktop
+# https://www.docker.com/products/docker-desktop/
+# 安装时勾选 "Use WSL 2 based engine"
+
+# 6. 启动 Docker Desktop，等右下角图标变绿
+
+# 7. 验证
+wsl
+docker --version
+docker run hello-world</code></pre>
+
+<h3>方案 B · 直接在 WSL2 里装 docker-ce（进阶用户）</h3>
+
+<pre><code class="language-bash"># Ubuntu 24.04 (WSL2) 内执行
+sudo apt update
+sudo apt install -y ca-certificates curl gnupg
+
+# 添加 Docker 官方 GPG key
+sudo install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+sudo chmod a+r /etc/apt/keyrings/docker.gpg
+
+# 添加仓库
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+sudo apt update
+sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+# 允许当前用户免 sudo 用 docker
+sudo usermod -aG docker $USER
+newgrp docker
+
+# 验证
+docker --version
+docker run hello-world</code></pre>
+
+<div class="pitfall">
+<strong>⚠️ WSL2 内 docker-ce 启动 daemon 需要</strong>
+<code class="inline">sudo service docker start</code> 或在 <code class="inline">/etc/wsl.conf</code> 加 <code class="inline">[boot] command="service docker start"</code>。
+</div>
+</section>
+
+<!-- ============ 步骤 1 ============ -->
+<section class="unit" id="step-1">
+<h2>🪜 步骤 1 · 启动中间件</h2>
+
+<div class="step"><span class="step-num">1</span><b>进入项目根</b>
+<pre><code class="language-bash">cd /home/ljh2923/opencode-project/diancan-system
+bash scripts/docker-up.sh</code></pre>
+</div>
+
+<h3>📤 输出示例</h3>
+<pre><code class="language-bash">[INFO] 检查 Docker 环境...
+[INFO] 使用命令: docker compose
+[INFO] 预处理 SQL 文件（库名修正）...
+✅ 已生成 .docker/initdb/01-init.sql（库名：digital_ordering_system → diancan-system）
+[INFO] 启动中间件容器（首次启动约 60~90 秒）...
+[+] Running 6/6
+ ✔ Network diancan-system_default       Created
+ ✔ Container diancan-mysql              Started
+ ✔ Container diancan-redis              Started
+ ✔ Container diancan-rocketmq-namesrv   Started
+ ✔ Container diancan-rocketmq-broker    Started
+ ✔ Container diancan-minio              Started
+[INFO] 等待 MySQL 就绪...
+✅ MySQL 就绪，diancan-system 库共 102 张表</code></pre>
+
+<div class="summary">
+<strong>📌 服务地址</strong>
+<ul>
+  <li>MySQL: <code class="inline">localhost:3307</code> (root / 123456，库: diancan-system)</li>
+  <li>Redis: <code class="inline">localhost:6379</code> (密码: 123456)</li>
+  <li>RocketMQ: <code class="inline">localhost:9876</code></li>
+  <li>MinIO API: <code class="inline">http://localhost:9000</code></li>
+  <li>MinIO Web: <code class="inline">http://localhost:9001</code></li>
+</ul>
+</div>
+</section>
+
+<!-- ============ 步骤 1.5 ============ -->
+<section class="unit" id="step-15">
+<h2>🪜 步骤 1.5 · 启动后端（WSL2 Ubuntu）</h2>
+
+<div class="analogy">
+<strong>💡 为什么需要专门的脚本？</strong>
+<ul>
+  <li>WSL2 的 <code class="inline">localhost:3306</code> 通过 Docker Desktop 转发表可能被 Windows 主机的 MySQL 占用</li>
+  <li>本项目 docker 容器的 MySQL 改用 3307 端口</li>
+  <li>脚本用 <code class="inline">SPRING_DATASOURCE_URL</code> 环境变量覆盖默认配置</li>
+</ul>
+</div>
+
+<pre><code class="language-bash">cd /home/ljh2923/opencode-project/diancan-system
+bash scripts/start-backend.sh</code></pre>
+
+<div class="note">
+<strong>📌 如果用 VSCode Spring Boot Dashboard 启动</strong>
+直接启动就行，<code class="inline">application-dev.yml</code> 已经写死了 <code class="inline">localhost:3307</code>（不用环境变量）。
+</div>
+
+<p>打开浏览器：<code class="inline">http://localhost:8080/api/doc.html</code>（Knife4j 接口文档）</p>
+</section>
+
+<!-- ============ 步骤 2 ============ -->
+<section class="unit" id="step-2">
+<h2>🪜 步骤 2 · 启动后端（命令行方式）</h2>
+
+<pre><code class="language-bash">cd diancan-admin
+mvn spring-boot:run</code></pre>
+
+<p>打开浏览器：<code class="inline">http://localhost:8080/api/doc.html</code>（Knife4j 接口文档）</p>
+</section>
+
+<!-- ============ 步骤 3 ============ -->
+<section class="unit" id="step-3">
+<h2>🪜 步骤 3 · 启动管理端 + 小程序</h2>
+
+<pre><code class="language-bash"># 另开终端
+cd diancan-admin-web
+pnpm install
+pnpm dev
+# → http://localhost:9527
+# → 登录：admin / 123456</code></pre>
+
+<p>小程序用微信开发者工具导入 <code class="inline">diancan-miniapp/</code>。</p>
+
+<p>启动后端后，到 Swagger UI 调一下 <code class="inline">/api/admin/dish/list</code>，看到返回数据说明三端链路通了。</p>
+</section>
+
+<!-- ============ 常用命令 ============ -->
+<section class="unit" id="commands">
+<h2>🔧 常用 Docker 命令（最小集合）</h2>
+
+<pre><code class="language-bash"># 查看运行中的容器
+docker ps
+
+# 查看所有容器（包括已停止）
+docker ps -a
+
+# 查看某个容器日志
+docker logs -f diancan-mysql       # Ctrl+C 退出
+bash scripts/docker-logs.sh mysql  # 等价命令
+
+# 进入容器内部
+docker exec -it diancan-mysql bash
+docker exec -it diancan-mysql mysql -uroot -p123456    # 直接进 MySQL CLI
+
+# 停止 / 启动容器
+docker stop diancan-mysql
+docker start diancan-mysql
+
+# 重启某个服务
+docker compose restart mysql
+
+# 查看资源占用
+docker stats
+
+# 清理无用镜像（慎用）
+docker system prune</code></pre>
+
+<div class="note">
+<strong>💡 完整 Docker 命令手册</strong>
+看主教程的 <a href="diancan-system-tutorial.html#U11">U11 · Docker 命令详解</a>，覆盖了 7 大类命令。
+</div>
+</section>
+
+<!-- ============ 故障排查 ============ -->
+<section class="unit" id="troubleshoot">
+<h2>🔍 故障排查（9 个常见问题）</h2>
+
+<h3 id="t-1">1. <code class="inline">docker compose</code> 命令找不到</h3>
+<p><b>原因</b>：Docker Desktop 没装 compose v2，或 docker-compose-plugin 没装。</p>
+<p><b>解决</b>：</p>
+<ul>
+  <li>Docker Desktop 用户：升级到最新版本</li>
+  <li>docker-ce 用户：<code class="inline">sudo apt install docker-compose-plugin</code></li>
+</ul>
+
+<h3 id="t-2">2. 端口被占用</h3>
+<pre><code class="language-bash"># 看谁占了 3306
+sudo lsof -i :3306
+# 或
+sudo ss -tlnp | grep 3306</code></pre>
+<p><b>解决</b>：停掉旧 MySQL 服务或修改 <code class="inline">.env</code> 里 <code class="inline">MYSQL_PORT=3307</code>。</p>
+
+<h3 id="t-3">3. MySQL 容器一直 restarting</h3>
+<pre><code class="language-bash">docker logs diancan-mysql | tail -50</code></pre>
+<p>常见原因：</p>
+<ul>
+  <li>数据卷冲突：先 <code class="inline">bash scripts/docker-reset.sh</code> 清掉</li>
+  <li>内存不够：MySQL 至少需要 512MB，WSL2 默认 4GB 内存通常够</li>
+</ul>
+
+<h3 id="t-4">4. RocketMQ broker 起不来</h3>
+<pre><code class="language-bash">docker logs diancan-rocketmq-broker | tail -30</code></pre>
+<p>常见原因：</p>
+<ul>
+  <li>namesrv 没就绪就启动了 broker：等待 30 秒自动恢复</li>
+  <li>broker.conf 配置错：检查 <code class="inline">scripts/rocketmq/broker.conf</code> 路径</li>
+</ul>
+
+<h3 id="t-5">5. SQL 没自动导入</h3>
+<p><b>原因</b>：数据卷已存在但 SQL 没跑过（MySQL 只在 volume 首次创建时跑 init 脚本）。</p>
+<p><b>解决</b>：</p>
+<pre><code class="language-bash">bash scripts/docker-reset.sh   # 删掉数据卷
+bash scripts/docker-up.sh       # 重新跑</code></pre>
+
+<h3 id="t-6">6. 镜像拉取 429 Too Many Requests</h3>
+<div class="pitfall">
+<strong>症状</strong>
+<pre><code>Error response from daemon: unknown: failed to resolve reference "..."
+unexpected status from GET request to ... 429 Too Many Requests</code></pre>
+</div>
+<p><b>原因</b>：Docker 配置的镜像加速器对特定 tag 触发限流（常见于第三方镜像代理）。</p>
+<p><b>解决</b>：</p>
+<ol>
+  <li><b>重试一次</b>——429 通常是临时限流，等 30 秒再跑
+    <pre><code class="language-bash">bash scripts/docker-up.sh</code></pre>
+  </li>
+  <li><b>检查镜像加速器配置</b>——<code class="inline">docker info | grep -A 5 "Registry Mirrors"</code></li>
+  <li><b>改用官方 Docker Hub</b>——临时禁用加速器：
+    <pre><code class="language-bash"># 编辑 /etc/docker/daemon.json（需要 sudo）
+sudo nano /etc/docker/daemon.json
+# 把 registry-mirrors 改成空数组 []，然后 sudo systemctl restart docker</code></pre>
+  </li>
+  <li><b>本项目已规避</b>——<code class="inline">minio/mc</code> 是第三方工具已被移除，bucket 由后端自动创建</li>
+</ol>
+
+<h3 id="t-7">7. 后端连不上中间件</h3>
+<p><b>症状</b>：Spring Boot 启动报 <code class="inline">Unknown database 'diancan-system'</code>，但 <code class="inline">docker exec diancan-mysql mysql</code> 看库是存在的。</p>
+<p><b>根因</b>：本机（WSL2 / Windows）有另一个 MySQL 占用了 3306 端口，Docker Desktop 把容器端口 publish 到 3306 失败。你的应用连到的不是 docker 里的 MySQL，而是本机的"野 MySQL"。</p>
+<p><b>解决</b>：</p>
+<ol>
+  <li>改 <code class="inline">.env</code> 把 MYSQL_PORT 改成空闲端口（3307 / 3308 / 13306 等）</li>
+  <li>跑 <code class="inline">docker compose up -d mysql</code> 让容器用新端口</li>
+  <li>用 <code class="inline">bash scripts/start-backend.sh</code> 启动后端</li>
+</ol>
+<div class="note">
+<strong>📌 原理图</strong>
+<pre>[WSL2 Ubuntu] 应用 localhost:3307  → Docker Desktop NAT  → [容器 mysql 3306]  ✅
+[WSL2 Ubuntu] 应用 localhost:3306  → Windows 主机 MySQL 8.0.40（不是你 docker 那个） ❌</pre>
+</div>
+
+<h3 id="t-8">8. Windows 主机有 MySQL / Redis 占用了端口</h3>
+<p><b>检查清单</b>：</p>
+<ul style="list-style: none; padding-left: 0;">
+  <li>☐ 容器都 running：<code class="inline">docker ps</code></li>
+  <li>☐ 后端 <code class="inline">application-dev.yml</code> 用的是 <code class="inline">localhost:3307</code>（容器和宿主机共享 localhost）</li>
+  <li>☐ MySQL 密码是 <code class="inline">123456</code>（和 <code class="inline">.env</code> 里一致）</li>
+</ul>
+
+<h3 id="t-9">9. RocketMQ broker 启动崩溃（5.x 版本 bug）</h3>
+<div class="pitfall">
+<strong>症状</strong>：<code class="inline">diancan-rocketmq-broker</code> 一直 <code class="inline">Restarting (255)</code>，日志里有 <code class="inline">java.lang.NullPointerException at ScheduleMessageService.configFilePath</code>。
+</div>
+<p><b>根因</b>：RocketMQ 5.x 在 <code class="inline">apache/rocketmq:5.x</code> 镜像启动时 <code class="inline">ScheduleMessageService.configFilePath</code> 触发 NPE。</p>
+<p><b>解决</b>：用 4.9.7，并在 <code class="inline">docker-compose.yml</code> 用绝对路径启动：</p>
+<pre><code class="language-yaml">rocketmq-broker:
+  image: apache/rocketmq:4.9.7
+  command: >
+    /home/rocketmq/rocketmq-4.9.7/bin/mqbroker
+      -n rocketmq-namesrv:9876
+  volumes:
+    - ./scripts/rocketmq/broker.conf:/home/rocketmq/rocketmq-4.9.7/conf/broker.conf:ro</code></pre>
+<p>注意：4.9.7 镜像的 mqbroker 不在 PATH，必须用绝对路径。</p>
+</section>
+
+<!-- ============ 文件位置 + 学习路径 ============ -->
+<section class="unit" id="files">
+<h2>📂 文件位置</h2>
+<table>
+<tr><th>文件</th><th>说明</th></tr>
+<tr><td><code class="inline">docker-compose.yml</code></td><td>中间件编排（A 方案：仅中间件）</td></tr>
+<tr><td><code class="inline">.env.docker.example</code></td><td>环境变量模板（复制为 <code class="inline">.env</code> 后修改）</td></tr>
+<tr><td><code class="inline">.docker/initdb/01-init.sql</code></td><td>自动生成，库名已修正</td></tr>
+<tr><td><code class="inline">scripts/docker-up.sh</code></td><td>一键启动</td></tr>
+<tr><td><code class="inline">scripts/docker-down.sh</code></td><td>停止（保留数据）</td></tr>
+<tr><td><code class="inline">scripts/docker-reset.sh</code></td><td>重置（删数据）</td></tr>
+<tr><td><code class="inline">scripts/docker-logs.sh</code></td><td>日志查看</td></tr>
+<tr><td><code class="inline">scripts/start-backend.sh</code></td><td>后端启动（带环境变量）</td></tr>
+<tr><td><code class="inline">scripts/rocketmq/broker.conf</code></td><td>RocketMQ broker 配置</td></tr>
+</table>
+</section>
+
+<section class="unit" id="path">
+<h2>🎯 学习路径建议</h2>
+<p>配合主教程 <a href="diancan-system-tutorial.html">diancan-system-tutorial.html</a>：</p>
+<ol>
+  <li>✅ <b>已完成</b> U2 后端骨架的环境准备</li>
+  <li>→ <b>继续</b> U3 管理端启动</li>
+  <li>→ <b>继续</b> U5 订单状态机调试（用 Swagger 调真实接口）</li>
+</ol>
+</section>
+
+</main>
+
+<footer>
+<div class="container">
+<p>🐳 Docker 一键启动指南 · WSL2 / Ubuntu</p>
+<p>配套学习：<a href="diancan-system-tutorial.html" style="color: white;">主教程</a> · <a href="code-exercises.html" style="color: white;">代码练习册</a></p>
+<p>部署于 GitHub Pages · 仓库 MIT</p>
+</div>
+</footer>
+
+</body>
+</html>
