@@ -52,6 +52,32 @@
     font-size: 0.88em;
   }
   nav.toc a:hover { background: var(--primary); color: white; }
+  nav.toc a.back-home {
+    background: linear-gradient(135deg, #f6ad55 0%, #ed8936 100%);
+    color: white !important;
+    font-weight: 600;
+    border: none;
+  }
+  nav.toc a.back-home:hover {
+    background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(237, 137, 54, 0.4);
+  }
+  footer a.back-home {
+    display: inline-block;
+    padding: 8px 20px;
+    background: linear-gradient(135deg, #f6ad55 0%, #ed8936 100%);
+    color: white !important;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: 600;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  footer a.back-home:hover {
+    background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(237, 137, 54, 0.4);
+  }
   main { padding: 40px 24px; }
   section.unit {
     background: white; border-radius: 12px; margin-bottom: 32px;
@@ -129,6 +155,7 @@
 
 <nav class="toc">
   <div class="container">
+    <a href="../" class="back-home">🏠 学习中心</a>
     <a href="#step-0">步骤 0 · 装 Docker</a>
     <a href="#step-1">步骤 1 · 启动中间件</a>
     <a href="#step-15">步骤 1.5 · 启动后端</a>
@@ -476,6 +503,7 @@ sudo nano /etc/docker/daemon.json
 
 <footer>
 <div class="container">
+<p><a href="../" class="back-home">🏠 返回学习中心</a></p>
 <p>🐳 Docker 一键启动指南 · WSL2 / Ubuntu</p>
 <p>配套学习：<a href="diancan-system-tutorial.html" style="color: white;">主教程</a> · <a href="code-exercises.html" style="color: white;">代码练习册</a></p>
 <p>部署于 GitHub Pages · 仓库 MIT</p>
