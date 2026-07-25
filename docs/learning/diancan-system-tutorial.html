@@ -313,6 +313,7 @@
     <a href="#U9">U9 增量+简历</a>
     <a href="#U10">U10 中间件</a>
     <a href="#U11">U11 Docker</a>
+    <a href="#U12">U12 GitHub Pages</a>
     <a href="#appendix">附录</a>
     <a href="code-exercises.html" target="_blank">📝 代码练习册</a>
   </div>
@@ -2859,12 +2860,298 @@ flushDiskType = ASYNC_FLUSH           # 异步刷盘（学习够用）
 
 </section>
 
+<!-- ==================== U12 ==================== -->
+<section class="unit" id="U12">
+<h2>🌐 U12 · GitHub Pages 部署教程</h2>
+
+<div class="why">
+<strong>为什么要学这个？</strong>
+你的项目已经在本地跑通、教材已经写好——下一步是 <b>让 HR / 朋友能在浏览器里访问</b>。GitHub Pages 是免费部署静态站点的最简单方案。这一章从原理到实战，让你 10 分钟上线一个项目。
+</div>
+
+<div class="analogy">
+<strong>🏠 类比：你的 GitHub 账号是一栋大楼</strong>
+<ul>
+  <li><b>User Pages</b> = 大楼大厅（一个账号只能有一个，URL 固定 <code class="inline">/&lt;user&gt;.github.io/</code>）</li>
+  <li><b>Project Pages</b> = 大楼里的独立房间（每个启用了 Pages 的仓库一个，URL <code class="inline">/&lt;repo&gt;/</code>）</li>
+  <li><b>自定义域名</b> = 给房间挂个独立门牌号（如 <code class="inline">blog.example.com</code>）</li>
+</ul>
+每个房间独立布置，<b>互不干扰</b>。你在 DIANCAN-SYSTEM 仓库部署的 Pages 不会动你的个人博客。
+</div>
+
+<h3>📚 12-A · 三种 Pages 类型详解</h3>
+
+<table>
+<tr><th>类型</th><th>URL 模式</th><th>仓库命名</th><th>数量限制</th><th>典型用途</th></tr>
+<tr>
+  <td><b>User Pages</b></td>
+  <td><code class="inline">&lt;user&gt;.github.io/</code></td>
+  <td>必须叫 <code class="inline">&lt;user&gt;.github.io</code></td>
+  <td>每账号 1 个</td>
+  <td>个人主页 / 博客</td>
+</tr>
+<tr>
+  <td><b>Project Pages</b></td>
+  <td><code class="inline">&lt;user&gt;.github.io/&lt;repo&gt;/</code></td>
+  <td>任意名字</td>
+  <td>每账号 N 个</td>
+  <td>项目展示 / 教程 / 简历</td>
+</tr>
+<tr>
+  <td><b>Custom Domain</b></td>
+  <td><code class="inline">yourdomain.com</code></td>
+  <td>User 或 Project 都行</td>
+  <td>每个 Pages 一个</td>
+  <td>品牌域名</td>
+</tr>
+</table>
+
+<div class="pitfall">
+<strong>⚠️ User Pages 命名陷阱</strong>：仓库名 <b>必须严格</b> 叫 <code class="inline">&lt;username&gt;.github.io</code>（小写、无空格、无后缀）。改名会导致原 <code class="inline">/&lt;user&gt;.github.io/</code> 链接全部 404。
+</div>
+
+<h3>🔧 12-B · 实战：本项目部署案例（按你刚才做的）</h3>
+
+<h4>Step 1 · 推送代码到 GitHub</h4>
+<pre><code class="language-bash"># 1.1 配置 git 用户（首次需要）
+git config --global user.name "meisijiya"
+git config --global user.email "2292360909@qq.com"
+
+# 1.2 设置远程仓库
+git remote remove origin   # 删旧的
+git remote add origin https://github.com/meisijiya/DIANCAN-SYSTEM.git
+git remote -v               # 确认
+
+# 1.3 首次推送
+git push -u origin master
+# 提示认证时，登录 GitHub → Settings → Developer settings → Personal access tokens
+# 或用 gh CLI（推荐）：
+gh auth login --git-protocol https</code></pre>
+
+<h4>Step 2 · 准备部署文件</h4>
+<pre><code class="language-bash"># GitHub Pages 默认从仓库根或 /docs 部署
+# 你的项目结构：
+diancan-system/
+└── docs/
+    ├── index.html                       # 🏠 入口导航页（刚创建的）
+    └── learning/
+        ├── diancan-system-tutorial.html  # 📘 主教程
+        ├── code-exercises.html           # ✍️ 练习册
+        └── docker-guide.md               # 🐳 Docker 指南
+
+# 入口页核心结构（docs/index.html）
+&lt;!-- 一段 HTML + CSS 跳转卡片就行 --&gt;
+&lt;a href="learning/diancan-system-tutorial.html"&gt;主教程&lt;/a&gt;
+&lt;a href="learning/code-exercises.html"&gt;练习册&lt;/a&gt;</code></pre>
+
+<h4>Step 3 · 启用 GitHub Pages（两种方式）</h4>
+
+<h5>方式 A：GitHub 网页设置（推荐新手）</h5>
+<pre><code class="language-bash">1. 打开 https://github.com/meisijiya/DIANCAN-SYSTEM/settings/pages
+2. Source 选 "Deploy from a branch"
+3. Branch 选 "master" / Branch 选 "/docs"
+4. Save
+5. 等 30-60 秒，刷新页面会显示 "Your site is live at https://..."
+</code></pre>
+
+<h5>方式 B：gh CLI 一键启用</h5>
+<pre><code class="language-bash"># 安装 gh CLI（如果没装）
+sudo apt install gh   # Ubuntu/Debian
+
+# 登录
+gh auth login
+# 选 GitHub.com → HTTPS → Login with a web browser → 复制验证码 → 浏览器授权
+
+# 启用 Pages（从 master 分支 /docs 部署）
+gh api -X POST repos/meisijiya/DIANCAN-SYSTEM/pages \
+  -f source[branch]=master \
+  -f source[path]=/docs \
+  -f build_type=legacy
+
+# 看 Pages 状态
+gh api repos/meisijiya/DIANCAN-SYSTEM/pages | jq '{status, build_type, source}'
+# 预期输出：
+# { "status": "built", "build_type": "legacy", "source": { "branch": "master", "path": "/docs" } }</code></pre>
+
+<h4>Step 4 · 验证部署</h4>
+<pre><code class="language-bash"># 等 30-60 秒后访问
+curl -sIL https://meisijiya.github.io/DIANCAN-SYSTEM/
+# 期望：HTTP/2 200 + 跟随重定向看到入口页内容
+
+# 验证所有教程 URL
+for path in "/" \
+            "/learning/diancan-system-tutorial.html" \
+            "/learning/code-exercises.html" \
+            "/learning/docker-guide.md"; do
+  status=$(curl -sIL -o /dev/null -w "%{http_code}" \
+    "https://meisijiya.github.io/DIANCAN-SYSTEM${path}")
+  echo "$path → $status"
+done</code></pre>
+
+<h3>📜 12-C · 一键部署脚本（团队复用）</h3>
+<pre><code class="language-bash">#!/usr/bin/env bash
+# scripts/deploy-pages.sh — 一键部署 docs/ 到 GitHub Pages
+# 用法：bash scripts/deploy-pages.sh
+set -euo pipefail
+
+# ---------- 配置 ----------
+GITHUB_USER="${GITHUB_USER:-meisijiya}"      # 改成你的用户名
+REPO_NAME="${REPO_NAME:-DIANCAN-SYSTEM}"
+SOURCE_BRANCH="${SOURCE_BRANCH:-master}"
+SOURCE_PATH="${SOURCE_PATH:-/docs}"
+
+# ---------- 1. 前置检查 ----------
+command -v gh &gt;/dev/null || { echo "❌ 缺 gh CLI：apt install gh"; exit 1; }
+gh auth status &amp;&gt;/dev/null || { echo "❌ 未登录：gh auth login"; exit 1; }
+
+# ---------- 2. 检查 docs/index.html 存在 ----------
+[ -f docs/index.html ] || { echo "❌ docs/index.html 不存在"; exit 1; }
+
+# ---------- 3. 启用 Pages ----------
+echo "🚀 启用 GitHub Pages..."
+gh api -X POST "repos/${GITHUB_USER}/${REPO_NAME}/pages" \
+  -f "source[branch]=${SOURCE_BRANCH}" \
+  -f "source[path]=${SOURCE_PATH}" \
+  -f "build_type=legacy" 2&gt;/dev/null || \
+gh api -X PUT "repos/${GITHUB_USER}/${REPO_NAME}/pages" \
+  -f "source[branch]=${SOURCE_BRANCH}" \
+  -f "source[path]=${SOURCE_PATH}" \
+  -f "build_type=legacy"
+
+# ---------- 4. 触发部署（push 触发） ----------
+echo "📤 触发部署..."
+git add docs/ &amp;&amp; git commit -m "docs: 触发 GitHub Pages 部署" || true
+git push origin "${SOURCE_BRANCH}"
+
+# ---------- 5. 等部署完成 ----------
+echo "⏳ 等 60 秒部署..."
+sleep 60
+
+# ---------- 6. 验证 ----------
+PAGES_URL="https://${GITHUB_USER}.github.io/${REPO_NAME}/"
+STATUS=$(curl -sIL -o /dev/null -w "%{http_code}" "${PAGES_URL}")
+echo "✅ ${PAGES_URL} → ${STATUS}"</code></pre>
+
+<h3>🔀 12-D · 自定义域名（可选）</h3>
+<pre><code class="language-bash"># 1. 域名 DNS 添加 CNAME 记录
+#    meisijiya.dev → meisijiya.github.io
+#    www.meisijiya.dev → meisijiya.github.io
+
+# 2. 仓库根目录创建 CNAME 文件
+echo "diancan.meisijiya.dev" &gt; docs/CNAME
+git add docs/CNAME &amp;&amp; git commit -m "feat: 添加自定义域名" &amp;&amp; git push
+
+# 3. GitHub Pages 设置 → Custom domain → 填 diancan.meisijiya.dev
+#    勾选 "Enforce HTTPS"（证书自动签发）
+
+# 4. 验证
+curl -sIL https://diancan.meisijiya.dev/</code></pre>
+
+<h3>🤖 12-E · GitHub Actions 自动部署（高级）</h3>
+<pre><code class="language-yaml"># .github/workflows/pages.yml
+name: Deploy to GitHub Pages
+on:
+  push:
+    branches: [master]
+    paths: ['docs/**']
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Build
+        run: |
+          # 你的构建命令（如果有）
+          # 这里不需要——docs/ 已经是静态文件
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/
+
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4</code></pre>
+
+<h3>📊 12-F · GitHub Pages vs Cloudflare Pages 对比</h3>
+<table>
+<tr><th>维度</th><th>GitHub Pages</th><th>Cloudflare Pages</th></tr>
+<tr><td><b>配置时间</b></td><td>5 分钟</td><td>5 分钟（需账号）</td></tr>
+<tr><td><b>URL</b></td><td><code class="inline">&lt;user&gt;.github.io/&lt;repo&gt;/</code></td><td><code class="inline">&lt;project&gt;.pages.dev</code></td></tr>
+<tr><td><b>构建</b></td><td>自动（push 触发）</td><td>自动（Git 集成）</td></tr>
+<tr><td><b>CDN</b></td><td>GitHub CDN</td><td>Cloudflare 全球 CDN（节点更多）</td></tr>
+<tr><td><b>HTTPS</b></td><td>自动</td><td>自动</td></tr>
+<tr><td><b>自定义域名</b></td><td>支持</td><td>支持</td></tr>
+<tr><td><b>国内访问</b></td><td>偶尔抽风</td><td>略好</td></tr>
+<tr><td><b>免费额度</b></td><td>公开无限 / 私有需 Pro</td><td>无限</td></tr>
+<tr><td><b>构建时间限制</b></td><td>10 分钟</td><td>20 分钟</td></tr>
+<tr><td><b>集成生态</b></td><td>GitHub 完整生态</td><td>Cloudflare Workers / KV</td></tr>
+</table>
+
+<div class="summary">
+<strong>选哪个？</strong>
+<ul>
+  <li><b>简单项目 / 个人展示</b> → GitHub Pages（你已经在用）</li>
+  <li><b>国内访问为主 / 想用 Cloudflare Workers</b> → Cloudflare Pages</li>
+  <li><b>已有 Cloudflare 域名管理</b> → Cloudflare Pages（统一管理）</li>
+</ul>
+</div>
+
+<h3>🛠️ 12-G · 排错清单</h3>
+<table>
+<tr><th>症状</th><th>原因</th><th>解决</th></tr>
+<tr><td>404 Not Found</td><td>分支或路径配错</td><td>Settings → Pages → 检查 Branch + Path</td></tr>
+<tr><td>页面无样式</td><td>CSS 用绝对路径</td><td>CSS 用相对路径或 base href</td></tr>
+<tr><td>中文乱码</td><td>HTML 没声明编码</td><td><code class="inline">&lt;meta charset="UTF-8"&gt;</code></td></tr>
+<tr><td>静态资源 404</td><td>用了 <code class="inline">file://</code> 协议</td><td>相对路径或完整 URL</td></tr>
+<tr><td>访问慢</td><td>CDN 缓存</td><td>等几分钟 / 强制刷新 Ctrl+Shift+R</td></tr>
+<tr><td>"There was an error"</td><td>workflow 文件语法错</td><td>看 Actions 标签的报错</td></tr>
+<tr><td>明明 push 了但没更新</td><td>Pages 缓存</td><td>Settings → Pages → 重新 Save</td></tr>
+</table>
+
+<h3>🧪 自我检测</h3>
+<div class="quiz">
+<span class="quiz-type">A 概念辨析</span>
+<span class="quiz-q">你的 GitHub 账号叫 <code class="inline">alice</code>，仓库叫 <code class="inline">blog</code>。Pages 部署成功后 URL 是什么？</span>
+<ul class="quiz-options">
+<li class="wrong">A. <code class="inline">https://alice.github.io/</code></li>
+<li class="correct">B. <code class="inline">https://alice.github.io/blog/</code></li>
+<li class="wrong">C. <code class="inline">https://blog.alice.github.io/</code></li>
+<li class="wrong">D. <code class="inline">https://github.com/alice/blog</code></li>
+</ul>
+<div class="quiz-answer">💡 Project Pages 的 URL = <code class="inline">https://&lt;user&gt;.github.io/&lt;repo&gt;/</code>。A 是 User Pages，C 是错的域名格式，D 是 GitHub 仓库不是 Pages URL。</div>
+</div>
+
+<div class="quiz">
+<span class="quiz-type">B 应用迁移</span>
+<span class="quiz-q">你想给项目部署自定义域名 <code class="inline">diancan.example.com</code>，需要做哪两件事？</span>
+<div class="quiz-answer">💡 (1) 域名 DNS 添加 CNAME 指向 <code class="inline">&lt;user&gt;.github.io</code>；(2) 仓库 <code class="inline">docs/CNAME</code> 写上 <code class="inline">diancan.example.com</code>，GitHub Pages 设置里勾选 Enforce HTTPS。</div>
+</div>
+
+<div class="summary">
+<strong>📌 本章小结</strong>
+<ul>
+  <li><b>3 种 Pages</b>：User（个人）/ Project（项目）/ Custom Domain</li>
+  <li><b>2 种启用方式</b>：GitHub 网页设置 / <code class="inline">gh CLI</code></li>
+  <li><b>本项目实战</b>：<code class="inline">docs/</code> 目录 + master 分支 = 自动部署到 <code class="inline">meisijiya.github.io/DIANCAN-SYSTEM/</code></li>
+  <li><b>常用 URL</b>：教程 / 练习册 / Docker 指南全部 200 OK</li>
+  <li><b>个人博客</b>：User Pages 是独立仓库，<b>互不干扰</b></li>
+</ul>
+</div>
+
+</section>
+
 </main>
 
 <footer>
 <div class="container">
 <p>📘 点餐系统从入门到全栈 · <b>teacher-skill 渲染产物</b></p>
-<p>data-level: weak | 9 单元 + U10 中间件 + U11 Docker | 适合编程能力弱的同学</p>
+<p>data-level: weak | 11 单元 + U12 GitHub Pages | 适合编程能力弱的同学</p>
 <p>浏览器 → 打印 → 保存为 PDF，可导出离线版</p>
 </div>
 </footer>
