@@ -4,82 +4,134 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>点餐系统从入门到全栈 · 9 单元完全学习手册</title>
-<style>  /* === Solarized Light 暖米色 === */
+<meta name="description" content="12 单元 3180 行手把手教程 · Spring Boot 3.2 + Vue 3 + 微信小程序 · 含 Swagger 实战">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect width=%22100%22 height=%22100%22 rx=%2218%22 fill=%22%23fdf6e3%22/%3E%3Ctext x=%2250%22 y=%2272%22 text-anchor=%22middle%22 font-size=%2270%22 font-family=%22serif%22 fill=%22%23cb4b16%22%3E%E2%9C%93%3C/text%3E%3C/svg%3E">
+<style>  /* ============================================
+     Solarized Light 暖米色 + 教学教材增强版
+     ============================================ */
+  :root {
+    --bg: #fdf6e3;          /* Solarized base3 */
+    --bg-soft: #eee8d5;     /* Solarized base2 */
+    --bg-deep: #e0d8b8;     /* deeper 米色 */
+    --text: #586e75;        /* Solarized base01 */
+    --text-light: #93a1a1;  /* Solarized base1 */
+    --text-strong: #073642; /* Solarized base02 */
+    --accent: #268bd2;      /* Solarized blue */
+    --accent-warm: #cb4b16; /* Solarized orange */
+    --code-bg: #002b36;     /* Solarized base03 */
+    --code-text: #93a1a1;   /* Solarized base1 */
+    --success: #859900;     /* Solarized green */
+    --danger: #dc322f;      /* Solarized red */
+    --border: #eee8d5;
+    --border-deep: #e0d8b8;
+    --max-w: 820px;
+    --side-w: 220px;
+    --header-h: 60px;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
   body {
     font-family: "Source Han Serif SC", "Noto Serif CJK SC", "Songti SC",
                  "STSong", "SimSun", Charter, "Source Serif Pro",
                  Georgia, "Times New Roman", serif;
     line-height: 1.85;
-    color: #586e75;
-    background: #fdf6e3;
+    color: var(--text);
+    background: var(--bg);
     margin: 0; padding: 0;
     font-size: 17px;
+    text-wrap: pretty;
   }
   code, pre {
     font-family: "SF Mono", "JetBrains Mono", Consolas, Monaco, monospace;
     font-size: 0.88em;
+    font-variant-numeric: tabular-nums;
   }
-  /* === 顶部 hero（无渐变，暖米色） === */
+  /* === 阅读进度条（顶部 2px） === */
+  #progress-bar {
+    position: fixed; top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--accent-warm);
+    transform-origin: 0% 50%;
+    transform: scaleX(0);
+    z-index: 1000;
+    transition: transform 0.1s linear;
+    pointer-events: none;
+  }
+  /* === 顶部 hero === */
   header.hero, header.masthead {
-    background: #fdf6e3;
-    padding: 60px 0 40px;
-    border-bottom: 1px solid #eee8d5;
-    color: #586e75;
+    background: var(--bg);
+    padding: 64px 0 44px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+    text-wrap: balance;
   }
   header.hero h1, header.masthead h1 {
-    font-size: 2.4em;
+    font-size: 2.6em;
     font-weight: 700;
-    margin: 0 0 12px;
-    color: #073642;
+    margin: 0 0 14px;
+    color: var(--text-strong);
+    letter-spacing: -0.01em;
   }
   header.hero p, header.masthead p {
     font-size: 1.1em;
-    color: #586e75;
+    color: var(--text);
     font-style: italic;
     margin: 4px 0;
   }
   header.hero .kicker, header.masthead .kicker {
     font-size: 13px;
-    color: #93a1a1;
+    color: var(--text-light);
     letter-spacing: 1.5px;
     text-transform: uppercase;
     margin-bottom: 16px;
+    font-style: normal;
+    font-weight: 600;
   }
   /* === 容器 === */
   .container {
-    max-width: 760px;
+    max-width: var(--max-w);
     margin: 0 auto;
     padding: 0 32px;
   }
   /* === 章节 === */
   section.unit {
-    background: transparent;
-    margin: 48px 0;
+    margin: 56px 0;
     padding: 0;
     border: none;
-    box-shadow: none;
+    background: transparent;
+    scroll-margin-top: calc(var(--header-h) + 20px);
   }
   section.unit h2 {
-    font-size: 1.7em;
+    font-size: 1.85em;
     font-weight: 700;
-    margin: 56px 0 20px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid #eee8d5;
-    color: #073642;
+    margin: 0 0 24px;
+    padding: 0 0 12px;
+    border-bottom: 2px solid var(--text-strong);
+    color: var(--text-strong);
+    letter-spacing: -0.005em;
+    text-wrap: balance;
+  }
+  section.unit h2::before {
+    content: "§";
+    color: var(--accent-warm);
+    margin-right: 12px;
+    font-weight: 700;
+    opacity: 0.7;
   }
   section.unit h3 {
-    font-size: 1.3em;
+    font-size: 1.45em;
     font-weight: 700;
-    margin: 36px 0 14px;
-    padding-left: 0;
-    border-left: none;
-    color: #073642;
+    margin: 40px 0 16px;
+    padding: 0;
+    color: var(--text-strong);
+    letter-spacing: -0.003em;
+    text-wrap: balance;
   }
   section.unit h4 {
-    font-size: 1em;
+    font-size: 1.05em;
     font-weight: 700;
-    margin: 24px 0 8px;
-    color: #073642;
+    margin: 28px 0 10px;
+    color: var(--text-strong);
     text-transform: none;
     letter-spacing: 0;
   }
@@ -87,53 +139,89 @@
   .why, .analogy, .summary, .note {
     padding: 16px 20px;
     margin: 24px 0;
-    background: #eee8d5;
-    border-left: 1px solid #93a1a1;
+    background: var(--bg-soft);
+    border-left: 1px solid var(--text-light);
     border-radius: 0;
-    color: #586e75;
+    color: var(--text);
+    transition: background 0.2s ease, border-color 0.2s ease;
+  }
+  .why:hover, .analogy:hover, .summary:hover, .note:hover {
+    background: var(--bg-deep);
   }
   .why strong, .analogy strong, .summary strong, .note strong {
     display: block;
     margin-bottom: 6px;
-    color: #073642;
+    color: var(--text-strong);
     font-weight: 700;
   }
   .pitfall {
     padding: 16px 20px;
     margin: 24px 0;
     background: #fdf0e8;
-    border-left: 1px solid #cb4b16;
+    border-left: 3px solid var(--accent-warm);
     border-radius: 0;
-    color: #586e75;
+    color: var(--text);
+    transition: background 0.2s ease;
   }
+  .pitfall:hover { background: #fae6d6; }
   .pitfall strong {
     display: block;
     margin-bottom: 6px;
-    color: #cb4b16;
+    color: var(--accent-warm);
     font-weight: 700;
   }
-  /* === 代码块：Solarized Dark（与背景呼应） === */
+  /* === 代码块 === */
   pre {
-    background: #002b36;
-    color: #93a1a1;
+    background: var(--code-bg);
+    color: var(--code-text);
     padding: 18px 22px;
     border-radius: 0;
-    border-left: 3px solid #cb4b16;
+    border-left: 3px solid var(--accent-warm);
     overflow-x: auto;
     line-height: 1.65;
     margin: 24px 0;
+    position: relative;
   }
-  pre code {
-    font-family: "SF Mono", "JetBrains Mono", Consolas, Monaco, monospace;
+  pre code { font-family: inherit; }
+  /* 代码复制按钮 */
+  .copy-btn {
+    position: absolute;
+    top: 8px; right: 8px;
+    background: transparent;
+    color: var(--code-text);
+    border: 1px solid var(--text-light);
+    padding: 4px 10px;
+    font-size: 0.78em;
+    cursor: pointer;
+    font-family: inherit;
+    opacity: 0;
+    transition: opacity 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+  }
+  pre:hover .copy-btn { opacity: 1; }
+  .copy-btn:hover {
+    background: var(--accent-warm);
+    border-color: var(--accent-warm);
+    color: var(--bg);
+  }
+  .copy-btn:focus-visible {
+    outline: 2px solid var(--accent-warm);
+    outline-offset: 2px;
+    opacity: 1;
+  }
+  .copy-btn.copied {
+    background: var(--success);
+    border-color: var(--success);
+    color: var(--bg);
+    opacity: 1;
   }
   code.inline {
-    background: #eee8d5;
+    background: var(--bg-soft);
     padding: 1px 6px;
     border-radius: 0;
     font-size: 0.92em;
-    color: #073642;
+    color: var(--text-strong);
     font-family: "SF Mono", Consolas, Monaco, monospace;
-    border: 1px solid #e0d8b8;
+    border: 1px solid var(--border-deep);
   }
   /* === 表格 === */
   table {
@@ -143,218 +231,393 @@
     background: transparent;
     border: none;
     font-size: 0.95em;
+    font-variant-numeric: tabular-nums;
   }
   th, td {
     padding: 10px 14px;
     text-align: left;
-    border-bottom: 1px solid #eee8d5;
+    border-bottom: 1px solid var(--border);
   }
   th {
     background: transparent;
-    color: #073642;
+    color: var(--text-strong);
     font-weight: 700;
-    border-bottom: 2px solid #073642;
+    border-bottom: 2px solid var(--text-strong);
   }
   tr:last-child td { border-bottom: none; }
-  tr:hover { background: transparent; }
+  tr { transition: background 0.15s ease; }
+  tr:hover { background: var(--bg-soft); }
   /* === 链接 === */
   a {
-    color: #268bd2;
+    color: var(--accent);
     text-decoration: none;
     border-bottom: 1px solid transparent;
+    transition: color 0.15s ease, border-color 0.15s ease;
   }
   a:hover {
-    color: #cb4b16;
+    color: var(--accent-warm);
     text-decoration: underline;
-    border-bottom: 1px solid #cb4b16;
+    border-bottom: 1px solid var(--accent-warm);
+  }
+  a:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 0;
   }
   /* === 步骤框 === */
   .step {
-    background: #fdf6e3;
-    border: 1px solid #eee8d5;
-    border-left: 3px solid #268bd2;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
     border-radius: 0;
     padding: 16px 20px;
     margin: 16px 0;
     position: relative;
-    color: #586e75;
+    color: var(--text);
+    transition: border-color 0.2s ease, background 0.2s ease;
+  }
+  .step:hover {
+    border-left-color: var(--accent-warm);
+    background: var(--bg-soft);
   }
   .step-num {
     position: absolute;
     top: -10px; left: 16px;
-    background: #268bd2;
-    color: #fdf6e3;
+    background: var(--accent);
+    color: var(--bg);
     width: 24px; height: 24px;
     border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
     font-weight: 700; font-size: 0.85em;
+    font-family: "SF Mono", monospace;
   }
   /* === Quiz === */
   .quiz {
-    background: #eee8d5;
-    border: 1px solid #e0d8b8;
-    border-left: 3px solid #268bd2;
+    background: var(--bg-soft);
+    border: 1px solid var(--border-deep);
+    border-left: 3px solid var(--accent);
     border-radius: 0;
     padding: 18px 22px;
     margin: 24px 0;
-    color: #586e75;
+    color: var(--text);
+    transition: border-color 0.2s ease;
   }
-  .quiz-q { font-weight: 700; margin-bottom: 10px; color: #073642; }
+  .quiz:hover { border-left-color: var(--accent-warm); }
+  .quiz-q { font-weight: 700; margin-bottom: 10px; color: var(--text-strong); }
   .quiz-options { list-style: none; padding: 0; margin: 0; }
   .quiz-options li {
     padding: 6px 12px; margin: 4px 0;
-    background: #fdf6e3;
-    border: 1px solid #e0d8b8;
+    background: var(--bg);
+    border: 1px solid var(--border-deep);
     border-radius: 0;
     cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease;
   }
-  .quiz-options li:hover { background: #eee8d5; }
-  .quiz-options li::before { content: "○ "; color: #93a1a1; }
-  .quiz-options li.correct { background: #eee8d5; }
-  .quiz-options li.correct::before { content: "✓ "; color: #859900; font-weight: 700; }
-  .quiz-options li.wrong { background: #fdf0e8; }
-  .quiz-options li.wrong::before { content: "✗ "; color: #cb4b16; font-weight: 700; }
+  .quiz-options li:hover {
+    background: var(--bg-soft);
+    border-color: var(--accent);
+  }
+  .quiz-options li::before { content: "○  "; color: var(--text-light); }
+  .quiz-options li.correct { background: var(--bg-soft); border-color: var(--success); }
+  .quiz-options li.correct::before { content: "✓  "; color: var(--success); font-weight: 700; }
+  .quiz-options li.wrong { background: #fdf0e8; border-color: var(--accent-warm); }
+  .quiz-options li.wrong::before { content: "✗  "; color: var(--accent-warm); font-weight: 700; }
   .quiz-answer {
     margin-top: 12px; padding: 10px 14px;
-    background: #eee8d5;
-    border-left: 1px solid #93a1a1;
+    background: var(--bg-soft);
+    border-left: 1px solid var(--text-light);
     font-size: 0.95em;
-    color: #586e75;
+    color: var(--text);
   }
   .quiz-type {
     display: inline-block;
     background: transparent;
-    color: #93a1a1;
+    color: var(--text-light);
     font-size: 0.75em;
     padding: 1px 8px;
-    border: 1px solid #93a1a1;
+    border: 1px solid var(--text-light);
     margin-right: 8px;
     font-weight: 700;
   }
   /* === 顶部 nav.toc === */
   nav.toc {
-    background: #fdf6e3;
-    border-bottom: 1px solid #eee8d5;
-    padding: 16px 0;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 0;
     position: sticky;
     top: 0;
     z-index: 100;
     box-shadow: none;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
   }
   nav.toc .container {
     display: flex; flex-wrap: wrap; gap: 8px;
+    align-items: center;
   }
   nav.toc a {
-    color: #586e75;
+    color: var(--text);
     padding: 4px 10px;
     border-radius: 0;
     background: transparent;
-    border: 1px solid #e0d8b8;
+    border: 1px solid var(--border-deep);
     font-size: 0.85em;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
   }
   nav.toc a:hover {
-    background: #073642;
-    color: #fdf6e3;
+    background: var(--text-strong);
+    color: var(--bg);
+    border-color: var(--text-strong);
     text-decoration: none;
   }
+  nav.toc a:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
   nav.toc a.back-home {
-    background: #073642;
-    color: #fdf6e3 !important;
+    background: var(--text-strong);
+    color: var(--bg) !important;
     font-weight: 700;
     border: none;
   }
   nav.toc a.back-home:hover {
-    background: #002b36;
-    transform: none;
-    box-shadow: none;
+    background: var(--code-bg);
+    border-color: var(--code-bg);
   }
+  /* === 侧边浮动目录（桌面端） === */
+  aside.toc-side {
+    display: none;
+    position: fixed;
+    top: calc(var(--header-h) + 40px);
+    right: 32px;
+    width: var(--side-w);
+    max-height: calc(100vh - var(--header-h) - 80px);
+    overflow-y: auto;
+    padding: 16px 18px;
+    background: transparent;
+    border-left: 1px solid var(--border);
+    font-size: 0.85em;
+    z-index: 50;
+  }
+  aside.toc-side h4 {
+    font-size: 0.78em;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    margin: 0 0 10px;
+    padding: 0;
+    border: none;
+    font-weight: 700;
+  }
+  aside.toc-side ul {
+    list-style: none; padding: 0; margin: 0;
+  }
+  aside.toc-side li {
+    margin: 4px 0;
+  }
+  aside.toc-side a {
+    display: block;
+    padding: 3px 8px;
+    color: var(--text);
+    border: none;
+    font-size: 0.92em;
+    border-left: 2px solid transparent;
+    transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+    line-height: 1.4;
+  }
+  aside.toc-side a:hover {
+    color: var(--accent-warm);
+    border-left-color: var(--accent-warm);
+    background: var(--bg-soft);
+    text-decoration: none;
+  }
+  aside.toc-side a.active {
+    color: var(--text-strong);
+    border-left-color: var(--accent-warm);
+    font-weight: 700;
+    background: var(--bg-soft);
+  }
+  /* === 回到顶部按钮 === */
+  #back-to-top {
+    position: fixed;
+    bottom: 32px; right: 32px;
+    width: 44px; height: 44px;
+    background: var(--text-strong);
+    color: var(--bg);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.4em;
+    font-family: inherit;
+    display: none;
+    align-items: center; justify-content: center;
+    z-index: 90;
+    transition: background 0.2s ease, transform 0.2s ease;
+    box-shadow: 0 2px 8px rgba(7, 54, 66, 0.15);
+  }
+  #back-to-top:hover {
+    background: var(--accent-warm);
+    transform: translateY(-2px);
+  }
+  #back-to-top:active {
+    transform: translateY(0);
+  }
+  #back-to-top:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+  #back-to-top.visible { display: flex; }
   /* === Footer === */
   footer {
-    background: #fdf6e3;
-    color: #93a1a1;
+    background: var(--bg);
+    color: var(--text-light);
     padding: 32px 0;
-    margin-top: 60px;
+    margin-top: 80px;
     text-align: center;
-    border-top: 1px solid #eee8d5;
+    border-top: 1px solid var(--border);
   }
   footer p {
     margin: 6px 0;
-    opacity: 1;
     font-style: italic;
-    color: #93a1a1;
+    color: var(--text-light);
   }
   footer a {
-    color: #268bd2;
+    color: var(--accent);
   }
   footer a.back-home {
     display: inline-block;
     padding: 8px 20px;
-    background: #073642;
-    color: #fdf6e3 !important;
+    background: var(--text-strong);
+    color: var(--bg) !important;
     text-decoration: none;
     border-radius: 0;
     font-weight: 700;
-    transition: none;
+    transition: background 0.2s ease;
     border: none;
   }
   footer a.back-home:hover {
-    background: #002b36;
-    color: #fdf6e3 !important;
+    background: var(--code-bg);
+    color: var(--bg) !important;
+    text-decoration: none;
     transform: none;
     box-shadow: none;
-    text-decoration: none;
   }
   /* === 文件路径 === */
   .file-path {
     font-family: "SF Mono", "JetBrains Mono", Consolas, Monaco, monospace;
-    background: #eee8d5;
+    background: var(--bg-soft);
     padding: 1px 6px;
     font-size: 0.92em;
-    color: #073642;
-    border: 1px solid #e0d8b8;
+    color: var(--text-strong);
+    border: 1px solid var(--border-deep);
   }
   /* === 资源列表（入口页用） === */
-  .resources {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
+  .resources { list-style: none; padding: 0; margin: 0; }
   .resources li {
     padding: 20px 0;
-    border-bottom: 1px solid #eee8d5;
+    border-bottom: 1px solid var(--border);
+    transition: padding 0.2s ease;
   }
   .resources li:last-child { border-bottom: none; }
+  .resources li:hover {
+    padding-left: 8px;
+  }
   .resources a {
-    color: #073642;
+    color: var(--text-strong);
     text-decoration: none;
     display: block;
     border-bottom: none;
   }
-  .resources a:hover { color: #cb4b16; }
+  .resources a:hover { color: var(--accent-warm); }
   .resources .title {
     font-size: 1.25em;
     font-weight: 600;
     margin-bottom: 4px;
-    color: #073642;
+    color: var(--text-strong);
   }
   .resources .desc {
-    color: #586e75;
+    color: var(--text);
     font-size: 0.95em;
     line-height: 1.6;
   }
   .resources .meta {
-    color: #93a1a1;
+    color: var(--text-light);
     font-size: 0.85em;
     margin-top: 6px;
     font-style: italic;
   }
   /* === 响应式 === */
+  @media (min-width: 1280px) {
+    aside.toc-side { display: block; }
+  }
+  @media (max-width: 1279px) {
+    /* 隐藏侧边目录，保留顶部 nav.toc */
+    aside.toc-side { display: none !important; }
+  }
   @media (max-width: 720px) {
     body { font-size: 16px; }
     .container { padding: 0 20px; }
-    section.unit h2 { font-size: 1.4em; }
+    section.unit h2 { font-size: 1.5em; }
+    section.unit h3 { font-size: 1.25em; }
     header.hero, header.masthead { padding: 40px 0 30px; }
-  }</style>
+    header.hero h1, header.masthead h1 { font-size: 1.95em; }
+    #back-to-top { bottom: 20px; right: 20px; width: 40px; height: 40px; }
+    pre { font-size: 0.82em; padding: 14px 16px; }
+  }
+  /* === 打印样式（教材导出 PDF 友好） === */
+  @media print {
+    body {
+      background: #fff;
+      color: #000;
+      font-size: 12pt;
+      line-height: 1.5;
+    }
+    nav.toc, aside.toc-side, #back-to-top, #progress-bar,
+    .copy-btn, footer a.back-home {
+      display: none !important;
+    }
+    section.unit { page-break-inside: avoid; }
+    section.unit h2 {
+      page-break-before: auto;
+      page-break-after: avoid;
+      border-bottom: 2px solid #000;
+    }
+    section.unit h3 {
+      page-break-after: avoid;
+      color: #000;
+    }
+    pre {
+      background: #f5f5f5 !important;
+      color: #000 !important;
+      border-left: 3px solid #000 !important;
+      page-break-inside: avoid;
+    }
+    pre code, code.inline { color: #000 !important; }
+    a { color: #000; text-decoration: underline; }
+    a[href^="http"]::after {
+      content: " (" attr(href) ")";
+      font-size: 0.85em;
+      color: #555;
+    }
+    .why, .analogy, .summary, .note, .pitfall {
+      background: #f9f9f9 !important;
+      border-left: 1px solid #000 !important;
+      page-break-inside: avoid;
+    }
+    header.hero, header.masthead {
+      padding: 20px 0;
+      border-bottom: 1px solid #000;
+    }
+  }
+  /* === 可访问性：减少动效 === */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+</style>
 </head>
 <body>
 
@@ -401,7 +664,7 @@
 
 <!-- ==================== U1 ==================== -->
 <section class="unit" id="U1">
-<h2></h2>
+<h2>📐 U1 · 项目全局与跨端契约</h2>
 
 <div class="why">
 <strong>为什么要学这个？</strong>
@@ -419,7 +682,7 @@
 三部门通过"单据"沟通：顾客递给服务员一个<b>订单</b>，服务员递给厨房一个<b>出餐单</b>，厨房回执递回给服务员。这套"单据流转"就是后端 API。
 </div>
 
-<h3></h3>
+<h3>📚 核心概念</h3>
 <ul class="concept-list">
   <li><b>三端单体仓库</b>：一个 Git 仓库里三个独立子项目（diancan-admin / diancan-admin-web / diancan-miniapp）。</li>
   <li><b>统一上下文路径 /api</b>：后端所有接口都以 <code class="inline">/api</code> 开头，例如 <code class="inline">/api/admin/dish/list</code>。</li>
@@ -427,7 +690,7 @@
   <li><b>中间件四件套</b>：MySQL（事实库）、Redis（会话+缓存）、RocketMQ（可靠消息）、MinIO（文件存储）。</li>
 </ul>
 
-<h3></h3>
+<h3>🗺️ 架构图</h3>
 <div class="mermaid">
 <pre>
   ┌──────────────┐    ┌──────────────┐    ┌──────────────┐
@@ -454,7 +717,7 @@
 </pre>
 </div>
 
-<h3></h3>
+<h3>📂 目录结构（关键文件）</h3>
 <table>
 <tr><th>路径</th><th>作用</th></tr>
 <tr><td><span class="file-path">diancan-admin/</span></td><td>Spring Boot 后端，Java 17，单体应用</td></tr>
@@ -465,7 +728,7 @@
 <tr><td><span class="file-path">AGENTS.md（根）</span></td><td>跨端契约的"地图"——先读这个</td></tr>
 </table>
 
-<h3></h3>
+<h3>🌐 跨端接口契约表（务必背下来）</h3>
 <table>
 <tr><th>调用方</th><th>客户端路径</th><th>后端映射</th><th>典型业务</th></tr>
 <tr><td>管理端</td><td>src/service/api/* 的 /admin/*</td><td>/api/admin/*</td><td>菜品、桌台、订单、报表、系统</td></tr>
@@ -473,7 +736,7 @@
 <tr><td>支付平台</td><td>外部回调 URL</td><td>/api/notify/*</td><td>微信支付回调、签名校验</td></tr>
 </table>
 
-<h3></h3>
+<h3>💻 关键代码：跨端 Controller 命名空间</h3>
 <pre><code class="language-java">// diancan-admin/src/main/java/com/scaffold/modules/order/controller/
 //
 // 同一业务"订单"分两个 Controller：
@@ -515,13 +778,13 @@ public class AppOrderController {
     }
 }</code></pre>
 
-<h3></h3>
+<h3>📝 业务主链：从扫码到复盘</h3>
 <pre>
 扫码入桌 → 菜单浏览 → 购物车 → 提交订单 → 微信支付 → 后厨出餐 → 评价反馈 → 报表复盘
 └─table─┘ └─dish──┘ └cart┘ └─order─┘ └payment┘ └─kitchen┘ └─review─┘ └─report─┘
 </pre>
 
-<h3></h3>
+<h3>👣 动手步骤</h3>
 <div class="step"><span class="step-num">1</span><b>打开仓库根</b>：用 VSCode 或 IDE 打开 <code class="inline">diancan-system/</code>，先看 <span class="file-path">AGENTS.md</span>，再看 <span class="file-path">readme.md</span> 的"项目结构"小节。</div>
 <div class="step"><span class="step-num">2</span><b>摸清三端分布</b>：在终端里依次执行 <code class="inline">ls diancan-admin</code>、<code class="inline">ls diancan-admin-web</code>、<code class="inline">ls diancan-miniapp</code>，记下各自根目录。</div>
 <div class="step"><span class="step-num">3</span><b>验证契约表</b>：用 IDE 的全局搜索，按下表验证至少 3 个接口是否真存在。</div>
@@ -533,7 +796,7 @@ public class AppOrderController {
 </table>
 <div class="step"><span class="step-num">4</span><b>完成自检</b>（下方）。</div>
 
-<h3></h3>
+<h3>🧪 自我检测</h3>
 <div class="quiz">
 <span class="quiz-type">A 概念辨析</span>
 <span class="quiz-q">1. 小程序的请求路径写 <code class="inline">/api/app/order/create</code>，但 api 文件里只写 <code class="inline">/order/create</code>，前缀是从哪里补的？</span>
@@ -560,7 +823,7 @@ public class AppOrderController {
 
 <!-- ==================== U2 ==================== -->
 <section class="unit" id="U2">
-<h2></h2>
+<h2>🛠️ U2 · 后端 Spring Boot 工程骨架</h2>
 
 <div class="why">
 <strong>为什么要学这个？</strong>
@@ -572,7 +835,7 @@ public class AppOrderController {
 你写一个 <code class="inline">OrderController</code>，Spring Boot 自动帮你接 HTTP 请求、解析 JSON、注入 service、写日志。你只关心"做什么菜"（业务），不关心"怎么接单"（基础设施）。
 </div>
 
-<h3></h3>
+<h3>📚 核心概念</h3>
 <ul class="concept-list">
   <li><b>Spring Boot 启动器</b>：<code class="inline">DiancanAdminApplication.java</code> 上的 <code class="inline">@SpringBootApplication</code> 注解，一键启动整个应用。</li>
   <li><b>模块化目录</b>：<code class="inline">com.scaffold.modules.&lt;domain&gt;</code>——17 个业务模块（订单、菜品、会员等）。</li>
@@ -580,7 +843,7 @@ public class AppOrderController {
   <li><b>技术栈三件套</b>：MyBatis-Plus（ORM）+ Sa-Token（鉴权）+ Knife4j（接口文档）。</li>
 </ul>
 
-<h3></h3>
+<h3>💻 关键代码 1：启动类</h3>
 <pre><code class="language-java">// 文件：diancan-admin/src/main/java/com/scaffold/DiancanAdminApplication.java
 package com.scaffold;
 
@@ -601,7 +864,7 @@ public class DiancanAdminApplication {
     }
 }</code></pre>
 
-<h3></h3>
+<h3>💻 关键代码 2：分层配置（开发环境）</h3>
 <pre><code class="language-yaml"># 文件：diancan-admin/src/main/resources/application-dev.yml
 server:
   port: 8080
@@ -651,7 +914,7 @@ SQL 文件里导出的库名是 <code class="inline">digital_ordering_system</co
 <b>启动前必须把这两处统一</b>，否则启动正常但所有查询都会 500 报"Table doesn't exist"。
 </div>
 
-<h3></h3>
+<h3>💻 关键代码 3：一个 Controller 的完整结构</h3>
 <pre><code class="language-java">// 文件：diancan-admin/src/main/java/com/scaffold/modules/dish/controller/AdminDishController.java
 package com.scaffold.modules.dish.controller;
 
@@ -697,7 +960,7 @@ public class AdminDishController {
     }
 }</code></pre>
 
-<h3></h3>
+<h3>👣 动手步骤：把后端跑起来</h3>
 <div class="step">
 <span class="step-num">1</span><b>准备 JDK 17</b>：终端执行 <code class="inline">java -version</code> 确认输出包含 <code class="inline">17</code>。没有的话用 <code class="inline">sdk install java 17</code>（sdkman）或从 <code class="inline">apt install openjdk-17-jdk</code>（Ubuntu）。
 </div>
@@ -721,7 +984,7 @@ mvn spring-boot:run -Dspring-boot.run.profiles=dev</code></pre>
 <span class="step-num">6</span><b>访问接口文档</b>：浏览器打开 <code class="inline">http://localhost:8080/api/swagger-ui.html</code>，能看到 Knife4j 文档即成功。
 </div>
 
-<h3></h3>
+<h3>🧪 自我检测</h3>
 <div class="quiz">
 <span class="quiz-type">A 概念辨析</span>
 <span class="quiz-q">1. SQL 库名 <code class="inline">digital_ordering_system</code>，配置写 <code class="inline">diancan-system</code>，启动后会发生什么？</span>
@@ -748,7 +1011,7 @@ mvn spring-boot:run -Dspring-boot.run.profiles=dev</code></pre>
 
 <!-- ==================== U3 ==================== -->
 <section class="unit" id="U3">
-<h2></h2>
+<h2>💻 U3 · 管理端 Vue 3 工程骨架</h2>
 
 <div class="why">
 <strong>为什么要学这个？</strong>
@@ -760,7 +1023,7 @@ mvn spring-boot:run -Dspring-boot.run.profiles=dev</code></pre>
 <code class="inline">vite.config.ts</code> 是展位平面图，<code class="inline">src/views/</code> 是一个个展品柜台，<code class="inline">src/service/api/</code> 是"询问柜台工作人员的标准化话术"。你只管站在正确的柜台前问问题。
 </div>
 
-<h3></h3>
+<h3>📚 核心概念</h3>
 <ul class="concept-list">
   <li><b>pnpm workspace</b>：包管理工具，比 npm 快 2 倍，磁盘空间节省 50%。</li>
   <li><b>Vite 7</b>：构建工具，开发时按需编译，秒级热更新。</li>
@@ -768,13 +1031,13 @@ mvn spring-boot:run -Dspring-boot.run.profiles=dev</code></pre>
   <li><b>UI 四件套</b>：Naive UI（组件） + UnoCSS（原子化 CSS） + Pinia（状态） + ECharts（图表）。</li>
 </ul>
 
-<h3></h3>
+<h3>💻 关键代码 1：环境配置</h3>
 <pre><code class="language-bash"># 文件：diancan-admin-web/.env.dev
 VITE_APP_TITLE=点餐管理端
 VITE_SERVICE_BASE_URL=http://localhost:8080/api
 VITE_HTTP_PROXY=Y</code></pre>
 
-<h3></h3>
+<h3>💻 关键代码 2：统一请求层</h3>
 <pre><code class="language-ts">// 文件：diancan-admin-web/src/service/request/index.ts
 import axios, { type AxiosInstance, type AxiosRequestConfig } from 'axios'
 import { getToken } from '@/utils/auth'
@@ -810,7 +1073,7 @@ service.interceptors.response.use(
 
 export default service</code></pre>
 
-<h3></h3>
+<h3>💻 关键代码 3：API 封装（业务契约集中层）</h3>
 <pre><code class="language-ts">// 文件：diancan-admin-web/src/service/api/dish.ts
 import service from '@/service/request'
 
@@ -845,7 +1108,7 @@ export const AdminDishAPI = {
     service.delete(`/admin/dish/${id}`),
 }</code></pre>
 
-<h3></h3>
+<h3>💻 关键代码 4：页面调用 API</h3>
 <pre><code class="language-vue">&lt;!-- 文件：diancan-admin-web/src/views/dish/list/index.vue --&gt;
 &lt;script setup lang="ts"&gt;
 import { ref, onMounted } from 'vue'
@@ -865,7 +1128,7 @@ onMounted(loadData)
   &lt;n-data-table :columns="columns" :data="tableData" /&gt;
 &lt;/template&gt;</code></pre>
 
-<h3></h3>
+<h3>👣 动手步骤：把管理端跑起来</h3>
 <div class="step"><span class="step-num">1</span><b>安装 Node.js 20.19+</b>：<code class="inline">node -v</code>。推荐用 nvm 管理多版本。</div>
 <div class="step"><span class="step-num">2</span><b>安装 pnpm 10.5+</b>：<code class="inline">npm i -g pnpm</code>，然后 <code class="inline">pnpm -v</code>。</div>
 <div class="step"><span class="step-num">3</span><b>启动后端</b>：U2 已经跑起来，没跑起来先去跑。</div>
@@ -878,7 +1141,7 @@ pnpm dev</code></pre>
 <div class="step"><span class="step-num">5</span><b>登录管理端</b>：浏览器打开 <code class="inline">http://localhost:9527</code>，用 <code class="inline">admin / 123456</code> 登录。看到桌台看板即成功。</div>
 <div class="step"><span class="step-num">6</span><b>完整路径验证</b>：新增菜品 → 删除菜品 → 关闭浏览器重开 → 数据还在。说明前端、后端、数据库全链路畅通。</div>
 
-<h3></h3>
+<h3>🧪 自我检测</h3>
 <div class="quiz">
 <span class="quiz-type">A 概念辨析</span>
 <span class="quiz-q">1. 把 <code class="inline">VITE_SERVICE_BASE_URL</code> 改成 <code class="inline">http://localhost:9999/api</code>（错端口），会发生什么？</span>
@@ -905,7 +1168,7 @@ pnpm dev</code></pre>
 
 <!-- ==================== U4 ==================== -->
 <section class="unit" id="U4">
-<h2></h2>
+<h2>📱 U4 · 小程序原生工程骨架</h2>
 
 <div class="why">
 <strong>为什么要学这个？</strong>
@@ -917,7 +1180,7 @@ pnpm dev</code></pre>
 每一页 = 一个页面（<code class="inline">pages/xxx</code>）；书脊 = <code class="inline">app.js</code>（全局状态）；目录 = <code class="inline">app.json</code>（页面注册）。<code class="inline">utils/request.js</code> 是"由你联系作者"的统一通道。
 </div>
 
-<h3></h3>
+<h3>📚 核心概念</h3>
 <ul class="concept-list">
   <li><b>app.json</b>：小程序的"目录"，注册所有页面和 tabBar；小程序启动时第一读它。</li>
   <li><b>utils/request.js</b>：所有 HTTP 请求的单一入口，统一加前缀、Token、错误处理。</li>
@@ -925,7 +1188,7 @@ pnpm dev</code></pre>
   <li><b>pages/ 一个页面 = 4 个文件</b>：<code class="inline">.js .json .wxml .wxss</code>（类比 HTML 项目的 html/css/js 分离）。</li>
 </ul>
 
-<h3></h3>
+<h3>💻 关键代码 1：app.json（页面注册）</h3>
 <pre><code class="language-json">{
   "pages": [
     "pages/index/index",
@@ -951,7 +1214,7 @@ pnpm dev</code></pre>
   }
 }</code></pre>
 
-<h3></h3>
+<h3>💻 关键代码 2：环境配置</h3>
 <pre><code class="language-js">// 文件：diancan-miniapp/config/env.js
 module.exports = {
   // 开发者工具可用 127.0.0.1
@@ -963,7 +1226,7 @@ module.exports = {
   // API_HOST: 'http://192.168.x.x:8080',
 }</code></pre>
 
-<h3></h3>
+<h3>💻 关键代码 3：utils/request.js（HTTP 汇合点）</h3>
 <pre><code class="language-js">// 文件：diancan-miniapp/utils/request.js
 const { API_HOST, apiPrefix } = require('../config/env.js')
 
@@ -1002,7 +1265,7 @@ module.exports = {
   del:  (url)                 =&gt; request(url, 'DELETE', null),
 }</code></pre>
 
-<h3></h3>
+<h3>💻 关键代码 4：API 封装示例</h3>
 <pre><code class="language-js">// 文件：diancan-miniapp/api/order.js
 const request = require('../utils/request.js')
 
@@ -1017,7 +1280,7 @@ module.exports = {
   getOrderDetail: (id) =&gt; request.get(`/order/detail/${id}`),
 }</code></pre>
 
-<h3></h3>
+<h3>💻 关键代码 5：页面调用</h3>
 <pre><code class="language-js">// 文件：diancan-miniapp/pages/order/order.js
 const { createOrder } = require('../../api/order.js')
 
@@ -1045,13 +1308,13 @@ Page({
 手机里的 <code class="inline">127.0.0.1</code> 指向手机自己，不是你电脑。必须打开 <code class="inline">config/env.js</code> 改成电脑局域网 IP（如 <code class="inline">192.168.1.100</code>），并保证手机和电脑在同一 WiFi 下。
 </div>
 
-<h3></h3>
+<h3>👣 动手步骤</h3>
 <div class="step"><span class="step-num">1</span><b>下载微信开发者工具</b>：<a href="https://developers.weixin.qq.com/miniprogram/dev/devtools/download.html">官方下载</a>。</div>
 <div class="step"><span class="step-num">2</span><b>导入项目</b>：开发者工具 → 导入项目 → 选 <code class="inline">diancan-miniapp/</code> → AppID 选"测试号"即可。</div>
 <div class="step"><span class="step-num">3</span><b>看到首页</b>：不登录也能看到首页静态结构，因为登录态在本地存储里可能没值。</div>
 <div class="step"><span class="step-num">4</span><b>改 API 地址（可选）</b>：只有真机调试才需要改 <code class="inline">config/env.js</code>。开发者工具默认用 <code class="inline">127.0.0.1</code>。</div>
 
-<h3></h3>
+<h3>🧪 自我检测</h3>
 <div class="quiz">
 <span class="quiz-type">A 概念辨析</span>
 <span class="quiz-q">1. 真机调试时把 <code class="inline">API_HOST</code> 改成 <code class="inline">127.0.0.1</code>，会发生什么？</span>
@@ -1072,7 +1335,7 @@ Page({
 
 <!-- ==================== U5 ==================== -->
 <section class="unit" id="U5">
-<h2></h2>
+<h2>💰 U5 · 核心交易链：订单 + 支付</h2>
 
 <div class="why">
 <strong>为什么要学这个？</strong>
@@ -1084,7 +1347,7 @@ Page({
 未下单 → 已下单 → 已支付 → 后厨接单 → 出餐中 → 已完成 → 已评价。任意两个状态之间都有"门禁"，后端要做的是守住这些门。
 </div>
 
-<h3></h3>
+<h3>📚 核心概念</h3>
 <ul class="concept-list">
   <li><b>OrderServiceImpl</b>：交易主链热点，连接桌台、菜品、支付、履约。</li>
   <li><b>PaymentServiceImpl</b>：支付状态机 + 退款逻辑。</li>
@@ -1092,7 +1355,7 @@ Page({
   <li><b>幂等性</b>：同一个支付回调可能来多次，状态机必须能容忍重复。</li>
 </ul>
 
-<h3></h3>
+<h3>🔄 订单状态机</h3>
 <div class="mermaid">
 <pre>
    ┌────────┐
@@ -1121,7 +1384,7 @@ Page({
 </pre>
 </div>
 
-<h3></h3>
+<h3>💻 关键代码 1：下单核心方法</h3>
 <pre><code class="language-java">// 文件：diancan-admin/src/main/java/com/scaffold/modules/order/service/impl/OrderServiceImpl.java
 @Service
 @RequiredArgsConstructor
@@ -1195,7 +1458,7 @@ public class OrderServiceImpl implements OrderService {
     }
 }</code></pre>
 
-<h3></h3>
+<h3>💻 关键代码 2：支付回调（幂等性关键）</h3>
 <pre><code class="language-java">// 文件：diancan-admin/src/main/java/com/scaffold/modules/payment/service/impl/PaymentServiceImpl.java
 @Service
 @RequiredArgsConstructor
@@ -1249,7 +1512,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 }</code></pre>
 
-<h3></h3>
+<h3>💻 关键代码 3：订单状态枚举</h3>
 <pre><code class="language-java">// 文件：diancan-admin/src/main/java/com/scaffold/modules/order/enums/OrderStatusEnum.java
 @Getter
 @AllArgsConstructor
@@ -1273,13 +1536,13 @@ public enum OrderStatusEnum {
     }
 }</code></pre>
 
-<h3></h3>
+<h3>👣 动手步骤：用 Swagger 跑一单</h3>
 <div class="step"><span class="step-num">1</span><b>找到测试订单</b>：在数据库里执行 <code class="inline">SELECT * FROM t_order ORDER BY id DESC LIMIT 5;</code> 拿一个真实订单号。</div>
 <div class="step"><span class="step-num">2</span><b>调支付回调模拟</b>：Swagger 找 <code class="inline">/api/notify/pay/success</code>，手工 POST 一个回调（开发环境通常有内部端点）。</div>
 <div class="step"><span class="step-num">3</span><b>查订单状态</b>：<code class="inline">GET /api/admin/order/detail/{orderNo}</code> 看 status 是否从 10 → 20。</div>
 <div class="step"><span class="step-num">4</span><b>重复发同一条回调</b>：订单状态不应变化（幂等性）。</div>
 
-<h3></h3>
+<h3>🧪 自我检测</h3>
 <div class="quiz">
 <span class="quiz-type">C 教回来（Feynman）</span>
 <span class="quiz-q">用大白话给一个不懂技术的同学讲："顾客扫码 → 加购 → 下单 → 微信支付 → 后厨出餐"每一步后端做了什么？</span>
@@ -1309,7 +1572,7 @@ public enum OrderStatusEnum {
 
 <!-- ==================== U6 ==================== -->
 <section class="unit" id="U6">
-<h2></h2>
+<h2>🎁 U6 · 会员营销与优惠券体系</h2>
 
 <div class="why">
 <strong>为什么要学这个？</strong>
@@ -1321,7 +1584,7 @@ public enum OrderStatusEnum {
 消费 → 积分（钱生积分）；积分 → 成长值（积分升级）；等级 → 权益（折扣、生日券）。回流是个反向问题：退款 → 积分回退。
 </div>
 
-<h3></h3>
+<h3>📚 核心概念</h3>
 <ul class="concept-list">
   <li><b>MemberSettlementServiceImpl</b>：订单结算后联动积分、成长值、会员等级。</li>
   <li><b>CouponServiceImpl</b>：三段式生命周期——领取 → 锁定 → 核销。</li>
@@ -1329,7 +1592,7 @@ public enum OrderStatusEnum {
   <li><b>回退机制</b>：退款 → 扣回积分 → 退券 → 撤销权益。</li>
 </ul>
 
-<h3></h3>
+<h3>💻 关键代码 1：订单结算后的会员联动</h3>
 <pre><code class="language-java">// 文件：diancan-admin/src/main/java/com/scaffold/modules/member/service/impl/MemberSettlementServiceImpl.java
 @Service
 @RequiredArgsConstructor
@@ -1389,7 +1652,7 @@ public class MemberSettlementServiceImpl implements MemberSettlementService {
     }
 }</code></pre>
 
-<h3></h3>
+<h3>💻 关键代码 2：优惠券三段式</h3>
 <pre><code class="language-java">// 文件：diancan-admin/src/main/java/com/scaffold/modules/coupon/service/impl/CouponServiceImpl.java
 @Service
 @RequiredArgsConstructor
@@ -1450,7 +1713,7 @@ public class CouponServiceImpl implements CouponService {
     }
 }</code></pre>
 
-<h3></h3>
+<h3>💻 关键代码 3：退款时的积分回退</h3>
 <pre><code class="language-java">// 文件：diancan-admin/src/main/java/com/scaffold/modules/member/service/impl/MemberSettlementServiceImpl.java
 /**
  * 订单退款时反向操作
@@ -1494,13 +1757,13 @@ public void onOrderRefunded(Order order) {
 很多"积分商城"被羊毛党薅的根源就是：消费 + 积分有逻辑，但退款 - 积分没有逻辑。后端工程师必须主动问"退款时权益怎么变"。
 </div>
 
-<h3></h3>
+<h3>👣 动手步骤</h3>
 <div class="step"><span class="step-num">1</span><b>找一个测试会员</b>：SQL 查 <code class="inline">SELECT * FROM t_member LIMIT 5</code>。</div>
 <div class="step"><span class="step-num">2</span><b>模拟下单</b>：Swagger 下个测试订单，订单金额 100 元。</div>
 <div class="step"><span class="step-num">3</span><b>查积分增长</b>：<code class="inline">SELECT * FROM t_member WHERE user_id = ?</code>，看 points 字段是否 +100。</div>
 <div class="step"><span class="step-num">4</span><b>模拟退款</b>：调退款接口，再查积分是否回退到原值。</div>
 
-<h3></h3>
+<h3>🧪 自我检测</h3>
 <div class="quiz">
 <span class="quiz-type">B 应用迁移</span>
 <span class="quiz-q">如果订单退款时只扣了积分、没扣成长值，会有什么安全漏洞？</span>
@@ -1515,7 +1778,7 @@ public void onOrderRefunded(Order order) {
 
 <!-- ==================== U7 ==================== -->
 <section class="unit" id="U7">
-<h2></h2>
+<h2>🗄️ U7 · 数据库与 MyBatis</h2>
 
 <div class="why">
 <strong>为什么要学这个？</strong>
@@ -1527,7 +1790,7 @@ public void onOrderRefunded(Order order) {
 Java 不认识 SQL，SQL 不认识 Java 对象。MyBatis 帮你把 Java method 翻译成 SQL，把查询结果翻译回 Java 对象。
 </div>
 
-<h3></h3>
+<h3>📚 核心概念</h3>
 <ul class="concept-list">
   <li><b>db/diancan-system.sql</b>：新环境基线库（102+ 张表）。</li>
   <li><b>db/upgrade/</b>：已有环境按日期追加的增量脚本。</li>
@@ -1536,7 +1799,7 @@ Java 不认识 SQL，SQL 不认识 Java 对象。MyBatis 帮你把 Java method �
   <li><b>三件套同步</b>：改 SQL → 改 Entity → 必要时改 XML，缺一不可。</li>
 </ul>
 
-<h3></h3>
+<h3>💻 关键代码 1：核心表结构（订单表）</h3>
 <pre><code class="language-sql">-- 文件：db/diancan-system.sql（节选）
 CREATE TABLE `t_order` (
   `id`           BIGINT       NOT NULL COMMENT '雪花 ID',
@@ -1557,7 +1820,7 @@ CREATE TABLE `t_order` (
   KEY `idx_status_create` (`status`, `create_time`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='订单表';</code></pre>
 
-<h3></h3>
+<h3>💻 关键代码 2：Java Entity</h3>
 <pre><code class="language-java">// 文件：diancan-admin/src/main/java/com/scaffold/modules/order/entity/Order.java
 @Data
 @TableName("t_order")
@@ -1578,7 +1841,7 @@ public class Order {
     private LocalDateTime updateTime;
 }</code></pre>
 
-<h3></h3>
+<h3>💻 关键代码 3：Java Mapper 接口</h3>
 <pre><code class="language-java">// 文件：diancan-admin/src/main/java/com/scaffold/modules/order/mapper/OrderMapper.java
 public interface OrderMapper extends BaseMapper&lt;Order&gt; {
 
@@ -1593,7 +1856,7 @@ public interface OrderMapper extends BaseMapper&lt;Order&gt; {
     int updateStatus(@Param("id") Long id, @Param("status") Integer status);
 }</code></pre>
 
-<h3></h3>
+<h3>💻 关键代码 4：MyBatis XML 自定义 SQL</h3>
 <pre><code class="language-xml">&lt;!-- 文件：diancan-admin/src/main/resources/mapper/order/OrderMapper.xml --&gt;
 &lt;?xml version="1.0" encoding="UTF-8"?&gt;
 &lt;!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
@@ -1659,13 +1922,13 @@ public interface OrderMapper extends BaseMapper&lt;Order&gt; {
 </ol>
 </div>
 
-<h3></h3>
+<h3>👣 动手步骤</h3>
 <div class="step"><span class="step-num">1</span><b>打开 SQL 文件</b>：<code class="inline">code db/diancan-system.sql</code> 或 DBeaver 打开数据库，浏览前 50 张表。</div>
 <div class="step"><span class="step-num">2</span><b>看 Order 模块</b>：从 <code class="inline">t_order</code> 表反推 Java Entity，再看 <code class="inline">OrderMapper.xml</code> 的动态 SQL。</div>
 <div class="step"><span class="step-num">3</span><b>做一次手工查询</b>：<code class="inline">SELECT * FROM t_order WHERE status = 20 LIMIT 10;</code></div>
 <div class="step"><span class="step-num">4</span><b>尝试加字段</b>：给 <code class="inline">t_order</code> 加 <code class="inline">remark VARCHAR(255)</code>，同步加 Entity 字段，重新 <code class="inline">mvn compile</code> 验证不报错。</div>
 
-<h3></h3>
+<h3>🧪 自我检测</h3>
 <div class="quiz">
 <span class="quiz-type">A 概念辨析</span>
 <span class="quiz-q">1. 为什么不把所有 SQL 都写在 Java 里？</span>
@@ -1692,7 +1955,7 @@ DB 改动 = <b>SQL + Entity + XML</b> 三件套同步。读业务代码，先看
 
 <!-- ==================== U8 ==================== -->
 <section class="unit" id="U8">
-<h2></h2>
+<h2>📡 U8 · 实时消息（STOMP）与打印</h2>
 
 <div class="why">
 <strong>为什么要学这个？</strong>
@@ -1704,7 +1967,7 @@ DB 改动 = <b>SQL + Entity + XML</b> 三件套同步。读业务代码，先看
 管理端订阅一个频道（"后厨频道"），后端推送消息到这个频道，所有订阅者都能实时收到。区别于 HTTP 轮询（每 5 秒问一次"有新单吗？"），对讲机是"有新单了自动播"。
 </div>
 
-<h3></h3>
+<h3>📚 核心概念</h3>
 <ul class="concept-list">
   <li><b>WebSocket</b>：浏览器和服务器之间的"长连接"，双向通信。</li>
   <li><b>STOMP</b>：基于 WebSocket 的"消息协议"，类似消息队列的 topic/pubsub 模型。</li>
@@ -1713,7 +1976,7 @@ DB 改动 = <b>SQL + Entity + XML</b> 三件套同步。读业务代码，先看
   <li><b>RocketMQ 可靠消息</b>：跨服务的异步消息，保证至少一次投递。</li>
 </ul>
 
-<h3></h3>
+<h3>💻 关键代码 1：STOMP 配置</h3>
 <pre><code class="language-java">// 文件：diancan-admin/src/main/java/com/scaffold/config/WebSocketConfig.java
 @Configuration
 @EnableWebSocketMessageBroker
@@ -1736,7 +1999,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     }
 }</code></pre>
 
-<h3></h3>
+<h3>💻 关键代码 2：后端推送实时消息</h3>
 <pre><code class="language-java">// 文件：diancan-admin/src/main/java/com/scaffold/modules/kitchen/service/impl/KitchenServiceImpl.java
 @Service
 @RequiredArgsConstructor
@@ -1761,7 +2024,7 @@ public class KitchenServiceImpl implements KitchenService {
     }
 }</code></pre>
 
-<h3></h3>
+<h3>💻 关键代码 3：管理端订阅（Vue）</h3>
 <pre><code class="language-ts">// 文件：diancan-admin-web/src/service/socket/index.ts
 import SockJS from 'sockjs-client'
 import { Client } from '@stomp/stompjs'
@@ -1783,7 +2046,7 @@ export function connectKitchen(onMessage: (msg: any) =&gt; void) {
   stompClient.activate()
 }</code></pre>
 
-<h3></h3>
+<h3>💻 关键代码 4：RocketMQ 可靠消息</h3>
 <pre><code class="language-java">// 文件：diancan-admin/src/main/java/com/scaffold/modules/mq/service/impl/ReliableMessageServiceImpl.java
 @Service
 @RequiredArgsConstructor
@@ -1826,7 +2089,7 @@ public class ReliableMessageServiceImpl {
 本项目选择关闭小程序 Socket，是务实的取舍。
 </div>
 
-<h3></h3>
+<h3>🧪 自我检测</h3>
 <div class="quiz">
 <span class="quiz-type">A 概念辨析</span>
 <span class="quiz-q">1. 小程序为什么不直接用 STOMP？</span>
@@ -1862,7 +2125,7 @@ public class ReliableMessageServiceImpl {
 
 <!-- ==================== U9 ==================== -->
 <section class="unit" id="U9">
-<h2></h2>
+<h2>🚀 U9 · 补充功能设计 + 简历包装</h2>
 
 <div class="why">
 <strong>为什么要学这个？</strong>
@@ -1874,14 +2137,14 @@ public class ReliableMessageServiceImpl {
 预告片不会讲完整剧情，但要在 3 分钟内让观众想看。把功能、技术、数据三件事压成 1~2 句话。
 </div>
 
-<h3></h3>
+<h3>📚 核心概念</h3>
 <ul class="concept-list">
   <li><b>好功能 = 三端都有体感</b>：管理端配置 + 小程序体验 + 后端事务，缺一不可。</li>
   <li><b>简历 bullet = 业务 + 技术 + 数据</b>：做了什么、用什么技术、达到什么效果。</li>
   <li><b>优先级</b>：后端 &gt; 全栈 &gt; 运维——优先体现 Spring Boot / MyBatis / 事务 / 调优。</li>
 </ul>
 
-<h3></h3>
+<h3>🎯 4 个候选补充功能</h3>
 <table>
 <tr><th>功能</th><th>三端改动量</th><th>简历亮点</th></tr>
 <tr><td><b>外卖配送</b></td><td>后端新增 delivery 模块 + 管理端配送看板 + 小程序外卖入口</td><td>⭐⭐⭐⭐ 业务丰富、状态机复杂</td></tr>
@@ -1890,7 +2153,7 @@ public class ReliableMessageServiceImpl {
 <tr><td><b>AI 推荐</b></td><td>小程序加购后基于标签推荐菜品</td><td>⭐⭐⭐⭐ 简历加分项，但需外部 API</td></tr>
 </table>
 
-<h3></h3>
+<h3>💻 示例：实时看板的功能设计（推荐）</h3>
 
 <h4>1. 业务定义</h4>
 <pre>
@@ -1954,14 +2217,14 @@ onUnmounted(() =&gt; {
 })
 &lt;/script&gt;</code></pre>
 
-<h3></h3>
+<h3>📝 简历 bullet 模板（按"后端 &gt; 全栈"优先级）</h3>
 
-<h4>写得差</h4>
+<h4>❌ 写得差</h4>
 <pre>
 "参与了点餐系统开发，使用了 Spring Boot 和 Vue 技术。"
 </pre>
 
-<h4>写得好（后端岗）</h4>
+<h4>✅ 写得好（后端岗）</h4>
 <pre>
 <b>点餐系统（Spring Boot 3 + Vue 3 + 微信小程序）</b>
 
@@ -1977,7 +2240,7 @@ onUnmounted(() =&gt; {
 · 压力测试：订单创建 TPS 320，支付回调 P99 120ms，<b>无超时</b>。
 </pre>
 
-<h4>写得好（全栈岗）</h4>
+<h4>✅ 写得好（全栈岗）</h4>
 <pre>
 <b>点餐系统（Spring Boot 3 + Vue 3 + 微信小程序）</b>
 
@@ -1991,7 +2254,7 @@ onUnmounted(() =&gt; {
 · ECharts 实时看板叠加 5 秒轮询，<b>店长运营响应速度提升 60%</b>。
 </pre>
 
-<h3></h3>
+<h3>📊 软技能面试讲解稿（30 分钟）</h3>
 <table>
 <tr><th>时长</th><th>讲什么</th></tr>
 <tr><td>0-3 分钟</td><td>项目背景：为什么做这个、目标用户、解决了什么问题</td></tr>
@@ -2002,7 +2265,7 @@ onUnmounted(() =&gt; {
 <tr><td>28-30 分钟</td><td>补充功能：实时看板 / 后续规划</td></tr>
 </table>
 
-<h3></h3>
+<h3>👣 行动清单</h3>
 <ul class="checklist">
   <li>挑 1 个补充功能（推荐实时看板）</li>
   <li>按 U5 的事务规范走 TDD：先写测试用例，再写实现</li>
@@ -2011,7 +2274,7 @@ onUnmounted(() =&gt; {
   <li>找朋友当面试官，模拟问 5 个深挖问题</li>
 </ul>
 
-<h3></h3>
+<h3>🧪 自我检测</h3>
 <div class="quiz">
 <span class="quiz-type">C 教回来</span>
 <span class="quiz-q">用 5 分钟给面试官讲清楚"支付回调的幂等性"。利用本单元的代码例子。</span>
@@ -2032,11 +2295,11 @@ onUnmounted(() =&gt; {
 
 <!-- ==================== 附录 ==================== -->
 <section class="unit" id="appendix">
-<h2></h2>
+<h2>📋 附录 · 教学契约（teacher-skill renderer-neutral data）</h2>
 
 <p>这部分是给 Renderer / 其它教学工具看的标准化数据契约。普通同学可以跳过。</p>
 
-<h3></h3>
+<h3>教学契约 YAML</h3>
 <pre><code class="language-yaml">data-level: weak
 data-delivery-mode: single-file-html-doc
 target-renderer: omo-frontend
@@ -2124,7 +2387,7 @@ midware_practice_commands:
   rocketmq_broker: "docker exec -it diancan-rocketmq-broker /opt/rocketmq/bin/mqadmin topicList -n rocketmq-namesrv:9876"
   minio_console: "http://localhost:9001  (minioadmin / minioadmin)"</code></pre>
 
-<h3></h3>
+<h3>📂 文件位置</h3>
 <table>
 <tr><th>路径</th><th>作用</th></tr>
 <tr><td>本教程</td><td><span class="file-path">docs/learning/diancan-system-tutorial.html</span></td></tr>
@@ -2135,7 +2398,7 @@ midware_practice_commands:
 <tr><td>数据库基线</td><td><span class="file-path">db/diancan-system.sql</span></td></tr>
 </table>
 
-<h3></h3>
+<h3>🎯 学习路径建议</h3>
 <ol>
   <li><b>第 1 周</b>：U1 + U2 + U3，跑通后端 + 管理端</li>
   <li><b>第 2 周</b>：U4 + U5 + U7，理解核心交易链</li>
@@ -2148,7 +2411,7 @@ midware_practice_commands:
 
 <!-- ==================== U10 ==================== -->
 <section class="unit" id="U10">
-<h2></h2>
+<h2>🧰 U10 · 中间件实战工具箱</h2>
 
 <div class="why">
 <strong>为什么要学这个？</strong>
@@ -2167,14 +2430,14 @@ midware_practice_commands:
 </div>
 
 <!-- ========== U10-A MySQL ========== -->
-<h3></h3>
+<h3>📦 U10-A · MySQL（业务数据库）</h3>
 
 <div class="analogy">
 <strong>🍱 类比：MySQL 就像图书馆</strong>
 每张表 = 一个书架；每行 = 一本书；主键 = 书的索引号；外键 = 引用关系。SQL = 你对图书管理员说的话（"找 2023 年出版的所有 Java 书"）。
 </div>
 
-<h4>连接方式</h4>
+<h4>🔌 连接方式</h4>
 <pre><code class="language-bash"># 容器内直接连接（最常用）
 docker exec -it diancan-mysql mysql -uroot -p123456 diancan-system
 
@@ -2188,7 +2451,7 @@ mysql -h127.0.0.1 -P3306 -uroot -p123456 diancan-system
 # Password: 123456
 # Database: diancan-system</code></pre>
 
-<h4>常用命令（精选 12 条）</h4>
+<h4>🔧 常用命令（精选 12 条）</h4>
 <pre><code class="language-sql">-- 1. 看所有数据库
 SHOW DATABASES;
 
@@ -2230,7 +2493,7 @@ mysqldump -uroot -p123456 diancan-system &gt; backup.sql
 -- 12. 从备份恢复
 mysql -uroot -p123456 diancan-system &lt; backup.sql</code></pre>
 
-<h4>与本项目集成（Spring Boot 配置）</h4>
+<h4>🔗 与本项目集成（Spring Boot 配置）</h4>
 <pre><code class="language-yaml"># application-dev.yml 的 MySQL 块
 spring:
   datasource:
@@ -2242,7 +2505,7 @@ spring:
       minimum-idle: 5
       connection-timeout: 30000   # 30 秒拿不到连接就报错</code></pre>
 
-<h4>️ 常见坑</h4>
+<h4>⚠️ 常见坑</h4>
 <div class="pitfall">
 <strong>坑 1：库名不一致</strong><br>
 SQL 导出库名是 <code class="inline">digital_ordering_system</code>，application-dev.yml 是 <code class="inline">diancan-system</code>。<b>本项目 docker-up.sh 已自动处理</b>。
@@ -2256,13 +2519,13 @@ SQL 导出库名是 <code class="inline">digital_ordering_system</code>，applic
 JDBC URL 必加 <code class="inline">serverTimezone=Asia/Shanghai</code>，否则 create_time 差 8 小时。
 </div>
 
-<h4>动手步骤</h4>
+<h4>👣 动手步骤</h4>
 <div class="step"><span class="step-num">1</span><b>进 MySQL</b>：<code class="inline">docker exec -it diancan-mysql mysql -uroot -p123456 diancan-system</code></div>
 <div class="step"><span class="step-num">2</span><b>看表数</b>：<code class="inline">SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='diancan-system';</code> 应输出 102+</div>
 <div class="step"><span class="step-num">3</span><b>查核心表</b>：<code class="inline">SELECT id, order_no, total_amount, status FROM t_order LIMIT 5;</code></div>
 <div class="step"><span class="step-num">4</span><b>看索引</b>：<code class="inline">SHOW INDEX FROM t_order;</code> 关注 <code class="inline">uk_order_no</code> 唯一索引</div>
 
-<h4>自我检测</h4>
+<h4>🧪 自我检测</h4>
 <div class="quiz">
 <span class="quiz-type">A 概念辨析</span>
 <span class="quiz-q">库名 <code class="inline">diancan-system</code> 在 MySQL 里是合法标识符吗？</span>
@@ -2276,14 +2539,14 @@ JDBC URL 必加 <code class="inline">serverTimezone=Asia/Shanghai</code>，否�
 </div>
 
 <!-- ========== U10-B Redis ========== -->
-<h3></h3>
+<h3>⚡ U10-B · Redis（缓存 + 会话 + Pub/Sub）</h3>
 
 <div class="analogy">
 <strong>📝 类比：Redis 就像便签纸</strong>
 比数据库快 100 倍，但容量小、重启就丢。适合存"昨天点过什么菜"、"Token 还有多久过期"这类"临时但热"的数据。
 </div>
 
-<h4>连接方式</h4>
+<h4>🔌 连接方式</h4>
 <pre><code class="language-bash"># 容器内
 docker exec -it diancan-redis redis-cli -a 123456
 # 进去后先认证
@@ -2292,7 +2555,7 @@ AUTH 123456
 docker exec -it diancan-redis redis-cli -a 123456 PING
 # 应输出 PONG</code></pre>
 
-<h4>常用命令（精选 15 条）</h4>
+<h4>🔧 常用命令（精选 15 条）</h4>
 <pre><code class="language-bash"># 1. 看所有 key（生产慎用！可能卡死）
 KEYS *
 
@@ -2346,7 +2609,7 @@ FLUSHDB
 # 15. 看 key 数量
 DBSIZE</code></pre>
 
-<h4>与本项目集成</h4>
+<h4>🔗 与本项目集成</h4>
 <pre><code class="language-java">// 文件：com.scaffold.framework.redis.RedisUtils.java
 @Component
 public class RedisUtils {
@@ -2374,7 +2637,7 @@ public List&lt;DishVO&gt; listDishes() {
     return fresh;
 }</code></pre>
 
-<h4>️ WebSocket 走 Redis Pub/Sub 中转（关键架构）</h4>
+<h4>⚠️ WebSocket 走 Redis Pub/Sub 中转（关键架构）</h4>
 <pre><code class="language-java">// 项目用 Redis Pub/Sub 实现多实例广播，而不是直连 STOMP
 // 关键类：com.scaffold.framework.websocket.WsService
 public class WsService {
@@ -2389,7 +2652,7 @@ public class WsService {
 // 订阅方：RedisMessageSubscriber.java
 // 任何后端实例都能收到 → 所有实例的 WebSocket 客户端都被广播</code></pre>
 
-<h4>自我检测</h4>
+<h4>🧪 自我检测</h4>
 <div class="quiz">
 <span class="quiz-type">A 概念辨析</span>
 <span class="quiz-q">Redis 重启后数据会怎样？</span>
@@ -2403,14 +2666,14 @@ public class WsService {
 </div>
 
 <!-- ========== U10-C RocketMQ ========== -->
-<h3></h3>
+<h3>📨 U10-C · RocketMQ（可靠消息队列）</h3>
 
 <div class="analogy">
 <strong>📬 类比：RocketMQ 就像内部信箱</strong>
 厨房做完菜往信箱投一封信："5 号桌糖醋里脊出餐了"。服务员有空去信箱看一眼。这种"异步通知"模式比"每隔 5 秒问一次"省事得多。
 </div>
 
-<h4>连接方式</h4>
+<h4>🔌 连接方式</h4>
 <pre><code class="language-bash"># 看 NameServer 状态
 docker logs diancan-rocketmq-namesrv | grep -i started
 
@@ -2424,7 +2687,7 @@ cd /opt/rocketmq/bin
 ./mqadmin topicList -n rocketmq-namesrv:9876
 ./mqadmin consumerProgress -g coupon-grant-dispatch-group -n rocketmq-namesrv:9876</code></pre>
 
-<h4>关键概念（必须理解）</h4>
+<h4>🔑 关键概念（必须理解）</h4>
 <table>
 <tr><th>概念</th><th>类比</th><th>项目中的例子</th></tr>
 <tr><td><b>NameServer</b></td><td>邮局总台</td><td>负责告诉发信人"哪个 broker 在哪"</td></tr>
@@ -2435,7 +2698,7 @@ cd /opt/rocketmq/bin
 <tr><td><b>Consumer Group</b></td><td>收信人单位</td><td><code class="inline">coupon-grant-dispatch-group</code></td></tr>
 </table>
 
-<h4>与本项目集成（U6 优惠券发放）</h4>
+<h4>🔗 与本项目集成（U6 优惠券发放）</h4>
 <pre><code class="language-java">// 文件：com.scaffold.modules.coupon.service.impl.CouponServiceImpl.java
 
 // 1. 生产者：发送发券消息
@@ -2465,7 +2728,7 @@ public class GrantDispatchListener implements RocketMQListener&lt;GrantTask&gt; 
     }
 }</code></pre>
 
-<h4>️ 排查清单</h4>
+<h4>⚠️ 排查清单</h4>
 <div class="pitfall">
 <strong>坑 1：消息堆积</strong><br>
 <b>现象</b>：消费速度跟不上生产速度。<br>
@@ -2483,7 +2746,7 @@ public class GrantDispatchListener implements RocketMQListener&lt;GrantTask&gt; 
 <b>查</b>：broker.conf 里的 <code class="inline">namesrvAddr</code> 是否指向 docker 内的 namesrv 服务名。
 </div>
 
-<h4>自我检测</h4>
+<h4>🧪 自我检测</h4>
 <div class="quiz">
 <span class="quiz-type">B 应用迁移</span>
 <span class="quiz-q">订单支付成功回调时，业务要求：(1) 立即给用户发回执 (2) 异步发券。哪部分应该用 RocketMQ？</span>
@@ -2491,14 +2754,14 @@ public class GrantDispatchListener implements RocketMQListener&lt;GrantTask&gt; 
 </div>
 
 <!-- ========== U10-D MinIO ========== -->
-<h3></h3>
+<h3>🪣 U10-D · MinIO（文件存储）</h3>
 
 <div class="analogy">
 <strong>📦 类比：MinIO 就像仓库货架</strong>
 MySQL 存"这是宫保鸡丁"，MinIO 存"宫保鸡丁的照片"。MySQL 里只放一个照片的"地址"（URL），照片本身在 MinIO 里。
 </div>
 
-<h4>连接方式</h4>
+<h4>🔌 连接方式</h4>
 <pre><code class="language-bash"># Web 控制台（最直观）
 浏览器打开 http://localhost:9001
 # 用户名: minioadmin
@@ -2513,7 +2776,7 @@ mc ls local/
 mc mb local/dish-images
 mc cp ./photo.jpg local/dish-images/photo.jpg</code></pre>
 
-<h4>常用操作（Web 控制台）</h4>
+<h4>🔧 常用操作（Web 控制台）</h4>
 <table>
 <tr><th>操作</th><th>路径</th></tr>
 <tr><td>查看文件</td><td>左侧 Buckets → 选 bucket → 看 Object 列表</td></tr>
@@ -2523,7 +2786,7 @@ mc cp ./photo.jpg local/dish-images/photo.jpg</code></pre>
 <tr><td>删除文件</td><td>点文件 → Delete</td></tr>
 </table>
 
-<h4>与本项目集成（Java SDK）</h4>
+<h4>🔗 与本项目集成（Java SDK）</h4>
 <pre><code class="language-java">// 文件：com.scaffold.common.config.MinIOConfig.java
 @Configuration
 public class MinIOConfig {
@@ -2579,7 +2842,7 @@ public class FileService {
     }
 }</code></pre>
 
-<h4>️ 常见坑</h4>
+<h4>⚠️ 常见坑</h4>
 <div class="pitfall">
 <strong>坑 1：上传后 403 Forbidden</strong><br>
 <b>原因</b>：<code class="inline">private-bucket: true</code> 表示 bucket 默认私有，URL 直接访问被拒。<br>
@@ -2594,7 +2857,7 @@ public class FileService {
 本项目 <code class="inline">auto-create-bucket: true</code>，后端启动时会自动创建。如果用本项目以外的代码访问 MinIO，需手动 <code class="inline">mc mb local/dish-images</code>。
 </div>
 
-<h4>自我检测</h4>
+<h4>🧪 自我检测</h4>
 <div class="quiz">
 <span class="quiz-type">B 应用迁移</span>
 <span class="quiz-q">菜品管理页上传图片，前端拿到 URL 后图片 403。你如何排查？</span>
@@ -2617,7 +2880,7 @@ public class FileService {
 
 <!-- ==================== U11 ==================== -->
 <section class="unit" id="U11">
-<h2></h2>
+<h2>🐳 U11 · Docker 命令详解 + 脚本解析</h2>
 
 <div class="why">
 <strong>为什么要学这个？</strong>
@@ -2635,7 +2898,7 @@ public class FileService {
 一句话：<b>镜像定义"是什么"，容器是"运行中的实例"，卷管"数据持久化"</b>。
 </div>
 
-<h3></h3>
+<h3>📚 核心命令（按使用频率）</h3>
 
 <h4>① 容器生命周期</h4>
 <pre><code class="language-bash"># 启动一个新容器（从镜像）
@@ -2768,14 +3031,14 @@ docker compose config
 # 拉镜像但不启动
 docker compose pull</code></pre>
 
-<h3></h3>
+<h3>🛠️ 实战：常见排错命令组合</h3>
 <div class="step"><span class="step-num">1</span><b>"容器起不来"</b>：<code class="inline">docker logs diancan-mysql --tail 50</code> + <code class="inline">docker inspect diancan-mysql --format='{{.State.Status}} {{.State.Error}}'</code></div>
 <div class="step"><span class="step-num">2</span><b>"连不上数据库"</b>：<code class="inline">docker exec diancan-mysql mysql -uroot -p123456 -e "SELECT 1"</code>（先在容器内测，再用主机连）</div>
 <div class="step"><span class="step-num">3</span><b>"端口冲突"</b>：<code class="inline">docker ps --format "table {{.Names}}\t{{.Ports}}"</code> 看 host port 是否真映射了</div>
 <div class="step"><span class="step-num">4</span><b>"磁盘满了"</b>：<code class="inline">docker system df</code> 看各部分占用，<code class="inline">docker system prune</code> 清理</div>
 <div class="step"><span class="step-num">5</span><b>"容器之间连不上"</b>：<code class="inline">docker network inspect diancan-system_default</code> 看是否在同一网络</div>
 
-<h3></h3>
+<h3>⚠️ SqlSession 警告不是错误（你的疑问解答）</h3>
 <pre><code class="language-bash">Creating a new SqlSession
 SqlSession [...] was not registered for synchronization because synchronization is not active
 JDBC Connection [...] will not be managed by Spring
@@ -2786,9 +3049,9 @@ JDBC Connection [...] will not be managed by Spring
 </div>
 定时任务 <code class="inline">MqMessageDispatchTask</code> 每次只发一条消息派发，不需要"原子性"，所以不包事务。如果某个服务报"事务管理器不可用"才是 bug，这个不是。
 
-<h3></h3>
+<h3>📜 我写的 4 个脚本逐行解析</h3>
 
-<h4>scripts/docker-up.sh — 一键启动中间件</h4>
+<h4>📄 scripts/docker-up.sh — 一键启动中间件</h4>
 <pre><code class="language-bash">#!/usr/bin/env bash
 # shebang：告诉系统用 bash 执行
 set -euo pipefail
@@ -2847,7 +3110,7 @@ EOF</code></pre>
 <strong>📌 这个脚本做 3 件事</strong>：(1) 修 SQL 库名 (2) 启动 docker 容器 (3) 等 MySQL 准备好再告诉你
 </div>
 
-<h4>scripts/docker-down.sh — 停止中间件（保留数据）</h4>
+<h4>📄 scripts/docker-down.sh — 停止中间件（保留数据）</h4>
 <pre><code class="language-bash">#!/usr/bin/env bash
 set -euo pipefail
 $COMPOSE_CMD down
@@ -2855,7 +3118,7 @@ $COMPOSE_CMD down
 # 数据卷里的 MySQL 数据、Redis 缓存、MinIO 文件下次启动还在
 # 如果想删数据：docker compose down -v（带 -v）</code></pre>
 
-<h4>scripts/docker-reset.sh — 重置中间件（删数据）</h4>
+<h4>📄 scripts/docker-reset.sh — 重置中间件（删数据）</h4>
 <pre><code class="language-bash">read -p "确认要重置吗？输入 YES 继续：" CONFIRM
 if [ "$CONFIRM" != "YES" ]; then
   echo "已取消"
@@ -2866,7 +3129,7 @@ $COMPOSE_CMD down -v    # -v 删数据卷
 rm -rf .docker/initdb    # 删预处理目录，下次启动会重新生成
 # 必须打 YES 才执行，防止误删数据库</code></pre>
 
-<h4>scripts/docker-logs.sh — 跟踪日志</h4>
+<h4>📄 scripts/docker-logs.sh — 跟踪日志</h4>
 <pre><code class="language-bash">SERVICE="${1:-}"   # 第一个参数，没传就空
 if [ -n "$SERVICE" ]; then
   $COMPOSE_CMD logs -f "$SERVICE"   # 跟踪某个服务
@@ -2876,7 +3139,7 @@ fi
 # 用法：bash scripts/docker-logs.sh           # 看所有
 #      bash scripts/docker-logs.sh mysql     # 只看 mysql</code></pre>
 
-<h4>scripts/start-backend.sh — 启动后端（带环境变量）</h4>
+<h4>📄 scripts/start-backend.sh — 启动后端（带环境变量）</h4>
 <pre><code class="language-bash"># 关键：export SPRING_DATASOURCE_URL=...
 # Spring Boot 启动时会用环境变量覆盖 application-dev.yml 的 url
 # 原因：你的 Windows 主机有 MySQL 占 3306，docker 容器在 3307
@@ -2891,7 +3154,7 @@ exec mvn spring-boot:run -Dspring-boot.run.profiles=dev
 # -Dspring-boot.run.profiles=dev  用 dev profile 的配置
 # -Dspring-boot.run.jvmArguments   之前的脚本里有但这里省略了</code></pre>
 
-<h4>scripts/rocketmq/broker.conf — RocketMQ 配置</h4>
+<h4>📄 scripts/rocketmq/broker.conf — RocketMQ 配置</h4>
 <pre><code class="language-bash">brokerClusterName = DefaultCluster    # 集群名
 brokerName = diancan-broker          # broker 名
 brokerId = 0                          # 0 = 主节点
@@ -2902,7 +3165,7 @@ brokerRole = ASYNC_MASTER             # 异步主节点（适合学习用）
 flushDiskType = ASYNC_FLUSH           # 异步刷盘（学习够用）
 # 真实生产用 SYNC_MASTER + SYNC_FLUSH，数据更安全但慢</code></pre>
 
-<h3></h3>
+<h3>🧪 自我检测</h3>
 <div class="quiz">
 <span class="quiz-type">A 概念辨析</span>
 <span class="quiz-q"><code class="inline">docker compose down</code> 和 <code class="inline">docker compose down -v</code> 有什么区别？</span>
@@ -2935,7 +3198,7 @@ flushDiskType = ASYNC_FLUSH           # 异步刷盘（学习够用）
 
 <!-- ==================== U12 ==================== -->
 <section class="unit" id="U12">
-<h2></h2>
+<h2>🌐 U12 · GitHub Pages 部署教程</h2>
 
 <div class="why">
 <strong>为什么要学这个？</strong>
@@ -2952,7 +3215,7 @@ flushDiskType = ASYNC_FLUSH           # 异步刷盘（学习够用）
 每个房间独立布置，<b>互不干扰</b>。你在 DIANCAN-SYSTEM 仓库部署的 Pages 不会动你的个人博客。
 </div>
 
-<h3></h3>
+<h3>📚 12-A · 三种 Pages 类型详解</h3>
 
 <table>
 <tr><th>类型</th><th>URL 模式</th><th>仓库命名</th><th>数量限制</th><th>典型用途</th></tr>
@@ -2983,7 +3246,7 @@ flushDiskType = ASYNC_FLUSH           # 异步刷盘（学习够用）
 <strong>⚠️ User Pages 命名陷阱</strong>：仓库名 <b>必须严格</b> 叫 <code class="inline">&lt;username&gt;.github.io</code>（小写、无空格、无后缀）。改名会导致原 <code class="inline">/&lt;user&gt;.github.io/</code> 链接全部 404。
 </div>
 
-<h3></h3>
+<h3>🔧 12-B · 实战：本项目部署案例（按你刚才做的）</h3>
 
 <h4>Step 1 · 推送代码到 GitHub</h4>
 <pre><code class="language-bash"># 1.1 配置 git 用户（首次需要）
@@ -3061,7 +3324,7 @@ for path in "/" \
   echo "$path → $status"
 done</code></pre>
 
-<h3></h3>
+<h3>📜 12-C · 一键部署脚本（团队复用）</h3>
 <pre><code class="language-bash">#!/usr/bin/env bash
 # scripts/deploy-pages.sh — 一键部署 docs/ 到 GitHub Pages
 # 用法：bash scripts/deploy-pages.sh
@@ -3105,7 +3368,7 @@ PAGES_URL="https://${GITHUB_USER}.github.io/${REPO_NAME}/"
 STATUS=$(curl -sIL -o /dev/null -w "%{http_code}" "${PAGES_URL}")
 echo "✅ ${PAGES_URL} → ${STATUS}"</code></pre>
 
-<h3></h3>
+<h3>🔀 12-D · 自定义域名（可选）</h3>
 <pre><code class="language-bash"># 1. 域名 DNS 添加 CNAME 记录
 #    meisijiya.dev → meisijiya.github.io
 #    www.meisijiya.dev → meisijiya.github.io
@@ -3120,7 +3383,7 @@ git add docs/CNAME &amp;&amp; git commit -m "feat: 添加自定义域名" &amp;&
 # 4. 验证
 curl -sIL https://diancan.meisijiya.dev/</code></pre>
 
-<h3></h3>
+<h3>🤖 12-E · GitHub Actions 自动部署（高级）</h3>
 <pre><code class="language-yaml"># .github/workflows/pages.yml
 name: Deploy to GitHub Pages
 on:
@@ -3151,7 +3414,7 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4</code></pre>
 
-<h3></h3>
+<h3>📊 12-F · GitHub Pages vs Cloudflare Pages 对比</h3>
 <table>
 <tr><th>维度</th><th>GitHub Pages</th><th>Cloudflare Pages</th></tr>
 <tr><td><b>配置时间</b></td><td>5 分钟</td><td>5 分钟（需账号）</td></tr>
@@ -3175,7 +3438,7 @@ jobs:
 </ul>
 </div>
 
-<h3></h3>
+<h3>🛠️ 12-G · 排错清单</h3>
 <table>
 <tr><th>症状</th><th>原因</th><th>解决</th></tr>
 <tr><td>404 Not Found</td><td>分支或路径配错</td><td>Settings → Pages → 检查 Branch + Path</td></tr>
@@ -3187,7 +3450,7 @@ jobs:
 <tr><td>明明 push 了但没更新</td><td>Pages 缓存</td><td>Settings → Pages → 重新 Save</td></tr>
 </table>
 
-<h3></h3>
+<h3>🧪 自我检测</h3>
 <div class="quiz">
 <span class="quiz-type">A 概念辨析</span>
 <span class="quiz-q">你的 GitHub 账号叫 <code class="inline">alice</code>，仓库叫 <code class="inline">blog</code>。Pages 部署成功后 URL 是什么？</span>
@@ -3230,5 +3493,99 @@ jobs:
 </div>
 </footer>
 
+<script>  /* ============================================
+     T1 交互逻辑（vanilla JS，无依赖）
+     - 滚动进度条
+     - 回到顶部按钮显隐
+     - 代码块复制按钮
+     - 侧边目录高亮当前章节
+     ============================================ */
+  (function() {
+    // 1. 注入进度条 + 回到顶部按钮 DOM
+    const progress = document.createElement('div');
+    progress.id = 'progress-bar';
+    document.body.appendChild(progress);
+
+    const backTop = document.createElement('button');
+    backTop.id = 'back-to-top';
+    backTop.title = '回到顶部';
+    backTop.setAttribute('aria-label', '回到顶部');
+    backTop.textContent = '↑';
+    document.body.appendChild(backTop);
+
+    backTop.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // 2. 给所有 <pre> 加复制按钮
+    document.querySelectorAll('pre').forEach(pre => {
+      const btn = document.createElement('button');
+      btn.className = 'copy-btn';
+      btn.textContent = '复制';
+      btn.setAttribute('aria-label', '复制代码');
+      pre.appendChild(btn);
+
+      btn.addEventListener('click', async () => {
+        const code = pre.querySelector('code');
+        const text = code ? code.innerText : pre.innerText;
+        try {
+          await navigator.clipboard.writeText(text);
+          btn.textContent = '✓ 已复制';
+          btn.classList.add('copied');
+          setTimeout(() => {
+            btn.textContent = '复制';
+            btn.classList.remove('copied');
+          }, 1800);
+        } catch (e) {
+          btn.textContent = '复制失败';
+          setTimeout(() => { btn.textContent = '复制'; }, 1800);
+        }
+      });
+    });
+
+    // 3. 滚动监听：进度条 + 回到顶部按钮显隐
+    let ticking = false;
+    function onScroll() {
+      const docH = document.documentElement.scrollHeight - window.innerHeight;
+      const scrolled = window.scrollY;
+      const ratio = docH > 0 ? Math.min(scrolled / docH, 1) : 0;
+      progress.style.transform = `scaleX(${ratio})`;
+
+      if (scrolled > 400) backTop.classList.add('visible');
+      else backTop.classList.remove('visible');
+    }
+    window.addEventListener('scroll', () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          onScroll();
+          ticking = false;
+        });
+        ticking = true;
+      }
+    }, { passive: true });
+    onScroll();
+
+    // 4. 侧边目录高亮当前章节（scroll-spy）
+    const sideLinks = document.querySelectorAll('aside.toc-side a');
+    if (sideLinks.length > 0) {
+      const targets = Array.from(sideLinks).map(a => {
+        const id = a.getAttribute('href').replace('#', '');
+        return document.getElementById(id);
+      }).filter(Boolean);
+
+      function updateActive() {
+        const y = window.scrollY + 120;
+        let activeIdx = -1;
+        for (let i = 0; i < targets.length; i++) {
+          if (targets[i].offsetTop <= y) activeIdx = i;
+        }
+        sideLinks.forEach(a => a.classList.remove('active'));
+        if (activeIdx >= 0) sideLinks[activeIdx].classList.add('active');
+      }
+      window.addEventListener('scroll', updateActive, { passive: true });
+      updateActive();
+    }
+  })();
+</script>
 </body>
 </html>
