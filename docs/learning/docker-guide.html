@@ -744,6 +744,260 @@
       scroll-behavior: auto !important;
     }
   }
+
+  /* ============================================
+     左侧可收起 Sidebar（OpenChamber 风）
+     ============================================ */
+  body { transition: margin-left 0.25s ease; }
+  body[data-sidebar="expanded"] { margin-left: 240px; }
+  body[data-sidebar="collapsed"] { margin-left: 60px; }
+  body[data-sidebar="hidden"] { margin-left: 0; }
+
+  aside.sidebar {
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    width: 240px;
+    background: rgba(245, 239, 224, 0.92);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 24px 0 32px;
+    transition: width 0.25s ease, transform 0.25s ease;
+    z-index: 200;
+    scrollbar-width: thin;
+  }
+  aside.sidebar::-webkit-scrollbar { width: 6px; }
+  aside.sidebar::-webkit-scrollbar-track { background: transparent; }
+  aside.sidebar::-webkit-scrollbar-thumb {
+    background: var(--border-deep);
+    border-radius: 3px;
+  }
+  /* 收起状态 */
+  body[data-sidebar="collapsed"] aside.sidebar {
+    width: 60px;
+  }
+  body[data-sidebar="collapsed"] aside.sidebar .sidebar-text,
+  body[data-sidebar="collapsed"] aside.sidebar .sidebar-section-title,
+  body[data-sidebar="collapsed"] aside.sidebar .sidebar-brand-text,
+  body[data-sidebar="collapsed"] aside.sidebar .sidebar-footer {
+    display: none;
+  }
+  body[data-sidebar="collapsed"] aside.sidebar .sidebar-link {
+    justify-content: center;
+    padding: 8px;
+  }
+  body[data-sidebar="collapsed"] aside.sidebar .sidebar-icon {
+    margin-right: 0;
+  }
+
+  /* Sidebar 内部样式 */
+  .sidebar-brand {
+    display: flex;
+    align-items: center;
+    padding: 0 20px 20px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-strong);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.1em;
+    text-decoration: none;
+  }
+  .sidebar-brand:hover { color: var(--brand); text-decoration: none; }
+  .sidebar-brand .sidebar-icon {
+    font-size: 1.3em;
+    margin-right: 10px;
+  }
+  .sidebar-section {
+    margin-bottom: 16px;
+  }
+  .sidebar-section-title {
+    padding: 0 20px 8px;
+    font-size: 0.72em;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-lighter);
+    font-weight: 700;
+  }
+  .sidebar-section ul {
+    list-style: none; padding: 0; margin: 0;
+  }
+  .sidebar-link {
+    display: flex;
+    align-items: center;
+    padding: 7px 20px;
+    color: var(--text-light);
+    text-decoration: none;
+    border: none;
+    font-size: 0.9em;
+    line-height: 1.4;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .sidebar-link:hover {
+    background: var(--bg-soft);
+    color: var(--text-strong);
+    text-decoration: none;
+    border: none;
+  }
+  .sidebar-link.active {
+    background: var(--bg-soft);
+    color: var(--brand);
+    font-weight: 700;
+    border-left: 3px solid var(--brand);
+    padding-left: 17px;
+  }
+  .sidebar-link .sidebar-icon {
+    margin-right: 10px;
+    font-size: 1em;
+    width: 20px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+  .sidebar-link .sidebar-text {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .sidebar-footer {
+    padding: 16px 20px 0;
+    margin-top: 16px;
+    border-top: 1px solid var(--border);
+    font-size: 0.78em;
+    color: var(--text-lighter);
+    line-height: 1.5;
+  }
+  .sidebar-footer a {
+    color: var(--text-light);
+    text-decoration: none;
+  }
+  .sidebar-footer a:hover { color: var(--brand); }
+
+  /* 收起/展开按钮（桌面端） */
+  .sidebar-toggle {
+    position: fixed;
+    bottom: 24px; left: 196px;
+    width: 36px; height: 36px;
+    background: var(--text-strong);
+    color: var(--bg-top);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.1em;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 201;
+    transition: left 0.25s ease, background 0.2s ease, transform 0.2s ease;
+    box-shadow: 0 2px 8px rgba(45, 36, 24, 0.15);
+  }
+  body[data-sidebar="collapsed"] .sidebar-toggle { left: 16px; }
+  .sidebar-toggle:hover {
+    background: var(--brand);
+    transform: scale(1.08);
+  }
+  .sidebar-toggle:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+
+  /* 移动端汉堡按钮 */
+  .sidebar-toggle-mobile {
+    position: fixed;
+    top: 14px; left: 14px;
+    width: 40px; height: 40px;
+    background: var(--text-strong);
+    color: var(--bg-top);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.3em;
+    font-family: inherit;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 250;
+    transition: background 0.2s ease;
+    box-shadow: 0 2px 8px rgba(45, 36, 24, 0.18);
+  }
+  .sidebar-toggle-mobile:hover {
+    background: var(--brand);
+  }
+  .sidebar-toggle-mobile:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+
+  /* 移动端遮罩 */
+  .sidebar-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(45, 36, 24, 0.5);
+    backdrop-filter: blur(2px);
+    z-index: 199;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+  body[data-sidebar="hidden"] .sidebar-backdrop {
+    opacity: 0;
+    pointer-events: none;
+  }
+  body[data-sidebar="expanded-mobile"] .sidebar-backdrop {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* === 响应式 === */
+  @media (min-width: 1280px) {
+    /* 桌面端：expanded 默认 */
+    body:not([data-sidebar]) { margin-left: 240px; }
+    body[data-sidebar="hidden"] aside.sidebar { transform: translateX(0); }
+  }
+  @media (max-width: 1279px) and (min-width: 768px) {
+    /* 平板端：collapsed 默认 */
+    body[data-sidebar="expanded"] { margin-left: 60px; }
+    aside.sidebar { width: 60px; }
+    aside.sidebar .sidebar-text,
+    aside.sidebar .sidebar-section-title,
+    aside.sidebar .sidebar-brand-text,
+    aside.sidebar .sidebar-footer { display: none; }
+    aside.sidebar .sidebar-link { justify-content: center; padding: 8px; }
+    aside.sidebar .sidebar-icon { margin-right: 0; }
+    .sidebar-toggle { left: 16px; }
+  }
+  @media (max-width: 767px) {
+    /* 移动端：drawer 模式 */
+    body[data-sidebar="expanded"],
+    body[data-sidebar="collapsed"],
+    body[data-sidebar="hidden"] { margin-left: 0; }
+    aside.sidebar {
+      transform: translateX(-100%);
+      width: 280px !important;
+    }
+    body[data-sidebar="expanded-mobile"] aside.sidebar {
+      transform: translateX(0);
+    }
+    body[data-sidebar="expanded-mobile"] { margin-left: 0; }
+    .sidebar-toggle-mobile { display: flex; }
+    .sidebar-toggle { display: none; }
+    /* 移动端把容器调宽 */
+    .container { padding: 0 18px; }
+    section.unit h1, header.hero h1 { font-size: 1.85rem !important; }
+    section.unit h2 { font-size: 1.35em !important; }
+    section.unit h3 { font-size: 1.15em !important; }
+    /* 移动端让 pre 可滚动 */
+    pre { font-size: 0.78em !important; padding: 14px 16px !important; }
+    /* 移动端 footer 4 列 → 2 列 */
+    footer .footer-grid { grid-template-columns: 1fr 1fr !important; }
+    header.hero, header.masthead { padding: 80px 0 40px !important; }
+  }
+  @media (max-width: 480px) {
+    footer .footer-grid { grid-template-columns: 1fr !important; }
+    .terminal-block { font-size: 0.78em !important; padding: 14px 16px !important; }
+  }
 </style>
 </head>
 <body>
@@ -757,18 +1011,69 @@
   </div>
 </header>
 
-<nav class="toc">
-  <div class="container">
-    <a href="../" class="back-home">🏠 学习中心</a>
-    <a href="#step-0">步骤 0 · 装 Docker</a>
-    <a href="#step-1">步骤 1 · 启动中间件</a>
-    <a href="#step-15">步骤 1.5 · 启动后端</a>
-    <a href="#step-2">步骤 2 · 启动后端</a>
-    <a href="#step-3">步骤 3 · 管理端+小程序</a>
-    <a href="#commands">常用命令</a>
-    <a href="#troubleshoot">故障排查</a>
+<aside class="sidebar" id="sidebar">
+  <a href="../" class="sidebar-brand">
+    <span class="sidebar-icon">📚</span>
+    <span class="sidebar-brand-text">学习中心</span>
+  </a>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">其他教程</div>
+    <ul>
+      <li><a href="diancan-system-tutorial.html" class="sidebar-link">
+        <span class="sidebar-icon">📖</span>
+        <span class="sidebar-text">主教程</span>
+      </a></li>
+      <li><a href="code-exercises.html" class="sidebar-link">
+        <span class="sidebar-icon">📝</span>
+        <span class="sidebar-text">代码练习册</span>
+      </a></li>
+      <li><a href="https://github.com/meisijiya/DIANCAN-SYSTEM" target="_blank" class="sidebar-link">
+        <span class="sidebar-icon">⭐</span>
+        <span class="sidebar-text">GitHub 仓库</span>
+      </a></li>
+    </ul>
   </div>
-</nav>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">部署步骤</div>
+    <ul>
+      <li><a href="#step-0" class="sidebar-link">
+        <span class="sidebar-icon">0</span>
+        <span class="sidebar-text">装 Docker</span>
+      </a></li>
+      <li><a href="#step-1" class="sidebar-link">
+        <span class="sidebar-icon">1</span>
+        <span class="sidebar-text">启动中间件</span>
+      </a></li>
+      <li><a href="#step-15" class="sidebar-link">
+        <span class="sidebar-icon">1.5</span>
+        <span class="sidebar-text">启动后端（WSL2）</span>
+      </a></li>
+      <li><a href="#step-2" class="sidebar-link">
+        <span class="sidebar-icon">2</span>
+        <span class="sidebar-text">启动后端（命令行）</span>
+      </a></li>
+      <li><a href="#step-3" class="sidebar-link">
+        <span class="sidebar-icon">3</span>
+        <span class="sidebar-text">管理端+小程序</span>
+      </a></li>
+      <li><a href="#commands" class="sidebar-link">
+        <span class="sidebar-icon">⌨</span>
+        <span class="sidebar-text">常用命令</span>
+      </a></li>
+      <li><a href="#troubleshoot" class="sidebar-link">
+        <span class="sidebar-icon">🔍</span>
+        <span class="sidebar-text">故障排查</span>
+      </a></li>
+    </ul>
+  </div>
+
+  <div class="sidebar-footer">
+    <span class="sidebar-text">© 2026 diancan-system</span><br>
+    <span class="sidebar-text">MIT License</span>
+  </div>
+</aside>
 
 <main class="container">
 
@@ -1114,189 +1419,141 @@ sudo nano /etc/docker/daemon.json
 </div>
 </footer>
 
-<script>  /* ============================================
-     T1 交互逻辑（vanilla JS，无依赖）
-     - 滚动进度条
-     - 回到顶部按钮显隐
-     - 代码块复制按钮
-     - 侧边目录高亮当前章节
-     ============================================ */
+
+
+
+<!-- 桌面端收起/展开按钮 -->
+<button class="sidebar-toggle" aria-label="收起/展开侧边栏" title="收起侧边栏">«</button>
+
+<!-- 移动端汉堡按钮 -->
+<button class="sidebar-toggle-mobile" aria-label="打开菜单">☰</button>
+
+<!-- 移动端遮罩 -->
+<div class="sidebar-backdrop"></div>
+
+<script>
+
+  // ============ Sidebar 收起/展开逻辑 ============
   (function() {
-    // 1. 注入进度条 + 回到顶部按钮 DOM
-    const progress = document.createElement('div');
-    progress.id = 'progress-bar';
-    document.body.appendChild(progress);
+    const STORAGE_KEY = 'diancan-sidebar-state';
+    const body = document.body;
+    const sidebar = document.querySelector('aside.sidebar');
+    if (!sidebar) return;
 
-    const backTop = document.createElement('button');
-    backTop.id = 'back-to-top';
-    backTop.title = '回到顶部';
-    backTop.setAttribute('aria-label', '回到顶部');
-    backTop.textContent = '↑';
-    document.body.appendChild(backTop);
-
-    backTop.addEventListener('click', () => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-
-    // 2. 给所有 <pre> 加复制按钮
-    document.querySelectorAll('pre').forEach(pre => {
-      const btn = document.createElement('button');
-      btn.className = 'copy-btn';
-      btn.textContent = '复制';
-      btn.setAttribute('aria-label', '复制代码');
-      pre.appendChild(btn);
-
-      btn.addEventListener('click', async () => {
-        const code = pre.querySelector('code');
-        const text = code ? code.innerText : pre.innerText;
-        try {
-          await navigator.clipboard.writeText(text);
-          btn.textContent = '✓ 已复制';
-          btn.classList.add('copied');
-          setTimeout(() => {
-            btn.textContent = '复制';
-            btn.classList.remove('copied');
-          }, 1800);
-        } catch (e) {
-          btn.textContent = '复制失败';
-          setTimeout(() => { btn.textContent = '复制'; }, 1800);
-        }
-      });
-    });
-
-    // 3. 滚动监听：进度条 + 回到顶部按钮显隐
-    let ticking = false;
-    function onScroll() {
-      const docH = document.documentElement.scrollHeight - window.innerHeight;
-      const scrolled = window.scrollY;
-      const ratio = docH > 0 ? Math.min(scrolled / docH, 1) : 0;
-      progress.style.transform = `scaleX(${ratio})`;
-
-      if (scrolled > 400) backTop.classList.add('visible');
-      else backTop.classList.remove('visible');
+    // 响应式判断
+    function getAutoState() {
+      if (window.innerWidth < 768) return 'hidden';
+      if (window.innerWidth < 1280) return 'collapsed';
+      return 'expanded';
     }
-    window.addEventListener('scroll', () => {
-      if (!ticking) {
-        requestAnimationFrame(() => {
-          onScroll();
-          ticking = false;
-        });
-        ticking = true;
-      }
-    }, { passive: true });
-    onScroll();
 
-    // 4. 侧边目录高亮当前章节（scroll-spy）
-    const sideLinks = document.querySelectorAll('aside.toc-side a');
-    if (sideLinks.length > 0) {
-      const targets = Array.from(sideLinks).map(a => {
+    // 应用状态
+    function applyState(state, skipStorage) {
+      body.setAttribute('data-sidebar', state);
+      // 同步更新按钮文字（桌面端 toggle）
+      const btn = document.querySelector('.sidebar-toggle');
+      if (btn) {
+        if (state === 'collapsed') {
+          btn.textContent = '»';
+          btn.title = '展开侧边栏';
+        } else if (state === 'expanded' || state === 'expanded-mobile') {
+          btn.textContent = '«';
+          btn.title = '收起侧边栏';
+        }
+      }
+      if (!skipStorage && state !== 'hidden' && state !== 'expanded-mobile') {
+        try { localStorage.setItem(STORAGE_KEY, state); } catch(e) {}
+      }
+    }
+
+    // 初始化
+    const stored = (() => { try { return localStorage.getItem(STORAGE_KEY); } catch(e) { return null; } })();
+    const auto = getAutoState();
+    // 用户手动设置优先，否则按响应式默认
+    if (stored && (stored === 'expanded' || stored === 'collapsed')) {
+      // 桌面/平板尊重手动，平板/桌面边界自动响应
+      if ((stored === 'expanded' && window.innerWidth >= 1280) ||
+          (stored === 'collapsed' && window.innerWidth >= 768)) {
+        applyState(stored);
+      } else {
+        applyState(auto);
+      }
+    } else {
+      applyState(auto);
+    }
+
+    // 桌面端收起/展开按钮
+    const toggleBtn = document.querySelector('.sidebar-toggle');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', () => {
+        const current = body.getAttribute('data-sidebar');
+        const next = (current === 'collapsed') ? 'expanded' : 'collapsed';
+        applyState(next);
+      });
+    }
+
+    // 移动端汉堡按钮
+    const mobileBtn = document.querySelector('.sidebar-toggle-mobile');
+    const backdrop = document.querySelector('.sidebar-backdrop');
+    if (mobileBtn) {
+      mobileBtn.addEventListener('click', () => {
+        const current = body.getAttribute('data-sidebar');
+        applyState(current === 'expanded-mobile' ? 'hidden' : 'expanded-mobile');
+      });
+    }
+    if (backdrop) {
+      backdrop.addEventListener('click', () => {
+        applyState('hidden');
+      });
+    }
+
+    // 响应窗口大小变化
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        const current = body.getAttribute('data-sidebar');
+        // 只在自动模式时跟随窗口
+        if (current === 'hidden' || current === 'expanded-mobile') return;
+        // 桌面/平板才允许 expanded/collapsed 切换
+        const newAuto = getAutoState();
+        if (newAuto !== 'hidden') {
+          const stored = (() => { try { return localStorage.getItem(STORAGE_KEY); } catch(e) { return null; } })();
+          if (!stored) applyState(newAuto);
+        }
+      }, 150);
+    });
+
+    // 当前章节高亮（scroll-spy）
+    const links = sidebar.querySelectorAll('.sidebar-link[href^="#"]');
+    if (links.length > 0) {
+      const targets = Array.from(links).map(a => {
         const id = a.getAttribute('href').replace('#', '');
-        return document.getElementById(id);
-      }).filter(Boolean);
+        return { link: a, el: document.getElementById(id) };
+      }).filter(t => t.el);
 
       function updateActive() {
         const y = window.scrollY + 120;
         let activeIdx = -1;
         for (let i = 0; i < targets.length; i++) {
-          if (targets[i].offsetTop <= y) activeIdx = i;
+          if (targets[i].el.offsetTop <= y) activeIdx = i;
         }
-        sideLinks.forEach(a => a.classList.remove('active'));
-        if (activeIdx >= 0) sideLinks[activeIdx].classList.add('active');
+        links.forEach(a => a.classList.remove('active'));
+        if (activeIdx >= 0) targets[activeIdx].link.classList.add('active');
       }
-      window.addEventListener('scroll', updateActive, { passive: true });
+      window.addEventListener('scroll', () => {
+        if (!updateActive.ticking) {
+          requestAnimationFrame(() => {
+            updateActive();
+            updateActive.ticking = false;
+          });
+          updateActive.ticking = true;
+        }
+      }, { passive: true });
       updateActive();
     }
   })();
-</script>
-<script>  /* ============================================
-     T1 交互逻辑（vanilla JS，无依赖）
-     - 滚动进度条
-     - 回到顶部按钮显隐
-     - 代码块复制按钮
-     - 侧边目录高亮当前章节
-     ============================================ */
-  (function() {
-    const progress = document.createElement('div');
-    progress.id = 'progress-bar';
-    document.body.appendChild(progress);
 
-    const backTop = document.createElement('button');
-    backTop.id = 'back-to-top';
-    backTop.title = '回到顶部';
-    backTop.setAttribute('aria-label', '回到顶部');
-    backTop.textContent = '↑';
-    document.body.appendChild(backTop);
-
-    backTop.addEventListener('click', () => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-
-    document.querySelectorAll('pre').forEach(pre => {
-      const btn = document.createElement('button');
-      btn.className = 'copy-btn';
-      btn.textContent = 'copy';
-      btn.setAttribute('aria-label', '复制代码');
-      pre.appendChild(btn);
-
-      btn.addEventListener('click', async () => {
-        const code = pre.querySelector('code');
-        const text = code ? code.innerText : pre.innerText;
-        try {
-          await navigator.clipboard.writeText(text);
-          btn.textContent = '✓ copied';
-          btn.classList.add('copied');
-          setTimeout(() => {
-            btn.textContent = 'copy';
-            btn.classList.remove('copied');
-          }, 1800);
-        } catch (e) {
-          btn.textContent = 'failed';
-          setTimeout(() => { btn.textContent = 'copy'; }, 1800);
-        }
-      });
-    });
-
-    let ticking = false;
-    function onScroll() {
-      const docH = document.documentElement.scrollHeight - window.innerHeight;
-      const scrolled = window.scrollY;
-      const ratio = docH > 0 ? Math.min(scrolled / docH, 1) : 0;
-      progress.style.transform = `scaleX(${ratio})`;
-
-      if (scrolled > 400) backTop.classList.add('visible');
-      else backTop.classList.remove('visible');
-    }
-    window.addEventListener('scroll', () => {
-      if (!ticking) {
-        requestAnimationFrame(() => {
-          onScroll();
-          ticking = false;
-        });
-        ticking = true;
-      }
-    }, { passive: true });
-    onScroll();
-
-    const sideLinks = document.querySelectorAll('aside.toc-side a');
-    if (sideLinks.length > 0) {
-      const targets = Array.from(sideLinks).map(a => {
-        const id = a.getAttribute('href').replace('#', '');
-        return document.getElementById(id);
-      }).filter(Boolean);
-
-      function updateActive() {
-        const y = window.scrollY + 120;
-        let activeIdx = -1;
-        for (let i = 0; i < targets.length; i++) {
-          if (targets[i].offsetTop <= y) activeIdx = i;
-        }
-        sideLinks.forEach(a => a.classList.remove('active'));
-        if (activeIdx >= 0) sideLinks[activeIdx].classList.add('active');
-      }
-      window.addEventListener('scroll', updateActive, { passive: true });
-      updateActive();
-    }
-  })();
 </script>
 </body>
 </html>
